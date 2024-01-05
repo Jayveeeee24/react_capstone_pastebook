@@ -14,6 +14,8 @@ import { NotificationScreen } from "../screens/stacks/NotificationScreen";
 import { FriendRequestScreen } from "../screens/stacks/FriendRequestScreen";
 import { Image, TouchableOpacity, View } from "react-native";
 import { NotificationIconWithBadge } from "../components/NotificationWithBadge";
+import AuthNavigation from './AuthStack';
+import { images } from '../utils/Images';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -103,8 +105,8 @@ export default function AppNavigation() {
           headerLeft: () => (
             <View style={{ flexDirection: 'row', marginLeft: 10}}>
               <Image
-                source={require('../../assets/images/logo_wide_dark.png')} // Replace with the actual path to your image
-                style={{ width: 100, height: 30 }} // Adjust the width and height according to your needs
+                source={images.logo_wide_dark} 
+                style={{ width: 120, height: 35 }} 
               />
             </View>
           ),
@@ -120,7 +122,8 @@ export default function AppNavigation() {
         headerShown: route.name === 'Notifications' || route.name === 'FriendRequest',
         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
       })}>
-        <Stack.Screen name="Pastebook" component={MyBottomTab} />
+        {/* <Stack.Screen name="Pastebook" component={MyBottomTab} /> */}
+        <Stack.Screen name="Pastebook" component={AuthNavigation} />
         <Stack.Screen name="Notifications" component={NotificationScreen} />
         <Stack.Screen name="FriendRequest" component={FriendRequestScreen} options={{ title: 'Friend Requests' }} />
       </Stack.Navigator>
