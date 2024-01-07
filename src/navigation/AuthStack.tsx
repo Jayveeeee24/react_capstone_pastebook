@@ -1,5 +1,4 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { View } from "react-native";
 import { LoginScreen } from "../screens/stacks/LoginScreen";
 import { RegisterScreen } from "../screens/stacks/RegisterScreen";
 
@@ -7,9 +6,9 @@ import { RegisterScreen } from "../screens/stacks/RegisterScreen";
 const Stack = createNativeStackNavigator();
 export default function AuthNavigation(){
     return( 
-        <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Navigator screenOptions={{headerShown: false, animation: 'slide_from_bottom'}}>
             <Stack.Screen name="Login" component={LoginScreen}/>
-            <Stack.Screen name="Onboarding" component={RegisterScreen}/>
+            <Stack.Screen name="Register" component={RegisterScreen}/>
         </Stack.Navigator>
     );
 }

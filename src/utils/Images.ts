@@ -7,5 +7,8 @@ export const images = {
     logo_dark: require('../../assets/images/logo_dark.png'),
     logo_light: require('../../assets/images/logo_light.png'),
 
+    register: require('../../assets/images/register.png'),
+
+
 
 }
