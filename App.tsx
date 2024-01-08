@@ -6,7 +6,10 @@ import {
 import {
   Colors
 } from 'react-native/Libraries/NewAppScreen';
-import AppNavigation from './src/navigation/AppStack';
+import AppStack from './src/navigation/AppStack';
+import AuthStack from './src/navigation/AuthStack';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { NavigationContainer } from '@react-navigation/native';
 
 
 function App(): React.JSX.Element {
@@ -17,7 +20,12 @@ function App(): React.JSX.Element {
   };
 
   return (
-    <AppNavigation/>
+    <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
+      <NavigationContainer>
+        {/* <AuthStack /> */}
+        <AuthStack />
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
 

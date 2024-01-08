@@ -14,7 +14,7 @@ import { NotificationScreen } from "../screens/stacks/NotificationScreen";
 import { FriendRequestScreen } from "../screens/stacks/FriendRequestScreen";
 import { Image, TouchableOpacity, View } from "react-native";
 import { NotificationIconWithBadge } from "../components/NotificationWithBadge";
-import AuthNavigation from './AuthStack';
+import AuthStack from './AuthStack';
 import { images } from '../utils/Images';
 
 const Tab = createBottomTabNavigator();
@@ -59,7 +59,7 @@ const getTabBarIcon = (route: any, focused: any, color: any) => {
   }
 };
 
-export default function AppNavigation() {
+export default function AppStack() {
 
   function MyBottomTab() {
     return (
@@ -103,10 +103,10 @@ export default function AppNavigation() {
             </View>
           ),
           headerLeft: () => (
-            <View style={{ flexDirection: 'row', marginLeft: 10}}>
+            <View style={{ flexDirection: 'row', marginLeft: 10 }}>
               <Image
-                source={images.logo_wide_dark} 
-                style={{ width: 120, height: 35 }} 
+                source={images.logo_wide_dark}
+                style={{ width: 120, height: 35 }}
               />
             </View>
           ),
@@ -117,16 +117,13 @@ export default function AppNavigation() {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={({ route }) => ({
-        headerShown: route.name === 'Notifications' || route.name === 'FriendRequest',
-        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-      })}>
-        {/* <Stack.Screen name="Pastebook" component={MyBottomTab} /> */}
-        <Stack.Screen name="Pastebook" component={AuthNavigation} />
-        <Stack.Screen name="Notifications" component={NotificationScreen} />
-        <Stack.Screen name="FriendRequest" component={FriendRequestScreen} options={{ title: 'Friend Requests' }} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator screenOptions={({ route }) => ({
+      headerShown: route.name === 'Notifications' || route.name === 'FriendRequest',
+      cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+    })}>
+      <Stack.Screen name="Pastebook" component={MyBottomTab} />
+      <Stack.Screen name="Notifications" component={NotificationScreen} />
+      <Stack.Screen name="FriendRequest" component={FriendRequestScreen} options={{ title: 'Friend Requests' }} />
+    </Stack.Navigator>
   );
 }

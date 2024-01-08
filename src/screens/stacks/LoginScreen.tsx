@@ -79,7 +79,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                             console.log('lol')
                             //add the logic of login submit
                         }
-                        else{
+                        else {
                             console.log("not so fast")
                         }
 
@@ -98,6 +98,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
 
             </TouchableWithoutFeedback>
         </SafeAreaView>
+
     );
 }
 
