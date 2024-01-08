@@ -10,6 +10,7 @@ import AppStack from './src/navigation/AppStack';
 import AuthStack from './src/navigation/AuthStack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
+import { AuthProvider } from './src/context/AuthContext';
 
 
 function App(): React.JSX.Element {
@@ -20,12 +21,14 @@ function App(): React.JSX.Element {
   };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
-      <NavigationContainer>
-        {/* <AuthStack /> */}
-        <AuthStack />
-      </NavigationContainer>
-    </GestureHandlerRootView>
+    <AuthProvider>
+      <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
+        <NavigationContainer>
+          {/* <AuthStack /> */}
+          <AuthStack />
+        </NavigationContainer>
+      </GestureHandlerRootView>
+    </AuthProvider>
   );
 }
 

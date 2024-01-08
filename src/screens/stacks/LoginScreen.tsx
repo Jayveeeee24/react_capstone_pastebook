@@ -2,8 +2,9 @@ import { Image, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "../../utils/Images";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import { AuthContext } from "../../context/AuthContext";
 
 interface LoginScreenProps {
     navigation: any;
@@ -11,6 +12,8 @@ interface LoginScreenProps {
 }
 
 export const LoginScreen = ({ navigation }: LoginScreenProps) => {
+    const {test} = useContext(AuthContext);
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -87,6 +90,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                     style={[styles.buttonContainer, { marginTop: 35, backgroundColor: '#3373B0' }]}>
                     <Text style={[styles.buttonText, styles.text]}>Login</Text>
                 </TouchableOpacity>
+                <Text>{test}</Text>
 
                 <TouchableOpacity
                     onPress={() => {
