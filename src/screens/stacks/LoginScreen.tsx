@@ -13,7 +13,9 @@ interface LoginScreenProps {
 export const LoginScreen = ({ navigation }: LoginScreenProps) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+
+    const [isValidEmail, setIsValidEmail] = useState(true);
+    const [isPasswordValid, setIsPasswordValid] = useState(true);
 
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
@@ -39,17 +41,21 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
 
                 </View>
 
-                <View style={[styles.credentialContainer, { marginBottom: 25 }]}>
+                <View style={[styles.credentialContainer, { marginBottom: isValidEmail ? 20 : 0 }]}>
                     <MaterialIcons name="alternate-email" size={20} color="#666" style={{ marginHorizontal: 5 }} />
                     <TextInput placeholder="Email Address" placeholderTextColor={'#666'} style={[styles.text, styles.credentialText]} value={email} onChangeText={setEmail} />
                 </View>
-
+                {!isValidEmail && (
+                    <Text style={styles.textValidation}>Please enter a valid email address.</Text>
+                )}
                 <View
-                    style={styles.credentialContainer}>
+                    style={[styles.credentialContainer, {}]}>
                     <MaterialIcons name="lock-outline" size={20} color="#666" style={{ marginHorizontal: 5 }} />
                     <TextInput placeholder="Password" placeholderTextColor={'#666'} secureTextEntry={true} style={[styles.text, styles.credentialText]} value={password} onChangeText={setPassword} />
                 </View>
-
+                {!isPasswordValid && (
+                    <Text style={styles.textValidation}>Please enter a valid password</Text>
+                )}
                 <View
                     style={styles.forgottenPassContainer}>
                     <TouchableOpacity onPress={() => {
@@ -60,7 +66,24 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                 </View>
 
                 <TouchableOpacity
-                    onPress={() => { }}
+                    onPress={() => {
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        const isValid = emailRegex.test(email);
+                        setIsValidEmail(isValid);
+
+
+                        const trimmedPassword = password.trim();
+                        setIsPasswordValid(!!trimmedPassword && trimmedPassword.length >= 8);
+
+                        if (!!isValid && !!trimmedPassword) {
+                            console.log('lol')
+                            //add the logic of login submit
+                        }
+                        else{
+                            console.log("not so fast")
+                        }
+
+                    }}
                     style={[styles.buttonContainer, { marginTop: 35, backgroundColor: '#3373B0' }]}>
                     <Text style={[styles.buttonText, styles.text]}>Login</Text>
                 </TouchableOpacity>
@@ -121,6 +144,9 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white', fontSize: 20, textAlign: 'center'
     },
+    textValidation: {
+        color: 'red', marginStart: 30
+    }
 
 
 });

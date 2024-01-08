@@ -1,4 +1,4 @@
-import { Button, Image, Keyboard, Pressable, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Button, Image, Keyboard, LayoutAnimation, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { images } from "../../utils/Images";
 import { useEffect, useRef, useState } from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -29,8 +29,11 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
     const [isFirstNameValid, setIsFirstNameValid] = useState(true);
     const [isLastNameValid, setIsLastNameValid] = useState(true);
     const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
+    const [isGenderValid, setIsGenderValid] = useState(true);
+    const [isDateOfBirthValid, setIsDateOfBirthValid] = useState(true);
 
-    const [isPasswordValid, setIsPasswordValid] = useState(true)
+    const [isPasswordValid, setIsPasswordValid] = useState(true);
+    const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
 
 
     const DropdownComponent = () => {
@@ -57,25 +60,32 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         };
 
         return (
-            <Dropdown
-                style={styles.dropdown}
-                placeholderStyle={styles.textStyle}
-                selectedTextStyle={styles.textStyle}
-                iconStyle={styles.iconStyle}
-                data={genders}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                placeholder="Gender"
-                value={gender}
-                onChange={item => {
-                    setGender(item.value);
-                }}
-                renderLeftIcon={() => (
-                    <MaterialCommunityIcons style={styles.icon} color="black" name="gender-male-female" size={20} />
+            <>
+                <Dropdown
+                    style={styles.dropdown}
+                    placeholderStyle={styles.textStyle}
+                    selectedTextStyle={styles.textStyle}
+                    iconStyle={styles.iconStyle}
+                    data={genders}
+                    maxHeight={300}
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Gender"
+                    value={gender}
+                    onChange={item => {
+                        setGender(item.value);
+                    }}
+                    renderLeftIcon={() => (
+                        <MaterialCommunityIcons style={styles.icon} color="black" name="gender-male-female" size={20} />
+                    )}
+                    renderItem={renderItem}
+                />
+                {!isGenderValid && (
+                    <Text style={[styles.textValidation, { marginTop: 5 }]}>Please choose a valid gender</Text>
                 )}
-                renderItem={renderItem}
-            />
+            </>
+
+
         );
     }
     const DatePickerComponent = () => {
@@ -111,6 +121,9 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                         </Card.Content>
                     </Card>
                 </TouchableWithoutFeedback>
+                {!isDateOfBirthValid && (
+                    <Text style={[styles.textValidation, { marginTop: 5 }]}>Please enter a valid birthdate (13 y.o. up)</Text>
+                )}
             </View>
         );
     }
@@ -118,6 +131,8 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
     const validateEmail = async () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isValid = emailRegex.test(email);
+
+        //change this and add in verifying if the email is already existing
         setIsValidEmail(isValid);
 
         if (isValid) {
@@ -134,13 +149,36 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         const trimmedPhoneNumber = phoneNumber.trim();
         setIsPhoneNumberValid(!!trimmedPhoneNumber);
 
-        if (!!trimmedFirstName && !!trimmedLastName && !!trimmedPhoneNumber) {
+        const trimmedGender = gender.trim();
+        setIsGenderValid(!!trimmedGender);
+
+        const currentDate = new Date();
+        const userBirthDate = new Date(dateOfBirth);
+        const age = currentDate.getFullYear() - userBirthDate.getFullYear();
+
+        setIsDateOfBirthValid(age >= 13);
+
+        if (!!trimmedFirstName && !!trimmedLastName && !!trimmedPhoneNumber && !!trimmedGender && age >= 13) {
+            handleNext();
+        }
+
+    }
+    const validatePassword = async () => {
+        const trimmedPassword = password.trim();
+        setIsPasswordValid(!!trimmedPassword && trimmedPassword.length >= 8);
+
+        const trimmedConfirmPassword = confirmPassword.trim();
+        setIsConfirmPasswordValid(!!trimmedConfirmPassword && trimmedConfirmPassword === trimmedPassword);
+
+        if (!!trimmedPassword && !!trimmedConfirmPassword && trimmedPassword === trimmedConfirmPassword) {
             handleNext();
         }
 
     }
 
     const handleNext = () => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
         if (currentView === 'EmailView') {
             setCurrentView('OtherDetailsView');
             setProgress(0.5);
@@ -148,6 +186,8 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
             setCurrentView('PasswordView');
             setProgress(0.9);
         } else {
+            //submit the form
+
         }
     };
     const getButtonText = () => {
@@ -167,7 +207,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
             case 'EmailView':
                 return (
                     <>
-                        <View style={[styles.credentialContainer, {}]}>
+                        <View style={[styles.credentialContainer, { marginBottom: isValidEmail ? 10 : 0 }]}>
                             <MaterialIcons name="alternate-email" size={20} color="#666" style={{ marginHorizontal: 5 }} />
                             <TextInput
                                 placeholder="Email Address"
@@ -178,59 +218,64 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                             />
                         </View>
                         {!isValidEmail && (
-                            <Text style={{ color: 'red', marginStart: 30 }}>Please enter a valid email address.</Text>
+                            <Text style={styles.textValidation}>Please enter a valid email address.</Text>
                         )}
                     </>
                 );
             case 'OtherDetailsView':
                 return (
                     <>
-                        <View style={[styles.credentialContainer, { marginBottom: 10 }]}>
-                            <MaterialCommunityIcons name="account-box-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput placeholder="First Name" style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={firstName} onChangeText={setFirstName} />
-                        </View>
-                        {!isFirstNameValid && (
-                            <Text style={{ color: 'red', marginStart: 30 }}>Please enter a valid first name</Text>
-                        )}
-                        <View style={[styles.credentialContainer, { marginBottom: 10 }]}>
-                            <MaterialCommunityIcons name="account-box-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput placeholder="Last Name" style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={lastName} onChangeText={setLastName} />
-                        </View>
-                        {!isLastNameValid && (
-                            <Text style={{ color: 'red', marginStart: 30 }}>Please enter a valid first name</Text>
-                        )}
-                        <View style={[styles.credentialContainer, {}]}>
-                            <MaterialCommunityIcons name="phone-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput placeholder="Phone Number" style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} keyboardType="phone-pad" value={phoneNumber} onChangeText={setPhoneNumber} />
-                        </View>
-                        {!isPhoneNumberValid && (
-                            <Text style={{ color: 'red', marginStart: 30 }}>Please enter a valid first name</Text>
-                        )}
+                        <ScrollView>
+                            <View style={[styles.credentialContainer, { marginBottom: isFirstNameValid ? 10 : 0 }]}>
+                                <MaterialCommunityIcons name="account-box-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
+                                <TextInput placeholder="First Name" style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={firstName} onChangeText={setFirstName} />
+                            </View>
+                            {!isFirstNameValid && (
+                                <Text style={styles.textValidation}>Please enter a valid first name</Text>
+                            )}
+                            <View style={[styles.credentialContainer, { marginBottom: isLastNameValid ? 10 : 0 }]}>
+                                <MaterialCommunityIcons name="account-box-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
+                                <TextInput placeholder="Last Name" style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={lastName} onChangeText={setLastName} />
+                            </View>
+                            {!isLastNameValid && (
+                                <Text style={styles.textValidation}>Please enter a valid last name</Text>
+                            )}
+                            <View style={[styles.credentialContainer, {}]}>
+                                <MaterialCommunityIcons name="phone-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
+                                <TextInput placeholder="Phone Number" style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} keyboardType="phone-pad" value={phoneNumber} onChangeText={setPhoneNumber} />
+                            </View>
+                            {!isPhoneNumberValid && (
+                                <Text style={styles.textValidation}>Please enter a valid phone number</Text>
+                            )}
 
-                        <DropdownComponent />
-                        <DatePickerComponent />
+                            <DropdownComponent />
+                            <DatePickerComponent />
+                        </ScrollView>
                     </>
                 );
             case 'PasswordView':
                 return (
                     <>
-                        <View style={[styles.credentialContainer, { marginBottom: 15 }]}>
+                        <View style={[styles.credentialContainer, { marginBottom: isPasswordValid ? 10 : 0 }]}>
                             <MaterialIcons name="lock-outline" size={20} color="#666" style={{ marginHorizontal: 5 }} />
                             <TextInput placeholder="Password" secureTextEntry style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={password} onChangeText={setPassword} />
                         </View>
+                        {!isPasswordValid && (
+                            <Text style={styles.textValidation}>Please enter a valid password (min 8 chars)</Text>
+                        )}
                         <View style={[styles.credentialContainer, {}]}>
                             <MaterialIcons name="lock-outline" size={20} color="#666" style={{ marginHorizontal: 5 }} />
                             <TextInput placeholder="Confirm Password" secureTextEntry style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={confirmPassword} onChangeText={setConfirmPassword} />
                         </View>
+                        {!isConfirmPasswordValid && (
+                            <Text style={styles.textValidation}>Passwords do not match</Text>
+                        )}
                     </>
                 );
             default:
                 return null;
         }
     };
-
-
-
 
 
     return (
@@ -273,7 +318,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                                 validateDetails();
                             }
                             else {
-                                handleNext();
+                                validatePassword();
                             }
                         }}
                         style={[styles.buttonContainer, { marginTop: 20, backgroundColor: '#3373B0' }]}>
@@ -381,6 +426,9 @@ const styles = StyleSheet.create({
         marginBottom: 30,
         height: 8,
         borderRadius: 5
+    },
+    textValidation: {
+        color: 'red', marginStart: 30
     }
 
 
