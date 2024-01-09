@@ -1,9 +1,11 @@
 import axios from 'axios';
 import React, { createContext, ReactNode, useState } from 'react';
-import { BASE_URL } from '../utils/config';
+import { BASE_URL, storage } from '../utils/config';
 
 interface AuthContextProps {
   register: (firstName: string, lastName: string, email: string, password: string, birthdate: Date, sex: string, phoneNumber: string) => void;
+  userInfo: {};
+  isLoading: boolean
 }
 
 interface AuthProviderProps {
@@ -12,13 +14,15 @@ interface AuthProviderProps {
 
 export const AuthContext = createContext<AuthContextProps>({
   register: () => { },
+  userInfo: {},
+  isLoading: false
 });
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [userInfo, setUserInfo] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const register = (
     firstName: string,
     lastName: string,
@@ -42,10 +46,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       .then((response) => {
         let userInfo = response.data;
         setUserInfo(userInfo);
-        console.log(response.data);
+        storage.set('userInfo', JSON.stringify(userInfo));
+        setIsLoading(false);
       })
       .catch((e) => {
         console.log(`error ${e}`);
+        setIsLoading(false);
       });
   };
 
@@ -58,5 +64,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   //   register,
   // };
 
-  return <AuthContext.Provider value={{ register }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{ isLoading, userInfo, register }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

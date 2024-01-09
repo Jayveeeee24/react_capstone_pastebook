@@ -1,10 +1,10 @@
 import { Image, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { images } from "../../utils/Images";
+import { images } from "../../../utils/Images";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import React, { useContext, useState } from "react";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
-import { AuthContext } from "../../context/AuthContext";
+import { AuthContext } from "../../../context/AuthContext";
 
 interface LoginScreenProps {
     navigation: any;
@@ -73,8 +73,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                         const isValid = emailRegex.test(email);
                         setIsValidEmail(isValid);
-
-
+                        
                         const trimmedPassword = password.trim();
                         setIsPasswordValid(!!trimmedPassword && trimmedPassword.length >= 8);
 
