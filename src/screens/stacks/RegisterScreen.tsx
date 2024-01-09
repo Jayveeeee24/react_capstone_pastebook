@@ -1,11 +1,12 @@
-import { Button, Image, Keyboard, LayoutAnimation, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Image, Keyboard, LayoutAnimation, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { images } from "../../utils/Images";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Card, ProgressBar } from "react-native-paper";
 import { Dropdown } from "react-native-element-dropdown";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import { AuthContext } from "../../context/AuthContext";
 
 interface RegisterScreenProps {
     navigation: any;
@@ -13,6 +14,8 @@ interface RegisterScreenProps {
 }
 
 export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
+    const {register} = useContext(AuthContext);
+
     const [currentView, setCurrentView] = useState('EmailView');
     const [progress, setProgress] = useState(0.3);
 
@@ -186,8 +189,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
             setCurrentView('PasswordView');
             setProgress(0.9);
         } else {
-            //submit the form
-
+            register(firstName, lastName, email, password, dateOfBirth, gender, phoneNumber);
         }
     };
     const getButtonText = () => {

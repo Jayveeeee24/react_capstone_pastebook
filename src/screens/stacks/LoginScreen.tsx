@@ -12,7 +12,7 @@ interface LoginScreenProps {
 }
 
 export const LoginScreen = ({ navigation }: LoginScreenProps) => {
-    const {test} = useContext(AuthContext);
+    // const {test} = useContext(AuthContext);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -90,7 +90,6 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                     style={[styles.buttonContainer, { marginTop: 35, backgroundColor: '#3373B0' }]}>
                     <Text style={[styles.buttonText, styles.text]}>Login</Text>
                 </TouchableOpacity>
-                <Text>{test}</Text>
 
                 <TouchableOpacity
                     onPress={() => {
