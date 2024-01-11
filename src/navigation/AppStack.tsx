@@ -119,7 +119,7 @@ export default function AppStack() {
   return (
     <Stack.Navigator screenOptions={({ route }) => ({
       headerShown: route.name === 'Notifications' || route.name === 'FriendRequest',
-      cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+      cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, 
     })}>
       <Stack.Screen name="Pastebook" component={MyBottomTab} />
       <Stack.Screen name="Notifications" component={NotificationScreen} />

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { SafeAreaView, Text, View } from "react-native";
 
 export const HomeTab = ({navigation}: any) => {

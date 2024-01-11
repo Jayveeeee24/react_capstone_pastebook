@@ -1,12 +1,13 @@
-import { Image, Keyboard, LayoutAnimation, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Image, Keyboard, LayoutAnimation, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { images } from "../../../utils/Images";
 import { useContext, useState } from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { ActivityIndicator, Card, ProgressBar } from "react-native-paper";
+import { Card, ProgressBar } from "react-native-paper";
 import { Dropdown } from "react-native-element-dropdown";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { AuthContext } from "../../../context/AuthContext";
+import ToastManager, { Toast } from "toastify-react-native";
 
 interface RegisterScreenProps {
     navigation: any;
@@ -14,7 +15,7 @@ interface RegisterScreenProps {
 }
 
 export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
-    const {isLoading, register} = useContext(AuthContext);
+    const { register } = useContext(AuthContext);
 
     const [currentView, setCurrentView] = useState('EmailView');
     const [progress, setProgress] = useState(0.3);
@@ -189,7 +190,19 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
             setCurrentView('PasswordView');
             setProgress(0.9);
         } else {
-            register(firstName, lastName, email, password, dateOfBirth, gender, phoneNumber);
+            const result = register ? register(firstName, lastName, email, password, dateOfBirth, gender, phoneNumber) : undefined;
+            if (result) {
+                Toast.success('Sign up success!', 'top');
+                setTimeout(() => {
+                    navigation.navigate({
+                        name: 'Login',
+                        params: { success: true },
+                        merge: true,
+                    });
+                }, 2500);
+            } else {
+                Toast.warn('Sign up error, please try again', 'top');
+            }
         }
     };
     const getButtonText = () => {
@@ -218,6 +231,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                                 onChangeText={setEmail}
                                 placeholderTextColor={'#666'}
                             />
+
                         </View>
                         {!isValidEmail && (
                             <Text style={styles.textValidation}>Please enter a valid email address.</Text>
@@ -285,8 +299,10 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
             <TouchableWithoutFeedback
                 onPress={() => Keyboard.dismiss()}>
                 <View>
+                    <ToastManager />
+
                     <View style={{ alignItems: 'center' }}>
-                        {isLoading && <ActivityIndicator animating={true} size="large" color="#0000ff" />}
+                        {/* TODO: STILL NEEDS A LOADER AND MODAL {isSuccess && <ActivityIndicator animating={true} size="large" color="#0000ff" />} */}
                         <Image
                             source={images.logo_wide_dark}
                             style={{ width: 130, height: 35, marginBottom: 15 }}
@@ -313,6 +329,8 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
                     {renderView()}
 
+
+
                     <TouchableOpacity
                         onPress={() => {
                             if (currentView == 'EmailView') {
@@ -327,6 +345,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                         style={[styles.buttonContainer, { marginTop: 20, backgroundColor: '#3373B0' }]}>
                         <Text style={[styles.buttonText, styles.text]}>{getButtonText()}</Text>
                     </TouchableOpacity>
+
 
 
                     <TouchableOpacity

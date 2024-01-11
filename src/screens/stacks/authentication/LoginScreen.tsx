@@ -1,10 +1,12 @@
-import { Image, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, Keyboard, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "../../../utils/Images";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import ToastManager, { Toast } from 'toastify-react-native'
 import { AuthContext } from "../../../context/AuthContext";
+
 
 interface LoginScreenProps {
     navigation: any;
@@ -12,7 +14,8 @@ interface LoginScreenProps {
 }
 
 export const LoginScreen = ({ navigation }: LoginScreenProps) => {
-    // const {test} = useContext(AuthContext);
+    const { login } = useContext(AuthContext);
+
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -24,6 +27,9 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
         <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
             <TouchableWithoutFeedback
                 onPress={() => Keyboard.dismiss()}>
+
+                <ToastManager />
+
                 <View style={{ alignItems: 'center' }}>
                     <Image
                         source={images.logo_wide_dark}
@@ -73,22 +79,22 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                         const isValid = emailRegex.test(email);
                         setIsValidEmail(isValid);
-                        
+
                         const trimmedPassword = password.trim();
                         setIsPasswordValid(!!trimmedPassword && trimmedPassword.length >= 8);
+                        const success = login ? login(email, password) : undefined;
 
-                        if (!!isValid && !!trimmedPassword) {
-                            console.log('lol')
-                            //add the logic of login submit
+                        if (success) {
+                            navigation.navigate('AppStack', 'Pastebook');
+                        } else {
+                            Toast.warn('Sign up error, please try again', 'top');
                         }
-                        else {
-                            console.log("not so fast")
-                        }
-
                     }}
-                    style={[styles.buttonContainer, { marginTop: 35, backgroundColor: '#3373B0' }]}>
+                    style={[styles.buttonContainer, { marginTop: 35, backgroundColor: '#3373B0' }]}
+                >
                     <Text style={[styles.buttonText, styles.text]}>Login</Text>
                 </TouchableOpacity>
+
 
                 <TouchableOpacity
                     onPress={() => {
@@ -149,7 +155,6 @@ const styles = StyleSheet.create({
     },
     textValidation: {
         color: 'red', marginStart: 30
-    }
-
+    },
 
 });
