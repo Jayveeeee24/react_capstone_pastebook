@@ -1,25 +1,21 @@
-import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { HomeTab } from "../screens/bottomTabs/HomeTab";
-import { SearchTab } from "../screens/bottomTabs/SearchTab";
-import { ProfileTab } from "../screens/bottomTabs/ProfileTab";
-import { CreatePostTab } from "../screens/bottomTabs/CreatePostTab";
 import { CardStyleInterpolators, StackNavigationProp, createStackNavigator } from "@react-navigation/stack";
-import { AlbumsTab } from "../screens/bottomTabs/AlbumsTab";
-
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-
-import { NotificationScreen } from "../screens/stacks/NotificationScreen";
-import { FriendRequestScreen } from "../screens/stacks/FriendRequestScreen";
+import { SearchTab } from "../screens/bottomTabs/SearchTab";
+import { CreatePostTab } from "../screens/bottomTabs/CreatePostTab";
+import { AlbumsTab } from "../screens/bottomTabs/AlbumsTab";
+import { ProfileTab } from "../screens/bottomTabs/ProfileTab";
+import { HomeTab } from "../screens/bottomTabs/HomeTab";
 import { Image, TouchableOpacity, View } from "react-native";
 import { NotificationIconWithBadge } from "../components/NotificationWithBadge";
-import AuthStack from './AuthStack';
-import { images } from '../utils/Images';
+import { images } from "../utils/Images";
+import { NotificationScreen } from "../screens/stacks/NotificationScreen";
+import { FriendRequestScreen } from "../screens/stacks/FriendRequestScreen";
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
-
 
 type HomeStackParamList = {
   Home: undefined;
@@ -29,59 +25,47 @@ type HomeStackParamList = {
 
 type HomeStackNavigationProp = StackNavigationProp<HomeStackParamList, 'Home'>;
 
-
 const getTabBarIcon = (route: any, focused: any, color: any) => {
   let iconName;
 
   if (route.name === 'HomeTab') {
     iconName = focused ? 'home-sharp' : 'home-outline';
 
-    return <Ionicons name={iconName} size={24} color={color} />;
+    return <Ionicons name={iconName} size={26} color={color} />;
   } else if (route.name === 'SearchTab') {
     iconName = focused ? 'search-sharp' : 'search-outline';
 
-    return <Ionicons name={iconName} size={24} color={color} />;
+    return <Ionicons name={iconName} size={26} color={color} />;
   } else if (route.name === 'ProfileTab') {
     iconName = focused ? 'account-circle' : 'account-circle-outline';
 
-    return <MaterialCommunityIcons name={iconName} size={24} color={color} />;
+    return <MaterialCommunityIcons name={iconName} size={26} color={color} />;
   } else if (route.name === 'CreatePostTab') {
     iconName = focused ? 'add-circle' : 'add-circle-outline';
 
-    return <Ionicons name={iconName} size={24} color={color} />;
+    return <Ionicons name={iconName} size={26} color={color} />;
   } else if (route.name === 'AlbumsTab') {
     iconName = focused ? 'albums-sharp' : 'albums-outline';
 
-    return <Ionicons name={iconName} size={24} color={color} />;
+    return <Ionicons name={iconName} size={26} color={color} />;
   }
   else {
     iconName = '';
   }
 };
 
-export default function AppStack() {
-
-  function MyBottomTab() {
-    return (
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color }) => getTabBarIcon(route, focused, color),
-          headerShown: false,
-          tabBarShowLabel: false,
-        })}
-      >
-        <Tab.Screen name="HomeTab" component={HomeStack} />
-        <Tab.Screen name="SearchTab" component={SearchTab} />
-        <Tab.Screen name="CreatePostTab" component={CreatePostTab} />
-        <Tab.Screen name="AlbumsTab" component={AlbumsTab} />
-        <Tab.Screen name="ProfileTab" component={ProfileTab} />
-      </Tab.Navigator>
-    );
-  }
+export const AppStack = () => {
 
   function HomeStack({ navigation }: { navigation: HomeStackNavigationProp }) {
     return (
-      <Stack.Navigator>
+      <Stack.Navigator screenOptions={({ route }) => ({
+        headerStyle: {
+          elevation: 0,
+          shadowOpacity: 0
+        },
+        // headerShown: route.name === 'Notifications' || route.name === 'FriendRequest',
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+      })}>
         <Stack.Screen name="Home" component={HomeTab} options={{
           title: '',
           headerRight: () => (
@@ -98,7 +82,7 @@ export default function AppStack() {
                   navigation.navigate('FriendRequest');
                 }}
               >
-                <MaterialCommunityIcons name="account-multiple-plus-outline" size={26} color="black" />
+                <MaterialCommunityIcons name="account-multiple-plus-outline" size={35} color="black" />
               </TouchableOpacity>
             </View>
           ),
@@ -111,19 +95,30 @@ export default function AppStack() {
             </View>
           ),
         }} />
+        <Stack.Screen name="Notifications" component={NotificationScreen} />
+        <Stack.Screen name="FriendRequest" component={FriendRequestScreen} options={{ title: 'Friend Requests' }} />
 
       </Stack.Navigator>
     );
   }
 
   return (
-    <Stack.Navigator screenOptions={({ route }) => ({
-      headerShown: route.name === 'Notifications' || route.name === 'FriendRequest',
-      cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, 
-    })}>
-      <Stack.Screen name="Pastebook" component={MyBottomTab} />
-      <Stack.Screen name="Notifications" component={NotificationScreen} />
-      <Stack.Screen name="FriendRequest" component={FriendRequestScreen} options={{ title: 'Friend Requests' }} />
-    </Stack.Navigator>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color }) => getTabBarIcon(route, focused, color),
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          height: 55  ,
+          alignItems: "center",
+        }
+      })}
+    >
+      <Tab.Screen name="HomeTab" component={HomeStack} />
+      <Tab.Screen name="SearchTab" component={SearchTab} />
+      <Tab.Screen name="CreatePostTab" component={CreatePostTab} />
+      <Tab.Screen name="AlbumsTab" component={AlbumsTab} />
+      <Tab.Screen name="ProfileTab" component={ProfileTab} />
+    </Tab.Navigator>
   );
-}
+} 

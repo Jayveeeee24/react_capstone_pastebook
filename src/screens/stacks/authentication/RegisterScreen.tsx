@@ -1,9 +1,9 @@
-import { Image, Keyboard, LayoutAnimation, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Image, Keyboard, LayoutAnimation, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { images } from "../../../utils/Images";
 import { useContext, useState } from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Card, ProgressBar } from "react-native-paper";
+import { Card, ProgressBar, TextInput } from "react-native-paper";
 import { Dropdown } from "react-native-element-dropdown";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { AuthContext } from "../../../context/AuthContext";
@@ -38,6 +38,8 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
     const [isPasswordValid, setIsPasswordValid] = useState(true);
     const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
+
+    const credentialTextTheme = { colors: { primary: '#3373B0' } };
 
 
     const DropdownComponent = () => {
@@ -218,6 +220,16 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         }
     };
     const renderView = () => {
+        const [showPassword, setShowPassword] = useState(false);
+        const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+        const togglePasswordVisibility = () => {
+            setShowPassword(!showPassword);
+        };
+        const toggleConfirmPasswordVisibility = () => {
+            setShowConfirmPassword(!showPassword);
+        };
+
         switch (currentView) {
             case 'EmailView':
                 return (
@@ -229,6 +241,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                                 style={[styles.text, styles.credentialText]}
                                 value={email}
                                 onChangeText={setEmail}
+                                theme={credentialTextTheme}
                                 placeholderTextColor={'#666'}
                             />
 
@@ -244,21 +257,22 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                         <ScrollView>
                             <View style={[styles.credentialContainer, { marginBottom: isFirstNameValid ? 10 : 0 }]}>
                                 <MaterialCommunityIcons name="account-box-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
-                                <TextInput placeholder="First Name" style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={firstName} onChangeText={setFirstName} />
+                                <TextInput placeholder="First Name" theme={credentialTextTheme} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={firstName} onChangeText={setFirstName} />
                             </View>
                             {!isFirstNameValid && (
                                 <Text style={styles.textValidation}>Please enter a valid first name</Text>
                             )}
                             <View style={[styles.credentialContainer, { marginBottom: isLastNameValid ? 10 : 0 }]}>
                                 <MaterialCommunityIcons name="account-box-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
-                                <TextInput placeholder="Last Name" style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={lastName} onChangeText={setLastName} />
+                                <TextInput placeholder="Last Name" theme={credentialTextTheme} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={lastName} onChangeText={setLastName} />
                             </View>
                             {!isLastNameValid && (
                                 <Text style={styles.textValidation}>Please enter a valid last name</Text>
                             )}
                             <View style={[styles.credentialContainer, {}]}>
                                 <MaterialCommunityIcons name="phone-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
-                                <TextInput placeholder="Phone Number" style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} keyboardType="phone-pad" value={phoneNumber} onChangeText={setPhoneNumber} />
+                                <TextInput placeholder="Phone Number" theme={credentialTextTheme}
+                                    style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} keyboardType="phone-pad" value={phoneNumber} onChangeText={setPhoneNumber} />
                             </View>
                             {!isPhoneNumberValid && (
                                 <Text style={styles.textValidation}>Please enter a valid phone number</Text>
@@ -274,14 +288,14 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                     <>
                         <View style={[styles.credentialContainer, { marginBottom: isPasswordValid ? 10 : 0 }]}>
                             <MaterialIcons name="lock-outline" size={20} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput placeholder="Password" secureTextEntry style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={password} onChangeText={setPassword} />
+                            <TextInput placeholder="Password" theme={credentialTextTheme} right={<TextInput.Icon icon={showPassword ? 'eye-off' : 'eye'} onPress={togglePasswordVisibility}/>} secureTextEntry={!showPassword} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={password} onChangeText={setPassword} />
                         </View>
                         {!isPasswordValid && (
                             <Text style={styles.textValidation}>Please enter a valid password (min 8 chars)</Text>
                         )}
                         <View style={[styles.credentialContainer, {}]}>
                             <MaterialIcons name="lock-outline" size={20} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput placeholder="Confirm Password" secureTextEntry style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={confirmPassword} onChangeText={setConfirmPassword} />
+                            <TextInput placeholder="Confirm Password" theme={credentialTextTheme} right={<TextInput.Icon icon={showConfirmPassword ? 'eye-off' : 'eye'} onPress={toggleConfirmPasswordVisibility}/>} secureTextEntry={!showConfirmPassword} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={confirmPassword} onChangeText={setConfirmPassword} />
                         </View>
                         {!isConfirmPasswordValid && (
                             <Text style={styles.textValidation}>Passwords do not match</Text>
@@ -302,7 +316,6 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                     <ToastManager />
 
                     <View style={{ alignItems: 'center' }}>
-                        {/* TODO: STILL NEEDS A LOADER AND MODAL {isSuccess && <ActivityIndicator animating={true} size="large" color="#0000ff" />} */}
                         <Image
                             source={images.logo_wide_dark}
                             style={{ width: 130, height: 35, marginBottom: 15 }}
@@ -385,12 +398,11 @@ const styles = StyleSheet.create({
     credentialContainer: {
         flexDirection: 'row',
         borderBottomColor: '#ccc',
-        borderBottomWidth: 1,
         marginHorizontal: 30,
         alignItems: "center"
     },
     credentialText: {
-        color: 'black', fontSize: 18, flex: 1,
+        color: 'black', fontSize: 18, flex: 1, backgroundColor: 'transparent'
     },
     buttonContainer: {
         padding: 15,
