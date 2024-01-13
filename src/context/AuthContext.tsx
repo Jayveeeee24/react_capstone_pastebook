@@ -1,9 +1,12 @@
 import axios from 'axios';
-import React, { createContext, ReactNode, useState } from 'react';
-import { BASE_URL } from '../utils/config';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { BASE_URL, storage } from '../utils/config';
 
 interface AuthContextProps {
-  register: (firstName: string, lastName: string, email: string, password: string, birthdate: Date, sex: string, phoneNumber: string) => void;
+  authState?: boolean
+  register?: (firstName: string, lastName: string, email: string, password: string, birthdate: Date, sex: string, phoneNumber: string) => Promise<any>;
+  login?: (email: string, password: string) => Promise<any>, 
+  logout?: () => void
 }
 
 interface AuthProviderProps {
@@ -11,15 +14,32 @@ interface AuthProviderProps {
 }
 
 export const AuthContext = createContext<AuthContextProps>({
-  register: () => { },
 });
+
+export const useAuth = () => {
+  return useContext(AuthContext);
+}
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
-  const [userInfo, setUserInfo] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const register = (
+  const [authState, setAuthState] = useState(false);
+
+  useEffect(() => {
+    const loadToken = () => {
+      const token = storage.getString('userToken');
+      console.log(token);
+
+      if (token) {
+        axios.defaults.headers.common['Authorization'] = token;
+        setAuthState(true);
+      }
+    }
+    loadToken();
+  }, []);
+
+
+
+  const register = async (
     firstName: string,
     lastName: string,
     email: string,
@@ -28,35 +48,61 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     sex: string,
     phoneNumber: string
   ) => {
-    setIsLoading(true);
-    axios
-      .post(`${BASE_URL}/api/authentication/register`, {
-        firstName,
-        lastName,
-        email,
-        password,
-        birthdate,
-        sex,
-        phoneNumber,
-      })
-      .then((response) => {
-        let userInfo = response.data;
-        setUserInfo(userInfo);
-        console.log(response.data);
-      })
-      .catch((e) => {
-        console.log(`error ${e}`);
-      });
+    try {
+      return axios
+        .post(`${BASE_URL}/api/authentication/register`, {
+          firstName,
+          lastName,
+          email,
+          password,
+          birthdate,
+          sex,
+          phoneNumber,
+        })
+    } catch (e) {
+      return { error: true, msg: (e as any).response.data.msg };
+    }
+
   };
 
-  const login = (email: string, password: string) => {
-    axios
-      .post
+  const login = async (email: string, password: string) => {
+    try {
+      const result = await axios
+        .post(`${BASE_URL}/api/authentication/login`, {
+          email,
+          password
+        });
+
+      setAuthState(true);
+      
+      axios.defaults.headers.common['Authorization'] = result.data.token;
+      await storage.set('userToken', JSON.stringify(result.data.token));
+
+      return result;
+    } catch (e) {
+      return { error: true, msg: (e as any).response.data.msg };
+    }
   }
 
-  // const contextValue: AuthContextProps = {
-  //   register,
-  // };
+  const logout = async () => {
+    await storage.clearAll();
 
-  return <AuthContext.Provider value={{ register }}>{children}</AuthContext.Provider>;
+    axios.defaults.headers.common['Authorization'] = '';
+
+    setAuthState(false);
+  }
+
+  const contextValue: AuthContextProps = {
+    authState,
+    register,
+    login,
+    logout
+  };
+
+  return (
+    <AuthContext.Provider
+      value={contextValue}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
