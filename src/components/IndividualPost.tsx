@@ -1,21 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity, ImageSourcePropType, Button } from "react-native";
 import { images } from "../utils/Images";
 import { Card } from "react-native-paper";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ReadMore from 'react-native-read-more-text';
+import { CommentModal } from "./modals/CommentModal";
 
 
 interface IndividualPostProps {
     username: string;
     avatarUrl: ImageSourcePropType;
     postImageUrl: ImageSourcePropType,
+    postTitle: string,
+    postCaption: string,
     likes: number,
+    comments: number,
     onLikePress: () => void
 }
 
-export const IndividualPost: React.FC<IndividualPostProps> = () => {
+export const IndividualPost: React.FC<IndividualPostProps> = ({ username, avatarUrl, postImageUrl, postTitle, postCaption, likes, comments, onLikePress }) => {
+    const [isModalVisible, setModalVisible] = useState(false);
 
+    const toggleModal = () => {
+        setModalVisible(!isModalVisible);
+    };
 
     return (
         <View style={styles.container}>
@@ -25,9 +33,9 @@ export const IndividualPost: React.FC<IndividualPostProps> = () => {
                 <TouchableOpacity onPress={() => { }}>
                     <View style={styles.avatarContainer}>
                         <Card style={styles.avatarCard}>
-                            <Card.Cover resizeMode="cover" source={images.sample_avatar} style={styles.avatarImage} />
+                            <Card.Cover resizeMode="cover" source={avatarUrl} style={styles.avatarImage} />
                         </Card>
-                        <Text style={[styles.avatarText, styles.text]}>jayvee.artemis</Text>
+                        <Text style={[styles.avatarText, styles.text]}>{username}</Text>
                     </View>
                 </TouchableOpacity>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
@@ -42,7 +50,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = () => {
 
             {/* Post Image */}
             <View style={styles.postImageContainer}>
-                <Image source={images.sample_post_image} resizeMode="cover" style={styles.postImage} />
+                <Image source={postImageUrl} resizeMode="cover" style={styles.postImage} />
             </View>
 
 
@@ -52,32 +60,35 @@ export const IndividualPost: React.FC<IndividualPostProps> = () => {
                         <TouchableOpacity onPress={() => { }}>
                             <MaterialCommunityIcons name="cards-heart-outline" size={30} color="black" />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => { }}>
+                        <TouchableOpacity onPress={toggleModal}>
                             <MaterialCommunityIcons name="comment-outline" size={26} color="black" />
                         </TouchableOpacity>
                     </View>
                     <Text style={styles.text}>22 hours ago</Text>
                 </View>
-                <View style={{ flexDirection: "column", marginStart: 12, gap: 2 }}>
+
+                <CommentModal isVisible={isModalVisible} onClose={toggleModal} />
+
+                <View style={{ flexDirection: "column", marginStart: 12, gap: 2, marginBottom: 10 }}>
                     <Text style={styles.text}>
                         <Text>Liked by </Text>
-                        <Text style={[{ fontWeight: "900" }]}>Marliss</Text>
+                        <Text style={[{ fontWeight: "900" }]}>yashimallow</Text>
                         <Text> and </Text>
-                        <Text style={[{ fontWeight: "900" }]}>1,600,234 others</Text>
+                        <Text style={[{ fontWeight: "900" }]}>{likes.toLocaleString()} others</Text>
                     </Text>
                     <View>
                         <ReadMore
                             numberOfLines={2}
-                            renderTruncatedFooter={(handlePress: () => void) => <Text onPress={handlePress}> more</Text>}
-                            renderRevealedFooter={(handlePress: () => void) => <Text onPress={handlePress}>... less</Text>}
+                            renderTruncatedFooter={(handlePress: () => void) => <Text style={[styles.text, { fontWeight: '500' }]} onPress={handlePress}>... more</Text>}
+                            renderRevealedFooter={(handlePress: () => void) => <Text style={[styles.text, { fontWeight: '500' }]} onPress={handlePress}>... less</Text>}
                             onReady={() => { }}>
-                            <Text style={[styles.text, { fontWeight: "900" }]}>This is a title</Text>
+                            <Text style={[styles.text, { fontWeight: "900" }]}>{postTitle}</Text>
                             <Text> </Text>
-                            <Text style={styles.text}> Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et nemo ut laboriosam velit omnis quaerat non sapiente sunt sequi distinctio vitae repudiandae reiciendis ipsa, error perspiciatis at. Omnis, obcaecati. Deleniti?</Text>
+                            <Text style={styles.text}>{postCaption}</Text>
                         </ReadMore>
                     </View>
 
-                    <Text style={{ color: 'gray' }}>View all 900 comments</Text>
+                    <Text style={{ color: 'gray' }}>View all {comments} comments</Text>
                 </View>
 
             </View>
@@ -92,8 +103,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'column',
-        borderBottomWidth: 0.8,
-        borderBottomColor: 'gray'
+        // borderBottomWidth: 0.8,
+        // borderBottomColor: 'gray'
     },
     headerContainer: {
         flexDirection: 'row',
