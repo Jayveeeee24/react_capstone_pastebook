@@ -7,6 +7,7 @@ import ToastManager, { Toast } from 'toastify-react-native'
 import { AuthContext } from "../../../context/AuthContext";
 import { TextInput } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
+import { colors } from "../../../utils/config";
 
 
 interface LoginScreenProps {
@@ -103,7 +104,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                                 Toast.warn('Sign up error, please try again', 'top');
                             }
                         }}
-                        style={[styles.buttonContainer, { marginTop: 35, backgroundColor: '#3373B0' }]}
+                        style={[styles.buttonContainer, { marginTop: 35, backgroundColor: colors.primaryBrand }]}
                     >
                         <Text style={[styles.buttonText, styles.text]}>Login</Text>
                     </TouchableOpacity>
@@ -113,7 +114,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                         onPress={() => {
                             navigation.navigate('Register');
                         }}
-                        style={[styles.buttonContainer, { marginTop: 10, backgroundColor: '#eab676' }]}>
+                        style={[styles.buttonContainer, { marginTop: 10, backgroundColor: colors.secondaryBrand }]}>
                         <Text style={[styles.buttonText, styles.text]}>Create an Account</Text>
                     </TouchableOpacity>
 
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     touchableForgot: {
-        color: "#3373B0", fontWeight: '700', fontSize: 16
+        color: colors.primaryBrand, fontWeight: '700', fontSize: 16
     },
     buttonContainer: {
         padding: 15,

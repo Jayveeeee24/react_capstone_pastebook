@@ -1,16 +1,44 @@
-import { View } from "react-native";
+import { ImageSourcePropType, StyleSheet, View } from "react-native";
 import { Card, Title } from "react-native-paper";
 import { images } from "../utils/Images";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
-export const UserAvatar = (name: string, imageUrl: string) => {
+interface UserAvatarProps {
+    name: string;
+    imageUrl: ImageSourcePropType;
+}
+
+export const UserAvatar: React.FC<UserAvatarProps> = ({ name, imageUrl }) => {
     return (
         <View>
-            <Card style={{ borderRadius: 30, width: 60, height: 60 }}>
-                <Card.Cover source={{uri: imageUrl}} style={{ height: '100%', borderRadius: 30 }} />
-            </Card>
-            <View style={{ alignItems: 'center' }}>
-                <Title style={{fontSize: 14, fontFamily: 'Roboto-Medium'}}>{ name }</Title>
+            <TouchableOpacity>
+                <Card style={styles.avatarContainer}>
+                    <Card.Cover resizeMode="cover" source={imageUrl} style={styles.avatarImage} />
+                </Card>
+            </TouchableOpacity>
+            <View style={styles.textContainer}>
+                <Title style={styles.text}>{name}</Title>
             </View>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    avatarContainer: {
+        borderRadius: 50,
+        width: 60,
+        height: 60
+    },
+    avatarImage: {
+        height: '100%',
+        borderRadius: 50
+    },
+    textContainer: {
+        alignItems: 'center',
+        padding: 0
+    },
+    text: {
+        fontSize: 14,
+        fontFamily: 'Roboto-Medium'
+    }
+})

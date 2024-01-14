@@ -12,6 +12,7 @@ import { NotificationIconWithBadge } from "../components/NotificationWithBadge";
 import { images } from "../utils/Images";
 import { NotificationScreen } from "../screens/stacks/NotificationScreen";
 import { FriendRequestScreen } from "../screens/stacks/FriendRequestScreen";
+import { colors } from "../utils/config";
 
 
 const Tab = createBottomTabNavigator();
@@ -69,20 +70,18 @@ export const AppStack = () => {
         <Stack.Screen name="Home" component={HomeTab} options={{
           title: '',
           headerRight: () => (
-            <View style={{ flexDirection: 'row', marginRight: 10 }}>
+            <View style={{ flexDirection: 'row', marginRight: 10, alignItems: "center" }}>
               <NotificationIconWithBadge
                 onPress={() => {
                   navigation.navigate('Notifications');
                 }}
-                badgeCount={3}
-              />
+                badgeCount={3}/>
 
               <TouchableOpacity
                 onPress={() => {
                   navigation.navigate('FriendRequest');
-                }}
-              >
-                <MaterialCommunityIcons name="account-multiple-plus-outline" size={35} color="black" />
+                }}>
+                <MaterialCommunityIcons name="account-supervisor-outline" size={35} color="black" />
               </TouchableOpacity>
             </View>
           ),
@@ -105,11 +104,11 @@ export const AppStack = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color }) => getTabBarIcon(route, focused, color),
+        tabBarIcon: ({ focused, color }) => getTabBarIcon(route, focused, colors.primaryBrand),
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          height: 55  ,
+          height: 55,
           alignItems: "center",
         }
       })}
