@@ -6,7 +6,7 @@ import { colors } from "../utils/config";
 export const NotificationIconWithBadge = ({ onPress, badgeCount }: any) => {
     return (
         <TouchableOpacity onPress={onPress} style={{ marginRight: 10 }}>
-            <Ionicons name="notifications-outline" size={ 27 } color="black" />
+            <Ionicons name="notifications-outline" size={ 27 } color='black' />
             {badgeCount > 0 && (
                 <View
                     style={{

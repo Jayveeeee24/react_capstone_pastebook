@@ -105,7 +105,7 @@ export const AppStack = () => {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused }) => getTabBarIcon(route, focused, colors.primaryBrand),
-        headerShown: route.name == 'ProfileTab',
+        headerShown: route.name == 'ProfileTab' || route.name === 'SearchTab',
         tabBarShowLabel: false,
         tabBarStyle: {
           height: 55,

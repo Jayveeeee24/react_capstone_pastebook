@@ -5,6 +5,7 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { images } from "../../utils/Images";
 import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 import {ProfileTabView} from "../tabViews/ProfileTabView";
+import { colors } from "../../utils/config";
 
 interface ProfileTabProps {
     navigation: any;
@@ -19,14 +20,14 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
         navigation.setOptions({
             headerLeft: () => (
                 <View style={{ flexDirection: "row", alignItems: "center", marginStart: 10 }}>
-                    <MaterialIcons name="lock-outline" size={24} color="black" />
+                    <MaterialIcons name="lock-outline" size={24} color='black' />
                     <Text style={{ marginStart: 8, fontSize: 22, color: 'black', fontWeight: '700', alignItems: "center" }}>artemis.jayvee</Text>
                 </View>
             ),
             headerRight: () => (
                 <TouchableOpacity>
                     <View style={{ flexDirection: "row", marginEnd: 12 }}>
-                        <SimpleLineIcons name="settings" size={20} color="black" />
+                        <SimpleLineIcons name="settings" size={20} color='black' />
                     </View>
                 </TouchableOpacity>
             ),

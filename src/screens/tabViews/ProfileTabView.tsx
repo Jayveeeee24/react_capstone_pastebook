@@ -4,9 +4,10 @@ import { TabView, SceneMap } from 'react-native-tab-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { IndividualPost } from '../../components/IndividualPost';
 import { images } from '../../utils/Images';
+import { colors } from '../../utils/config';
 
 const FirstRoute = () => (
-    <ScrollView>
+    <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{ flex: 1, backgroundColor: 'white', flexDirection: 'column', alignItems: 'center' }} >
             <IndividualPost name='jayvee.artemis' avatarUrl={images.sample_avatar} postImageUrl={images.sample_post_image} postTitle="This is a post" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={910} likes={1654432} onLikePress={() => { }} />
         </View>
@@ -14,7 +15,7 @@ const FirstRoute = () => (
 );
 
 const SecondRoute = () => (
-    <ScrollView>
+    <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{ flex: 1, backgroundColor: 'white', flexDirection: 'column', alignItems: 'center' }} >
             <IndividualPost name='yashimallow' avatarUrl={images.sample_avatar_female} postImageUrl={images.sample_post_image_2} postTitle="This is a post 2" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={754} likes={31321} onLikePress={() => { }} />
             <IndividualPost name='blec_siopao' avatarUrl={images.sample_avatar_female} postImageUrl={images.sample_post_image_3} postTitle="This is a post 3" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={3} likes={5} onLikePress={() => { }} />
@@ -35,7 +36,7 @@ const renderTabBar = (props: { navigationState: { routes: any[]; index: any; }; 
                 key={index}
                 style={[styles.tabItem, index === props.navigationState.index && styles.selectedTab]}
                 onPress={() => props.jumpTo(route.key)}>
-                <MaterialCommunityIcons name={route.key === 'first' ? 'grid' : 'account-box-outline'} size={26} color={'black'} />
+                <MaterialCommunityIcons name={route.key === 'first' ? 'grid' : 'account-box-outline'} size={26} color={colors.primaryBrand} />
             </TouchableOpacity>
         ))}
     </View>
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
     selectedTab: {
         backgroundColor: 'white',
         borderBottomWidth: 0.8,
-        borderBottomColor: 'gray'
+        borderBottomColor: colors.primaryBrand
     },
     tabText: {
         fontWeight: 'bold',
