@@ -3,7 +3,7 @@ import { UserAvatar } from "../../components/UserAvatar";
 import { images } from "../../utils/Images";
 import { IndividualPost } from "../../components/IndividualPost";
 
-export const HomeTab = ({ navigation }: any) => {
+export const HomeTab = () => {
 
     const friends = [
         {
@@ -64,12 +64,13 @@ export const HomeTab = ({ navigation }: any) => {
                         keyExtractor={(item) => item.id}
                         contentContainerStyle={[styles.friendsView]}
                         horizontal
-                        showsHorizontalScrollIndicator={false}
-                    />
+                        showsHorizontalScrollIndicator={false}/>
                 </View>
                 <View style={styles.postsContainer}>
-                    <IndividualPost username='jayvee.artemis' avatarUrl={images.sample_avatar} postImageUrl={images.sample_post_image} postTitle="This is a post" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={910} likes={1654432} onLikePress={() => { }} />
-                    <IndividualPost username='yashimallow' avatarUrl={images.sample_avatar_female} postImageUrl={images.sample_post_image_2} postTitle="This is a post 2" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={754} likes={31321} onLikePress={() => { }} />
+                    <IndividualPost name='jayvee.artemis' avatarUrl={images.sample_avatar} postImageUrl={images.sample_post_image} postTitle="This is a post" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={910} likes={1654432} onLikePress={() => { }} />
+                    <IndividualPost name='yashimallow' avatarUrl={images.sample_avatar_female} postImageUrl={images.sample_post_image_2} postTitle="This is a post 2" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={754} likes={31321} onLikePress={() => { }} />
+                    <IndividualPost name='blec_siopao' avatarUrl={images.sample_avatar_female} postImageUrl={images.sample_post_image_3} postTitle="This is a post 3" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={3} likes={5} onLikePress={() => { }} />
+                    <IndividualPost name='hmzzjin' avatarUrl={images.sample_avatar_female} postImageUrl={images.sample_post_image_4} postTitle="This is a post 4" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={10341} likes={3134221} onLikePress={() => { }} />
                 </View>
             </ScrollView>
 

@@ -14,5 +14,7 @@ export const images = {
 
     sample_post_image: require('../assets/images/sample_post_image.jpg'),
     sample_post_image_2: require('../assets/images/sample_post_image_2.jpg'),
+    sample_post_image_3: require('../assets/images/sample_post_image_3.jpg'),
+    sample_post_image_4: require('../assets/images/sample_post_image_4.jpg'),
 
 }

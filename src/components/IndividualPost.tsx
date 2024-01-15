@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity, ImageSourcePropType, Button } from "react-native";
-import { images } from "../utils/Images";
 import { Card } from "react-native-paper";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ReadMore from 'react-native-read-more-text';
@@ -8,7 +7,7 @@ import { CommentModal } from "./modals/CommentModal";
 
 
 interface IndividualPostProps {
-    username: string;
+    name: string;
     avatarUrl: ImageSourcePropType;
     postImageUrl: ImageSourcePropType,
     postTitle: string,
@@ -18,7 +17,7 @@ interface IndividualPostProps {
     onLikePress: () => void
 }
 
-export const IndividualPost: React.FC<IndividualPostProps> = ({ username, avatarUrl, postImageUrl, postTitle, postCaption, likes, comments, onLikePress }) => {
+export const IndividualPost: React.FC<IndividualPostProps> = ({ name, avatarUrl, postImageUrl, postTitle, postCaption, likes, comments, onLikePress }) => {
     const [isModalVisible, setModalVisible] = useState(false);
 
     const toggleModal = () => {
@@ -28,14 +27,13 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ username, avatar
     return (
         <View style={styles.container}>
 
-            {/* Header buttons */}
             <View style={styles.headerContainer}>
                 <TouchableOpacity onPress={() => { }}>
                     <View style={styles.avatarContainer}>
                         <Card style={styles.avatarCard}>
                             <Card.Cover resizeMode="cover" source={avatarUrl} style={styles.avatarImage} />
                         </Card>
-                        <Text style={[styles.avatarText, styles.text]}>{username}</Text>
+                        <Text style={[styles.avatarText, styles.text]}>{name}</Text>
                     </View>
                 </TouchableOpacity>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
@@ -48,7 +46,6 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ username, avatar
                 </View>
             </View>
 
-            {/* Post Image */}
             <View style={styles.postImageContainer}>
                 <Image source={postImageUrl} resizeMode="cover" style={styles.postImage} />
             </View>

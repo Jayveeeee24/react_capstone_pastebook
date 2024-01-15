@@ -98,8 +98,12 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                             setIsPasswordValid(!!trimmedPassword && trimmedPassword.length >= 8);
                             const success = login ? login(email, password) : undefined;
                             if (success) {
-                                navigation.navigate('AppStack', 'SearchTab');
-                                // nav.navigation.navigate('AppStack');
+                                navigation.reset({
+                                    index: 0,
+                                    routes: [{ name: 'AppStack', params: {screen: 'HomeTab', params: {screen: 'Home'} }}],
+                                });
+                                
+                                // navigation.navigate('AppStack', {screen: 'HomeTab', params: {screen: 'Home'}});
                             } else {
                                 Toast.warn('Sign up error, please try again', 'top');
                             }
