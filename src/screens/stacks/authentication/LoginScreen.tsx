@@ -89,23 +89,24 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                     </View>
 
                     <TouchableOpacity
-                        onPress={() => {
+                        onPress={async () => {
                             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                             const isValid = emailRegex.test(email);
                             setIsValidEmail(isValid);
 
                             const trimmedPassword = password.trim();
                             setIsPasswordValid(!!trimmedPassword && trimmedPassword.length >= 8);
-                            const success = login ? login(email, password) : undefined;
-                            if (success) {
-                                // navigation.reset({
-                                //     index: 0,
-                                //     routes: [{ name: 'AppStack', params: {screen: 'HomeTab', params: {screen: 'Home'} }}],
-                                // });
-                                navigation.replace('BottomHome');
-                                // navigation.navigate('AppStack', {screen: 'HomeTab', params: {screen: 'Home'}});
-                            } else {
-                                Toast.warn('Sign up error, please try again', 'top');
+
+                            try {
+                                const success = login ? await login(email, password) : undefined;
+
+                                if (success) {
+                                    navigation.replace('BottomHome');
+                                } else {
+                                    Toast.warn('Sign in error, please try again', 'top');
+                                }
+                            } catch (error) {
+                                Toast.warn('Sign in error, please try again', 'top');
                             }
                         }}
                         style={[styles.buttonContainer, { marginTop: 35, backgroundColor: colors.primaryBrand }]}

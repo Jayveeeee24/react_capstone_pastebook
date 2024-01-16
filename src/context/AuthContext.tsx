@@ -73,22 +73,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const result = await axios
-        .post(`${BASE_URL}/api/authentication/login`, {
-          email,
-          password
-        });
+      const result = await axios.post(`${BASE_URL}/api/authentication/login`, {
+        email,
+        password
+      });
 
       setAuthState(true);
 
       axios.defaults.headers.common['Authorization'] = result.data.token;
       await storage.set('userToken', JSON.stringify(result.data.token));
 
-      return result;
+      return result.data;  
     } catch (e) {
-      return { error: true, msg: (e as any).response.data.msg };
+      throw e;  
     }
   }
+
 
   const logout = async () => {
     await storage.clearAll();
