@@ -99,7 +99,7 @@ export const AppStack = () => {
                   }
                 }}
               >
-                <MaterialCommunityIcons name="account-supervisor-outline" size={35} color="black" />
+                <MaterialCommunityIcons name="account-plus-outline" size={30} color="black" />
               </TouchableOpacity>
 
             </View>
