@@ -16,5 +16,11 @@ export const images = {
     sample_post_image_2: require('../assets/images/sample_post_image_2.jpg'),
     sample_post_image_3: require('../assets/images/sample_post_image_3.jpg'),
     sample_post_image_4: require('../assets/images/sample_post_image_4.jpg'),
+    sample_post_image_5: require('../assets/images/sample_post_image_5.jpg'),
+    sample_post_image_6: require('../assets/images/sample_post_image_6.jpg'),
+    sample_post_image_7: require('../assets/images/sample_post_image_7.jpg'),
+    sample_post_image_8: require('../assets/images/sample_post_image_8.jpg'),
+    sample_post_image_9: require('../assets/images/sample_post_image_9.jpg'),
+    sample_post_image_10: require('../assets/images/sample_post_image_10.jpg'),
 
 }

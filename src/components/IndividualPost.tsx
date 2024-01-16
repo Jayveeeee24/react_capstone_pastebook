@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, ImageSourcePropType, Button } from "react-native";
-import { Card } from "react-native-paper";
+import { View, Text, Image, StyleSheet, TouchableOpacity, ImageSourcePropType } from "react-native";
+import { Card, Menu, PaperProvider } from "react-native-paper";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ReadMore from 'react-native-read-more-text';
 import { CommentModal } from "./modals/CommentModal";
@@ -19,77 +19,89 @@ interface IndividualPostProps {
 
 export const IndividualPost: React.FC<IndividualPostProps> = ({ name, avatarUrl, postImageUrl, postTitle, postCaption, likes, comments, onLikePress }) => {
     const [isModalVisible, setModalVisible] = useState(false);
+    const [isMenuVisible, setIsMenuVisible] = useState(false);
 
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
 
     return (
-        <View style={styles.container}>
+        <PaperProvider>
+            <View style={styles.container}>
 
-            <View style={styles.headerContainer}>
-                <TouchableOpacity onPress={() => { }}>
-                    <View style={styles.avatarContainer}>
-                        <Card style={styles.avatarCard}>
-                            <Card.Cover resizeMode="cover" source={avatarUrl} style={styles.avatarImage} />
-                        </Card>
-                        <Text style={[styles.avatarText, styles.text]}>{name}</Text>
-                    </View>
-                </TouchableOpacity>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-                    <TouchableOpacity style={{ backgroundColor: 'lightgray', borderRadius: 5, paddingHorizontal: 14, paddingVertical: 5 }}>
-                        <Text style={[styles.text, { fontWeight: '500' }]}>Follow</Text>
-                    </TouchableOpacity>
+                <View style={styles.headerContainer}>
                     <TouchableOpacity onPress={() => { }}>
-                        <MaterialCommunityIcons name="dots-vertical" size={20} color="#666" />
+                        <View style={styles.avatarContainer}>
+                            <Card style={styles.avatarCard}>
+                                <Card.Cover resizeMode="cover" source={avatarUrl} style={styles.avatarImage} />
+                            </Card>
+                            <Text style={[styles.avatarText, styles.text]}>{name}</Text>
+                        </View>
                     </TouchableOpacity>
-                </View>
-            </View>
-
-            <View style={styles.postImageContainer}>
-                <Image source={postImageUrl} resizeMode="cover" style={styles.postImage} />
-            </View>
-
-
-            <View style={{ flexDirection: "column" }}>
-                <View style={styles.footerButtonContainer}>
-                    <View style={{ flexDirection: "row", gap: 16, alignItems: "center" }}>
-                        <TouchableOpacity onPress={() => { }}>
-                            <MaterialCommunityIcons name="cards-heart-outline" size={30} color="black" />
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                        <TouchableOpacity style={{ backgroundColor: 'lightgray', borderRadius: 5, paddingHorizontal: 14, paddingVertical: 5 }}>
+                            <Text style={[styles.text, { fontWeight: '500' }]}>Follow</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={toggleModal}>
-                            <MaterialCommunityIcons name="comment-outline" size={26} color="black" />
-                        </TouchableOpacity>
+                        <View>
+                            <Menu
+                                visible={isMenuVisible}
+                                onDismiss={() => setIsMenuVisible(false)}   
+                                anchor={
+                                    <TouchableOpacity onPress={() => setIsMenuVisible(true)}>
+                                        <MaterialCommunityIcons name="dots-vertical" size={20} color="#666" />
+                                    </TouchableOpacity>
+                                }>
+                                <Menu.Item onPress={() => { }} title="Edit" />
+                                <Menu.Item onPress={() => { }} title="Delete" />
+                            </Menu>
+                        </View>
                     </View>
-                    <Text style={styles.text}>22 hours ago</Text>
                 </View>
 
-                <CommentModal isVisible={isModalVisible} onClose={toggleModal} />
+                <View style={styles.postImageContainer}>
+                    <Image source={postImageUrl} resizeMode="cover" style={styles.postImage} />
+                </View>
 
-                <View style={{ flexDirection: "column", marginStart: 12, gap: 2, marginBottom: 10 }}>
-                    <Text style={styles.text}>
-                        <Text>Liked by </Text>
-                        <Text style={[{ fontWeight: "900" }]}>yashimallow</Text>
-                        <Text> and </Text>
-                        <Text style={[{ fontWeight: "900" }]}>{likes.toLocaleString()} others</Text>
-                    </Text>
-                    <View>
-                        <ReadMore
-                            numberOfLines={2}
-                            renderTruncatedFooter={(handlePress: () => void) => <Text style={[styles.text, { fontWeight: '500' }]} onPress={handlePress}>... more</Text>}
-                            renderRevealedFooter={(handlePress: () => void) => <Text style={[styles.text, { fontWeight: '500' }]} onPress={handlePress}>... less</Text>}
-                            onReady={() => { }}>
-                            <Text style={[styles.text, { fontWeight: "900" }]}>{postTitle}</Text>
-                            <Text> </Text>
-                            <Text style={styles.text}>{postCaption}</Text>
-                        </ReadMore>
+                <View style={{ flexDirection: "column" }}>
+                    <View style={styles.footerButtonContainer}>
+                        <View style={{ flexDirection: "row", gap: 16, alignItems: "center" }}>
+                            <TouchableOpacity onPress={() => { }}>
+                                <MaterialCommunityIcons name="cards-heart-outline" size={30} color="black" />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={toggleModal}>
+                                <MaterialCommunityIcons name="comment-outline" size={26} color="black" />
+                            </TouchableOpacity>
+                        </View>
+                        <Text style={styles.text}>22 hours ago</Text>
                     </View>
 
-                    <Text style={{ color: 'gray' }}>View all {comments} comments</Text>
-                </View>
+                    <CommentModal isVisible={isModalVisible} onClose={toggleModal} />
 
+                    <View style={{ flexDirection: "column", marginStart: 12, gap: 2, marginBottom: 10 }}>
+                        <Text style={styles.text}>
+                            <Text>Liked by </Text>
+                            <Text style={[{ fontWeight: "900" }]}>yashimallow</Text>
+                            <Text> and </Text>
+                            <Text style={[{ fontWeight: "900" }]}>{likes.toLocaleString()} others</Text>
+                        </Text>
+                        <View>
+                            <ReadMore
+                                numberOfLines={2}
+                                renderTruncatedFooter={(handlePress: () => void) => <Text style={[styles.text, { fontWeight: '500' }]} onPress={handlePress}>... more</Text>}
+                                renderRevealedFooter={(handlePress: () => void) => <Text style={[styles.text, { fontWeight: '500' }]} onPress={handlePress}>... less</Text>}
+                                onReady={() => { }}>
+                                <Text style={[styles.text, { fontWeight: "900" }]}>{postTitle}</Text>
+                                <Text> </Text>
+                                <Text style={styles.text}>{postCaption}</Text>
+                            </ReadMore>
+                        </View>
+
+                        <Text style={{ color: 'gray' }}>View all {comments} comments</Text>
+                    </View>
+
+                </View>
             </View>
-        </View>
+        </PaperProvider>
     );
 };
 
@@ -100,8 +112,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'column',
-        // borderBottomWidth: 0.8,
-        // borderBottomColor: 'gray'
     },
     headerContainer: {
         flexDirection: 'row',
