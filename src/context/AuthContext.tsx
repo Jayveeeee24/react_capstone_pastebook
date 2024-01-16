@@ -5,7 +5,7 @@ import { BASE_URL, storage } from '../utils/config';
 interface AuthContextProps {
   authState?: boolean
   register?: (firstName: string, lastName: string, email: string, password: string, birthdate: Date, sex: string, phoneNumber: string) => Promise<any>;
-  login?: (email: string, password: string) => Promise<any>, 
+  login?: (email: string, password: string) => Promise<any>,
   logout?: () => void
 }
 
@@ -24,16 +24,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [authState, setAuthState] = useState(false);
 
+
+
   useEffect(() => {
     const loadToken = () => {
-      const token = storage.getString('userToken');
-      console.log(token);
+      try {
+        const token = storage.getString('userToken');
 
-      if (token) {
-        axios.defaults.headers.common['Authorization'] = token;
-        setAuthState(true);
+        if (token) {
+          axios.defaults.headers.common['Authorization'] = token;
+          setAuthState(true);
+        }
+      } catch (error) {
+        console.error('Error loading token:', error);
       }
-    }
+    };
+
     loadToken();
   }, []);
 
@@ -74,7 +80,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
 
       setAuthState(true);
-      
+
       axios.defaults.headers.common['Authorization'] = result.data.token;
       await storage.set('userToken', JSON.stringify(result.data.token));
 

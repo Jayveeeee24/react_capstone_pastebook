@@ -13,6 +13,9 @@ import { images } from "../utils/Images";
 import { NotificationScreen } from "../screens/stacks/NotificationScreen";
 import { FriendRequestScreen } from "../screens/stacks/FriendRequestScreen";
 import { colors } from "../utils/config";
+import { LoginScreen } from "../screens/stacks/authentication/LoginScreen";
+import { RegisterScreen } from "../screens/stacks/authentication/RegisterScreen";
+import { useAuth } from "../context/AuthContext";
 
 
 const Tab = createBottomTabNavigator();
@@ -59,14 +62,17 @@ export const AppStack = () => {
 
   function HomeStack({ navigation }: { navigation: HomeStackNavigationProp }) {
     return (
-      <Stack.Navigator screenOptions={({ route }) => ({
-        headerStyle: {
-          elevation: 0,
-          shadowOpacity: 0
-        },
-        // headerShown: route.name === 'Notifications' || route.name === 'FriendRequest',
-        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-      })}>
+      <Stack.Navigator
+        screenOptions={({ route }) => ({
+          headerStyle: {
+            elevation: 0,
+            shadowOpacity: 0
+          },
+          headerShown: route.name !== 'Login' && route.name !== 'Register',
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS ,
+
+
+        })}>
         <Stack.Screen name="Home" component={HomeTab} options={{
           title: '',
           headerRight: () => (
@@ -75,7 +81,7 @@ export const AppStack = () => {
                 onPress={() => {
                   navigation.navigate('Notifications');
                 }}
-                badgeCount={3}/>
+                badgeCount={3} />
 
               <TouchableOpacity
                 onPress={() => {
@@ -101,23 +107,35 @@ export const AppStack = () => {
     );
   }
 
+  function BottomTab() {
+    return (
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused }) => getTabBarIcon(route, focused, colors.primaryBrand),
+          headerShown: route.name != 'CreatePostTab' && route.name != 'HomeTab',
+          tabBarShowLabel: false,
+          tabBarStyle: {
+            height: 55,
+            alignItems: "center",
+          }
+        })}
+      >
+        <Tab.Screen name="HomeTab" component={HomeStack} />
+        <Tab.Screen name="SearchTab" component={SearchTab} />
+        <Tab.Screen name="CreatePostTab" component={CreatePostTab} />
+        <Tab.Screen name="AlbumsTab" component={AlbumsTab} />
+        <Tab.Screen name="ProfileTab" component={ProfileTab} />
+      </Tab.Navigator>
+    );
+  }
+  
+  const { authState } = useAuth();
+
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused }) => getTabBarIcon(route, focused, colors.primaryBrand),
-        headerShown: route.name != 'CreatePostTab' && route.name != 'HomeTab',
-        tabBarShowLabel: false,
-        tabBarStyle: {
-          height: 55,
-          alignItems: "center",
-        }
-      })}
-    >
-      <Tab.Screen name="HomeTab" component={HomeStack} />
-      <Tab.Screen name="SearchTab" component={SearchTab} />
-      <Tab.Screen name="CreatePostTab" component={CreatePostTab} />
-      <Tab.Screen name="AlbumsTab" component={AlbumsTab} />
-      <Tab.Screen name="ProfileTab" component={ProfileTab} />
-    </Tab.Navigator>
+    <Stack.Navigator screenOptions={({ route }) => ({ headerShown: false, cardStyleInterpolator: (route.name !== 'Login' && route.name !== 'Register') ? CardStyleInterpolators.forHorizontalIOS : CardStyleInterpolators.forBottomSheetAndroid })}>
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="BottomHome" component={BottomTab}/>
+    </Stack.Navigator>
   );
 } 

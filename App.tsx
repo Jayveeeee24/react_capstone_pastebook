@@ -19,7 +19,6 @@ function App(): React.JSX.Element {
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
-  const { authState } = useAuth();
 
   return (
     <AuthProvider>

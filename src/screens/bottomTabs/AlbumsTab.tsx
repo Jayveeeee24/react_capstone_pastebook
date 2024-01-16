@@ -94,13 +94,13 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
                                 </View>
                             </MenuTrigger>
                             <MenuOptions>
-                                <MenuOption onSelect={() => Alert.alert(`Save`)} >
+                                <MenuOption onSelect={() => Alert.alert('Newest')} >
                                     <View style={{ flexDirection: "row" }}>
                                         <MaterialIcons name="check" size={20} color="#666" style={{ display: 'none' }} />
                                         <Text style={{ color: 'black', marginStart: 10 }}>Newest</Text>
                                     </View>
                                 </MenuOption>
-                                <MenuOption onSelect={() => Alert.alert(`Save`)} >
+                                <MenuOption onSelect={() => Alert.alert(`Oldest`)} >
                                     <View style={{ flexDirection: "row" }}>
                                         <MaterialIcons name="check" size={20} color="#666" style={{ display: 'none' }} />
                                         <Text style={{ color: 'black', marginStart: 10 }}>Oldest</Text>
