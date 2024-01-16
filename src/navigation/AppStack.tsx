@@ -15,7 +15,9 @@ import { FriendRequestScreen } from "../screens/stacks/FriendRequestScreen";
 import { colors } from "../utils/config";
 import { LoginScreen } from "../screens/stacks/authentication/LoginScreen";
 import { RegisterScreen } from "../screens/stacks/authentication/RegisterScreen";
-import { useAuth } from "../context/AuthContext";
+import { AuthContext, useAuth } from "../context/AuthContext";
+import { useContext } from "react";
+import { Toast } from "toastify-react-native";
 
 
 const Tab = createBottomTabNavigator();
@@ -59,6 +61,7 @@ const getTabBarIcon = (route: any, focused: any, color: any) => {
 };
 
 export const AppStack = () => {
+  const { logout } = useContext(AuthContext);
 
   function HomeStack({ navigation }: { navigation: HomeStackNavigationProp }) {
     return (
@@ -69,7 +72,7 @@ export const AppStack = () => {
             shadowOpacity: 0
           },
           headerShown: route.name !== 'Login' && route.name !== 'Register',
-          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS ,
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 
 
         })}>
@@ -84,11 +87,21 @@ export const AppStack = () => {
                 badgeCount={3} />
 
               <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate('FriendRequest');
-                }}>
+                onPress={async () => {
+                  // navigation.navigate('FriendRequest');
+
+                  const success = logout ? await logout() : undefined;
+
+                  if (success) {
+                    navigation.navigate('Login' as keyof HomeStackParamList); 
+                  } else {
+                    Toast.warn('Logout error, please try again', 'top');
+                  }
+                }}
+              >
                 <MaterialCommunityIcons name="account-supervisor-outline" size={35} color="black" />
               </TouchableOpacity>
+
             </View>
           ),
           headerLeft: () => (
@@ -128,14 +141,26 @@ export const AppStack = () => {
       </Tab.Navigator>
     );
   }
-  
+
   const { authState } = useAuth();
 
   return (
     <Stack.Navigator screenOptions={({ route }) => ({ headerShown: false, cardStyleInterpolator: (route.name !== 'Login' && route.name !== 'Register') ? CardStyleInterpolators.forHorizontalIOS : CardStyleInterpolators.forBottomSheetAndroid })}>
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Register" component={RegisterScreen} />
-      <Stack.Screen name="BottomHome" component={BottomTab}/>
+      {
+        authState ?
+          (
+            <>
+              <Stack.Screen name="BottomHome" component={BottomTab} />
+            </>
+          )
+          :
+          (
+            <>
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="Register" component={RegisterScreen} />
+            </>
+          )
+      }
     </Stack.Navigator>
   );
 } 

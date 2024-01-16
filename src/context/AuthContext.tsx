@@ -6,7 +6,7 @@ interface AuthContextProps {
   authState?: boolean
   register?: (firstName: string, lastName: string, email: string, password: string, birthdate: Date, sex: string, phoneNumber: string) => Promise<any>;
   login?: (email: string, password: string) => Promise<any>,
-  logout?: () => void
+  logout?: () => Promise<any>
 }
 
 interface AuthProviderProps {
@@ -24,12 +24,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [authState, setAuthState] = useState(false);
 
-
-
   useEffect(() => {
-    const loadToken = () => {
+    const loadToken = async () => {
       try {
-        const token = storage.getString('userToken');
+        const token = await storage.getString('userToken');
 
         if (token) {
           axios.defaults.headers.common['Authorization'] = token;
@@ -83,20 +81,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       axios.defaults.headers.common['Authorization'] = result.data.token;
       await storage.set('userToken', JSON.stringify(result.data.token));
 
-      return result.data;  
+      return result.data;
     } catch (e) {
-      throw e;  
+      throw e;
     }
   }
 
 
   const logout = async () => {
-    await storage.clearAll();
-
-    axios.defaults.headers.common['Authorization'] = '';
-
-    setAuthState(false);
-  }
+    try {
+      await storage.clearAll();
+      axios.defaults.headers.common['Authorization'] = '';
+      setAuthState(false);
+      return true; 
+    } catch (error) {
+      return false; 
+    }
+  };
 
   const contextValue: AuthContextProps = {
     authState,
