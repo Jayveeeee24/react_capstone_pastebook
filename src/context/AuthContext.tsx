@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { BASE_URL, storage } from '../utils/Config';
+import { BASE_URL, Storage } from '../utils/Config';
 
 interface AuthContextProps {
   authState?: boolean
@@ -27,7 +27,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const loadToken = async () => {
       try {
-        const token = await storage.getString('userToken');
+        const token = await Storage.getString('userToken');
 
         if (token) {
           axios.defaults.headers.common['Authorization'] = token;
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setAuthState(true);
 
       axios.defaults.headers.common['Authorization'] = result.data.token;
-      await storage.set('userToken', JSON.stringify(result.data.token));
+      await Storage.set('userToken', JSON.stringify(result.data.token));
 
       return result.data;
     } catch (error: any) {
@@ -94,14 +94,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      await storage.clearAll();
-      axios.defaults.headers.common['Authorization'] = '';
+      await Storage.clearAll();
       setAuthState(false);
+
+      axios.post(`${BASE_URL}/api/authentication/logout`, {});
+      
+      axios.defaults.headers.common['Authorization'] = '';
       return true;
     } catch (error) {
       return false;
     }
   };
+
+  const forgot = async () => {
+    try {
+
+    } catch (error) {
+
+    }
+  }
 
   const contextValue: AuthContextProps = {
     authState,

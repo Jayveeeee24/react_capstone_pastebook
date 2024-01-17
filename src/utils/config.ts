@@ -5,9 +5,9 @@ import { MMKV } from "react-native-mmkv";
 export const BASE_URL = 'http://192.168.55.107:7208';//dorm
 
 
-export const storage = new MMKV();
+export const Storage = new MMKV();
 
-export const colors = {
+export const Colors = {
     primaryBrand: '#3373B0',
     secondaryBrand: '#eab676',
 }

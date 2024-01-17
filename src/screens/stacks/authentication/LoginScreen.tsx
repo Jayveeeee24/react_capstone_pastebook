@@ -6,7 +6,7 @@ import React, { useContext, useEffect, useState } from "react";
 import ToastManager, { Toast } from 'toastify-react-native'
 import { AuthContext } from "../../../context/AuthContext";
 import { TextInput } from "react-native-paper";
-import { colors } from "../../../utils/Config";
+import { Colors } from "../../../utils/Config";
 
 
 interface LoginScreenProps {
@@ -136,7 +136,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                                 setError('invalid_credentials');
                             }
                         }}
-                        style={[styles.buttonContainer, { marginTop: 35, backgroundColor: colors.primaryBrand }]}>
+                        style={[styles.buttonContainer, { marginTop: 35, backgroundColor: Colors.primaryBrand }]}>
                         {isLoading ? (
                             <ActivityIndicator size="small" color="white" />
                         ) : (
@@ -149,7 +149,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                         onPress={() => {
                             navigation.navigate('Register');
                         }}
-                        style={[styles.buttonContainer, { marginTop: 10, backgroundColor: colors.secondaryBrand }]}>
+                        style={[styles.buttonContainer, { marginTop: 10, backgroundColor: Colors.secondaryBrand }]}>
                         <Text style={[styles.buttonText, styles.text]}>Create an Account</Text>
                     </TouchableOpacity>
 
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     touchableForgot: {
-        color: colors.primaryBrand, fontWeight: '700', fontSize: 16
+        color: Colors.primaryBrand, fontWeight: '700', fontSize: 16
     },
     buttonContainer: {
         padding: 15,

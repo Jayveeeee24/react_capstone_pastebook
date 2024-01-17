@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Images } from "../utils/Images";
-import { colors } from "../utils/Config";
+import { Colors } from "../utils/Config";
 
 export const IndividualFriendRequest = () => {
     return (
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     followContainer: {
         flex: 0,
         alignItems: "center",
-        backgroundColor: colors.primaryBrand,
+        backgroundColor: Colors.primaryBrand,
         borderRadius: 5,
         paddingHorizontal: 14,
         paddingVertical: 5

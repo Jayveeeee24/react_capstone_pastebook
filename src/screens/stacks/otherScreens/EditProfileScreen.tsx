@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Image, Keyboard, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { Images } from "../../../utils/Images";
-import { colors } from "../../../utils/Config";
+import { Colors } from "../../../utils/Config";
 import { CustomDropdown } from "../../../components/CustomDropdown";
 import { DatePickerComponent } from "../../../components/DatePickerComponent";
 
@@ -45,7 +45,7 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ navigation
                         <View style={{ marginTop: 20, alignItems: "center" }}>
                             <Image source={Images.sample_avatar} resizeMode="cover" style={{ aspectRatio: 1, width: 80, height: 80, borderRadius: 30 }} />
                             <TouchableOpacity>
-                                <Text style={{ color: colors.primaryBrand, marginTop: 10 }}>Edit profile picture</Text>
+                                <Text style={{ color: Colors.primaryBrand, marginTop: 10 }}>Edit profile picture</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={{ marginHorizontal: 15, marginTop: 20 }}>
@@ -83,7 +83,7 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ navigation
                                 onPress={() => {
 
                                 }}
-                                style={[{ padding: 15, borderRadius: 10, marginTop: 40, backgroundColor: colors.secondaryBrand }]}>
+                                style={[{ padding: 15, borderRadius: 10, marginTop: 40, backgroundColor: Colors.secondaryBrand }]}>
                                 <Text style={[{ fontFamily: 'Roboto-Medium', color: 'white', fontSize: 20, textAlign: 'center' }]}>Save Profile</Text>
                             </TouchableOpacity>
 

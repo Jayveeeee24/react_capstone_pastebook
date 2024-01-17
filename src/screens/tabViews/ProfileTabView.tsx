@@ -4,7 +4,7 @@ import { TabView, SceneMap } from 'react-native-tab-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { IndividualPost } from '../../components/IndividualPost';
 import { Images } from '../../utils/Images';
-import { colors } from '../../utils/Config';
+import { Colors } from '../../utils/Config';
 
 const FirstRoute = () => (
     <ScrollView showsVerticalScrollIndicator={false}>
@@ -36,7 +36,7 @@ const renderTabBar = (props: { navigationState: { routes: any[]; index: any; }; 
                 key={index}
                 style={[styles.tabItem, index === props.navigationState.index && styles.selectedTab]}
                 onPress={() => props.jumpTo(route.key)}>
-                <MaterialCommunityIcons name={route.key === 'first' ? 'grid' : 'account-box-outline'} size={26} color={colors.primaryBrand} />
+                <MaterialCommunityIcons name={route.key === 'first' ? 'grid' : 'account-box-outline'} size={26} color={Colors.primaryBrand} />
             </TouchableOpacity>
         ))}
     </View>
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     selectedTab: {
         backgroundColor: 'white',
         borderBottomWidth: 0.8,
-        borderBottomColor: colors.primaryBrand
+        borderBottomColor: Colors.primaryBrand
     },
     tabText: {
         fontWeight: 'bold',

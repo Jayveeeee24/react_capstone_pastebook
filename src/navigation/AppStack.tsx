@@ -12,13 +12,15 @@ import { NotificationIconWithBadge } from "../components/NotificationWithBadge";
 import { Images } from "../utils/Images";
 import { NotificationScreen } from "../screens/stacks/otherScreens/NotificationScreen";
 import { FriendRequestScreen } from "../screens/stacks/otherScreens/FriendRequestScreen";
-import { colors } from "../utils/Config";
+import { Colors } from "../utils/Config";
 import { LoginScreen } from "../screens/stacks/authentication/LoginScreen";
 import { RegisterScreen } from "../screens/stacks/authentication/RegisterScreen";
 import { useAuth } from "../context/AuthContext";
 import { EditProfileScreen } from "../screens/stacks/otherScreens/EditProfileScreen";
 import { FollowersScreen } from "../screens/stacks/otherScreens/FollowersScreen";
 import { ForgotPasswordScreen } from "../screens/stacks/authentication/ForgotPasswordScreen";
+import { SettingsScreen } from "../screens/stacks/otherScreens/SettingsScreen";
+import { PhotosScreen } from "../screens/stacks/otherScreens/PhotosScreen";
 
 
 
@@ -108,6 +110,8 @@ export const AppStack = () => {
         <Stack.Screen name="FriendRequest" component={FriendRequestScreen} options={{ title: 'Friend Requests' }} />
         <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile' }} />
         <Stack.Screen name="Followers" component={FollowersScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="Photos" component={PhotosScreen} />
 
       </Stack.Navigator>
     );
@@ -117,7 +121,7 @@ export const AppStack = () => {
     return (
       <Tab.Navigator
         screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused }) => getTabBarIcon(route, focused, colors.primaryBrand),
+          tabBarIcon: ({ focused }) => getTabBarIcon(route, focused, Colors.primaryBrand),
           headerShown: route.name != 'CreatePostTab' && route.name != 'HomeTab',
           tabBarShowLabel: false,
           tabBarStyle: {
