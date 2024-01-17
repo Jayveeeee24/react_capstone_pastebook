@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Image, SafeAreaView, StyleSheet, Text, Touchable, TouchableOpacity, View } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { images } from "../../utils/Images";
 import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
-import {ProfileTabView} from "../tabViews/ProfileTabView";
+import { ProfileTabView } from "../tabViews/ProfileTabView";
 import { colors } from "../../utils/config";
+import { AuthContext } from "../../context/AuthContext";
+import { Toast } from "toastify-react-native";
 
 interface ProfileTabProps {
     navigation: any;
@@ -14,6 +16,7 @@ interface ProfileTabProps {
 
 export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => {
     const [dynamicTitle, setDynamicTitle] = useState("Profile Tab");
+    const { logout } = useContext(AuthContext);
 
 
     useEffect(() => {
@@ -25,7 +28,15 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                 </View>
             ),
             headerRight: () => (
-                <TouchableOpacity>
+                <TouchableOpacity onPress={async () => {
+                    const success = logout ? await logout() : undefined;
+
+                    if (success) {
+                        navigation.navigate('Login');
+                    } else {
+                        Toast.warn('Logout error, please try again', 'top');
+                    }
+                }}>
                     <View style={{ flexDirection: "row", marginEnd: 12 }}>
                         <SimpleLineIcons name="settings" size={20} color='black' />
                     </View>
@@ -44,7 +55,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <View style={{ flexDirection: "column", backgroundColor: 'white', flex: 1 }}>
-                <View style={{paddingHorizontal: 20, paddingVertical: 15 }}>
+                <View style={{ paddingHorizontal: 20, paddingVertical: 15 }}>
                     <View style={{ flexDirection: "row", gap: 20, }}>
                         <Image source={images.sample_avatar} resizeMode="cover" style={{ flex: 1, aspectRatio: 1, width: 60, height: 60 }} />
                         <TouchableOpacity style={{ flex: 1, justifyContent: "center" }}>

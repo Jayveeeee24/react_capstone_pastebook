@@ -1,13 +1,13 @@
-import { RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
-import { IndividualNotification } from "../../components/IndividualNotification";
 import { useCallback, useState } from "react";
+import { RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
+import { IndividualFriendRequest } from "../../components/IndividualFriendRequest";
 
-interface NotificationScreenProps {
+interface FriendRequestScreenProps {
     navigation: any;
     route: any;
 }
 
-export const NotificationScreen: React.FC<NotificationScreenProps> = ({ navigation, route }) => {
+export const FriendRequestScreen: React.FC<FriendRequestScreenProps> = ({ navigation, route }) => {
     const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -36,24 +36,17 @@ export const NotificationScreen: React.FC<NotificationScreenProps> = ({ navigati
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-            <ScrollView
+            <ScrollView 
                 showsVerticalScrollIndicator={false}
                 onScroll={handleScroll}
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
                 }>
                 <View style={{ flexDirection: "column", backgroundColor: 'white', flex: 1 }}>
-                    <Text style={{ marginHorizontal: 10, marginVertical: 13, fontSize: 18, color: 'black', fontFamily: 'Roboto-Medium' }}>Yesterday</Text>
-                    <IndividualNotification />
-                    <IndividualNotification />
-                    <IndividualNotification />
-                    <Text style={{ marginHorizontal: 10, marginVertical: 13, fontSize: 18, color: 'black', fontFamily: 'Roboto-Medium' }}>Last 7 days</Text>
-                    <IndividualNotification />
-                    <IndividualNotification />
-                    <IndividualNotification />
-                    <IndividualNotification />
-                    <IndividualNotification />
-                    <IndividualNotification />
+                    <IndividualFriendRequest />
+                    <IndividualFriendRequest />
+                    <IndividualFriendRequest />
+                    <IndividualFriendRequest />
                 </View>
             </ScrollView>
         </SafeAreaView>

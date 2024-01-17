@@ -10,14 +10,13 @@ import { HomeTab } from "../screens/bottomTabs/HomeTab";
 import { Image, TouchableOpacity, View } from "react-native";
 import { NotificationIconWithBadge } from "../components/NotificationWithBadge";
 import { images } from "../utils/Images";
-import { NotificationScreen } from "../screens/stacks/NotificationScreen";
-import { FriendRequestScreen } from "../screens/stacks/FriendRequestScreen";
+import { NotificationScreen } from "../screens/otherScreens/NotificationScreen";
+import { FriendRequestScreen } from "../screens/otherScreens/FriendRequestScreen";
 import { colors } from "../utils/config";
 import { LoginScreen } from "../screens/stacks/authentication/LoginScreen";
 import { RegisterScreen } from "../screens/stacks/authentication/RegisterScreen";
-import { AuthContext, useAuth } from "../context/AuthContext";
-import { useContext } from "react";
-import { Toast } from "toastify-react-native";
+import { useAuth } from "../context/AuthContext";
+
 
 
 const Tab = createBottomTabNavigator();
@@ -61,7 +60,6 @@ const getTabBarIcon = (route: any, focused: any, color: any) => {
 };
 
 export const AppStack = () => {
-  const { logout } = useContext(AuthContext);
 
   function HomeStack({ navigation }: { navigation: HomeStackNavigationProp }) {
     return (
@@ -88,15 +86,7 @@ export const AppStack = () => {
 
               <TouchableOpacity
                 onPress={async () => {
-                  // navigation.navigate('FriendRequest');
-
-                  const success = logout ? await logout() : undefined;
-
-                  if (success) {
-                    navigation.navigate('Login' as keyof HomeStackParamList); 
-                  } else {
-                    Toast.warn('Logout error, please try again', 'top');
-                  }
+                  navigation.navigate('FriendRequest');
                 }}
               >
                 <MaterialCommunityIcons name="account-plus-outline" size={30} color="black" />
