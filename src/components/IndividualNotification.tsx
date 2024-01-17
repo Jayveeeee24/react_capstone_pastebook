@@ -5,7 +5,7 @@ import Entypo from 'react-native-vector-icons/Entypo'
 export const IndividualNotification = () => {
     return (
         <View>
-            <TouchableOpacity onPress={() => console.log('parent')}>
+            <TouchableOpacity style={{marginVertical: 5}}>
                 <View style={{ flexDirection: 'row', width: '100%', justifyContent: "space-between", paddingVertical: 8, paddingHorizontal: 12, alignItems: "center" }}>
                     <View style={{ flex: 0 }}>
                         <Image source={Images.sample_avatar} resizeMode="cover" style={{ aspectRatio: 1, width: 50, height: 50 }} />
@@ -18,7 +18,6 @@ export const IndividualNotification = () => {
                             <Text style={{color: 'red', fontSize: 18}}> *</Text>
                         </Text>
                     </View>
-                    
                 </View>
             </TouchableOpacity>
 

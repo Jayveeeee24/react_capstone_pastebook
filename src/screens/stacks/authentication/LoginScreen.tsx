@@ -1,4 +1,4 @@
-import { Image, Keyboard, Platform, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity, View, ActivityIndicator } from "react-native";
+import { Image, Keyboard, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Images } from "../../../utils/Images";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -6,7 +6,6 @@ import React, { useContext, useEffect, useState } from "react";
 import ToastManager, { Toast } from 'toastify-react-native'
 import { AuthContext } from "../../../context/AuthContext";
 import { TextInput } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../../utils/Config";
 
 
@@ -17,7 +16,6 @@ interface LoginScreenProps {
 
 export const LoginScreen = ({ navigation }: LoginScreenProps) => {
     const { login } = useContext(AuthContext);
-
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

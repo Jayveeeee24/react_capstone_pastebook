@@ -4,7 +4,7 @@ import { colors } from "../utils/Config";
 
 export const IndividualFriendRequest = () => {
     return (
-        <TouchableOpacity>
+        <TouchableOpacity style={{marginVertical: 5}}>
             <View style={styles.container}>
                 <View style={styles.imageContainer}>
                     <Image source={Images.sample_avatar} resizeMode="cover" style={styles.avatarImage} />
