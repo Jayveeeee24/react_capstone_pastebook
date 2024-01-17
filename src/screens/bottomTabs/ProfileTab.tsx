@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Image, SafeAreaView, StyleSheet, Text, Touchable, TouchableOpacity, View } from "react-native";
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, Touchable, TouchableOpacity, View } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { Images } from "../../utils/Images";
@@ -58,15 +58,15 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                 <View style={{ paddingHorizontal: 20, paddingVertical: 15 }}>
                     <View style={{ flexDirection: "row", gap: 20, }}>
                         <Image source={Images.sample_avatar} resizeMode="cover" style={{ flex: 1, aspectRatio: 1, width: 60, height: 60 }} />
-                        <TouchableOpacity style={{ flex: 1, justifyContent: "center" }}>
+                        <View style={{ flex: 1, justifyContent: "center" }}>
                             <Text style={styles.textMetricsTitle}>19</Text>
                             <Text style={styles.textMetricsSub}>Posts</Text>
-                        </TouchableOpacity>
+                        </View>
                         <TouchableOpacity style={{ flex: 1, justifyContent: "center" }}>
                             <Text style={styles.textMetricsTitle}>62</Text>
                             <Text style={styles.textMetricsSub}>Followers</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ flex: 1, justifyContent: "center" }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('AlbumsTab')} style={{ flex: 1, justifyContent: "center" }}>
                             <Text style={styles.textMetricsTitle}>12</Text>
                             <Text style={styles.textMetricsSub}>Albums</Text>
                         </TouchableOpacity>

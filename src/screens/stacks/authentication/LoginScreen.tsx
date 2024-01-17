@@ -97,17 +97,22 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                             const trimmedPassword = password.trim();
                             setIsPasswordValid(!!trimmedPassword && trimmedPassword.length >= 8);
 
-                            try {
-                                const success = login ? await login(email, password) : undefined;
-                                console.log(success)
-                                if (success) {
-                                    navigation.replace('BottomHome');
-                                } else {
-                                    Toast.warn('Sign in error, please try again', 'top');
+                            if (isValid && trimmedPassword) {
+                                try {
+                                    const success = login ? await login(email, password) : undefined;
+                                    if (success) {
+                                        navigation.replace('BottomHome');
+                                    } else {
+                                        Toast.warn('Sign in error, please try again', 'top');
+                                    }
+                                } catch (error) {
+                                    Toast.warn('Issues signing in, please try again', 'top');
                                 }
-                            } catch (error) {
-                                Toast.warn('Issues signing in, please try again', 'top');
+                            } else {
+                                Toast.warn('Invalid credentials!', 'top');
                             }
+
+
                         }}
                         style={[styles.buttonContainer, { marginTop: 35, backgroundColor: colors.primaryBrand }]}
                     >

@@ -12,8 +12,6 @@ interface SearchTabProps {
 export const SearchTab: React.FC<SearchTabProps> = ({ navigation, route }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
-
-
     useEffect(() => {
         navigation.setOptions({
             headerLeft: () => (

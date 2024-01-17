@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
-import { IndividualFriendRequest } from "../../components/IndividualFriendRequest";
+import { IndividualFriendRequest } from "../../../components/IndividualFriendRequest";
 
 interface FriendRequestScreenProps {
     navigation: any;

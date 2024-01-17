@@ -334,49 +334,6 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white', fontSize: 20, textAlign: 'center'
     },
-    dropdown: {
-        marginHorizontal: 30,
-        marginTop: 10,
-        height: 50,
-        backgroundColor: 'white',
-        borderRadius: 12,
-        padding: 12,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 1,
-        },
-        shadowOpacity: 0.2,
-        shadowRadius: 1.41,
-        elevation: 2,
-    },
-    icon: {
-        marginRight: 5,
-    },
-    item: {
-        padding: 17,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    textItem: {
-        flex: 1,
-        fontSize: 16,
-    },
-    textStyle: {
-        color: '#666',
-        fontSize: 16,
-    },
-    iconStyle: {
-        width: 20,
-        height: 20,
-    },
-    datePickerCard: {
-        backgroundColor: "white",
-        borderRadius: 10,
-        marginHorizontal: 30,
-        marginTop: 10
-    },
     progressBar: {
         marginHorizontal: 30,
         marginBottom: 30,

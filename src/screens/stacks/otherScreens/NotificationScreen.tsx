@@ -1,5 +1,5 @@
 import { RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
-import { IndividualNotification } from "../../components/IndividualNotification";
+import { IndividualNotification } from "../../../components/IndividualNotification";
 import { useCallback, useState } from "react";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { TouchableOpacity } from "react-native-gesture-handler";

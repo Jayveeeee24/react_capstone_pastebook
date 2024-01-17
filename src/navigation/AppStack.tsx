@@ -10,13 +10,13 @@ import { HomeTab } from "../screens/bottomTabs/HomeTab";
 import { Image, TouchableOpacity, View } from "react-native";
 import { NotificationIconWithBadge } from "../components/NotificationWithBadge";
 import { Images } from "../utils/Images";
-import { NotificationScreen } from "../screens/otherScreens/NotificationScreen";
-import { FriendRequestScreen } from "../screens/otherScreens/FriendRequestScreen";
+import { NotificationScreen } from "../screens/stacks/otherScreens/NotificationScreen";
+import { FriendRequestScreen } from "../screens/stacks/otherScreens/FriendRequestScreen";
 import { colors } from "../utils/Config";
 import { LoginScreen } from "../screens/stacks/authentication/LoginScreen";
 import { RegisterScreen } from "../screens/stacks/authentication/RegisterScreen";
 import { useAuth } from "../context/AuthContext";
-import { EditProfileScreen } from "../screens/otherScreens/EditProfileScreen";
+import { EditProfileScreen } from "../screens/stacks/otherScreens/EditProfileScreen";
 
 
 
@@ -123,8 +123,7 @@ export const AppStack = () => {
             height: 55,
             alignItems: "center",
           }
-        })}
-      >
+        })}>
         <Tab.Screen name="HomeTab" component={HomeStack} />
         <Tab.Screen name="SearchTab" component={SearchTab} />
         <Tab.Screen name="CreatePostTab" component={CreatePostTab} />
