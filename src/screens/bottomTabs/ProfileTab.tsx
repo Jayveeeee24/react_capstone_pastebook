@@ -1,11 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, Touchable, TouchableOpacity, View } from "react-native";
+import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { Images } from "../../utils/Images";
-import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 import { ProfileTabView } from "../tabViews/ProfileTabView";
-import { colors } from "../../utils/Config";
 import { AuthContext } from "../../context/AuthContext";
 import { Toast } from "toastify-react-native";
 
@@ -62,7 +60,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                             <Text style={styles.textMetricsTitle}>19</Text>
                             <Text style={styles.textMetricsSub}>Posts</Text>
                         </View>
-                        <TouchableOpacity style={{ flex: 1, justifyContent: "center" }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Followers')} style={{ flex: 1, justifyContent: "center" }}>
                             <Text style={styles.textMetricsTitle}>62</Text>
                             <Text style={styles.textMetricsSub}>Followers</Text>
                         </TouchableOpacity>

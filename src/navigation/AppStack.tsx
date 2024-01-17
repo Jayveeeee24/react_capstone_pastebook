@@ -17,6 +17,8 @@ import { LoginScreen } from "../screens/stacks/authentication/LoginScreen";
 import { RegisterScreen } from "../screens/stacks/authentication/RegisterScreen";
 import { useAuth } from "../context/AuthContext";
 import { EditProfileScreen } from "../screens/stacks/otherScreens/EditProfileScreen";
+import { FollowersScreen } from "../screens/stacks/otherScreens/FollowersScreen";
+import { ForgotPasswordScreen } from "../screens/stacks/authentication/ForgotPasswordScreen";
 
 
 
@@ -72,8 +74,6 @@ export const AppStack = () => {
           },
           headerShown: route.name !== 'Login' && route.name !== 'Register',
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-
-
         })}>
         <Stack.Screen name="Home" component={HomeTab} options={{
           title: '',
@@ -107,6 +107,7 @@ export const AppStack = () => {
         <Stack.Screen name="Notifications" component={NotificationScreen} />
         <Stack.Screen name="FriendRequest" component={FriendRequestScreen} options={{ title: 'Friend Requests' }} />
         <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile' }} />
+        <Stack.Screen name="Followers" component={FollowersScreen} />
 
       </Stack.Navigator>
     );
@@ -149,6 +150,7 @@ export const AppStack = () => {
             <>
               <Stack.Screen name="Login" component={LoginScreen} />
               <Stack.Screen name="Register" component={RegisterScreen} />
+              <Stack.Screen name="Forgot" component={ForgotPasswordScreen} />
             </>
           )
       }

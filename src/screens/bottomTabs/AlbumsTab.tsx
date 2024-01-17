@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Alert, FlatList, Image, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import { Menu, MenuOption, MenuOptions, MenuProvider, MenuTrigger } from "react-native-popup-menu";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Images } from "../../utils/Images";
 
 interface AlbumTabProps {
@@ -21,8 +22,8 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
             ),
             headerTitle: '',
             headerStyle: {
-                borderBottomWidth: 0.8,
-                borderBottomColor: 'lightgray'
+                elevation: 0,
+                shadowOpacity: 0
             },
         });
     }, [navigation]);
@@ -87,7 +88,7 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
                 <View style={{ flexDirection: "column", flex: 1 }}>
                     <View style={{ width: '100%', alignItems: "flex-end" }}>
                         <Menu>
-                            <MenuTrigger style={{ margin: 10 }}>
+                            <MenuTrigger style={{ marginHorizontal: 10 }}>
                                 <View style={{ flexDirection: "row", borderColor: 'gray', borderWidth: 1, padding: 5 }}>
                                     <Text style={{ color: 'black' }}>Sort by: </Text>
                                     <MaterialIcons name="keyboard-arrow-down" size={20} color="#666" />
@@ -118,8 +119,8 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
                                     <TouchableOpacity>
                                         <View style={{ marginBottom: 3, marginRight: index % 3 !== 2 ? 2 : 0, }}>
                                             <Image source={item.albumThumbnail} resizeMode="cover" style={{ width: '100%', height: 120 }} />
-                                            <View style={{ position: "absolute", bottom: 0, alignSelf: "center", backgroundColor: '#26323890', width: '100%' }}>
-                                                <Text style={{color: 'white', textAlign: "center"}}>{item.albumName}</Text>
+                                            <View style={{ position: "absolute", top: 0, width: '100%' }}>
+                                                <MaterialCommunityIcons name="checkbox-multiple-blank" size={26} color={'white'} style={{alignSelf: "flex-end", margin: 5}} />
                                             </View>
                                         </View>
                                     </TouchableOpacity>

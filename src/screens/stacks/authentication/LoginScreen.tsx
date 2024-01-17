@@ -1,8 +1,8 @@
-import { Image, Keyboard, Platform, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity, View } from "react-native";
+import { Image, Keyboard, Platform, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Images } from "../../../utils/Images";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ToastManager, { Toast } from 'toastify-react-native'
 import { AuthContext } from "../../../context/AuthContext";
 import { TextInput } from "react-native-paper";
@@ -23,13 +23,35 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
+    const [isLoading, setIsLoading] = useState(false);
+
+    const [isValidEmail, setIsValidEmail] = useState(true);
+    const [isPasswordValid, setIsPasswordValid] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
-    const [isValidEmail, setIsValidEmail] = useState(true);
-    const [isPasswordValid, setIsPasswordValid] = useState(true);
+    useEffect(() => {
+        if (error) {
+            Toast.warn(getErrorMessage(error), 'top');
+            setError(null); 
+        }
+    }, [error]);
 
+    const getErrorMessage = (errorCode: string) => {
+        switch (errorCode) {
+            case 'no_user_found':
+                return 'No user found.';
+            case 'invalid_credentials':
+                return 'Invalid credentials.';
+            case 'invalid_user_login':
+                return 'Invalid user login.';
+            default:
+                return 'Sign in error. Please try again.';
+        }
+    };
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
             <TouchableWithoutFeedback
@@ -99,24 +121,29 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
 
                             if (isValid && trimmedPassword) {
                                 try {
-                                    const success = login ? await login(email, password) : undefined;
-                                    if (success) {
-                                        navigation.replace('BottomHome');
+                                    setIsLoading(true);
+                                    const result = login ? await login(email, password) : undefined;
+
+                                    if (result && result.error) {
+                                        setError(result.error);
                                     } else {
-                                        Toast.warn('Sign in error, please try again', 'top');
+                                        navigation.replace('BottomHome');
                                     }
                                 } catch (error) {
-                                    Toast.warn('Issues signing in, please try again', 'top');
+                                    setError('unknown_error');
+                                } finally {
+                                    setIsLoading(false);
                                 }
                             } else {
-                                Toast.warn('Invalid credentials!', 'top');
+                                setError('invalid_credentials');
                             }
-
-
                         }}
-                        style={[styles.buttonContainer, { marginTop: 35, backgroundColor: colors.primaryBrand }]}
-                    >
-                        <Text style={[styles.buttonText, styles.text]}>Login</Text>
+                        style={[styles.buttonContainer, { marginTop: 35, backgroundColor: colors.primaryBrand }]}>
+                        {isLoading ? (
+                            <ActivityIndicator size="small" color="white" />
+                        ) : (
+                            <Text style={[styles.buttonText, styles.text]}>Login</Text>
+                        )}
                     </TouchableOpacity>
 
 

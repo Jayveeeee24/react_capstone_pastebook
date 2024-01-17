@@ -82,8 +82,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await storage.set('userToken', JSON.stringify(result.data.token));
 
       return result.data;
-    } catch (e) {
-      throw e;
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.result) {
+        return { error: error.response.data.result };
+      } else {
+        throw error;
+      }
     }
   }
 
@@ -93,9 +97,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await storage.clearAll();
       axios.defaults.headers.common['Authorization'] = '';
       setAuthState(false);
-      return true; 
+      return true;
     } catch (error) {
-      return false; 
+      return false;
     }
   };
 

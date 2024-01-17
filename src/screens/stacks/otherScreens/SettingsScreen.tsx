@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 
-export const ForgotPasswordScreen = () => {
+export const SettingsScreen = () => {
     return (
         <View>
-            <Text>Forgot Password</Text>
+            <Text>Settings Screen</Text>
         </View>
     );
 }
