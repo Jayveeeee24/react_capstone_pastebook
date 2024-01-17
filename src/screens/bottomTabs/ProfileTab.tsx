@@ -2,10 +2,10 @@ import { useContext, useEffect, useState } from "react";
 import { Image, SafeAreaView, StyleSheet, Text, Touchable, TouchableOpacity, View } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
-import { images } from "../../utils/Images";
+import { Images } from "../../utils/Images";
 import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 import { ProfileTabView } from "../tabViews/ProfileTabView";
-import { colors } from "../../utils/config";
+import { colors } from "../../utils/Config";
 import { AuthContext } from "../../context/AuthContext";
 import { Toast } from "toastify-react-native";
 
@@ -57,7 +57,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
             <View style={{ flexDirection: "column", backgroundColor: 'white', flex: 1 }}>
                 <View style={{ paddingHorizontal: 20, paddingVertical: 15 }}>
                     <View style={{ flexDirection: "row", gap: 20, }}>
-                        <Image source={images.sample_avatar} resizeMode="cover" style={{ flex: 1, aspectRatio: 1, width: 60, height: 60 }} />
+                        <Image source={Images.sample_avatar} resizeMode="cover" style={{ flex: 1, aspectRatio: 1, width: 60, height: 60 }} />
                         <TouchableOpacity style={{ flex: 1, justifyContent: "center" }}>
                             <Text style={styles.textMetricsTitle}>19</Text>
                             <Text style={styles.textMetricsSub}>Posts</Text>
@@ -75,7 +75,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                         <Text style={{ fontWeight: '700' }}>John Bernard Tinio</Text>
                         <Text>{'\n'}Full-time Bug Sprayer{'\n'}Aspiring Photographer</Text>
                     </Text>
-                    <TouchableOpacity style={{ borderWidth: 0.8, borderColor: 'gray', marginTop: 8, padding: 5 }}>
+                    <TouchableOpacity onPress={() => navigation.navigate('EditProfile')} style={{ borderWidth: 0.8, borderColor: 'gray', marginTop: 8, padding: 5 }}>
                         <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', fontWeight: '700', textAlign: "center" }}>Edit Profile</Text>
                     </TouchableOpacity>
                 </View>

@@ -1,6 +1,6 @@
 import { FlatList, Image, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { UserAvatar } from "../../components/UserAvatar";
-import { images } from "../../utils/Images";
+import { Images } from "../../utils/Images";
 import { IndividualPost } from "../../components/IndividualPost";
 import { useCallback, useState } from "react";
 
@@ -13,53 +13,53 @@ export const HomeTab = () => {
         {
             id: '1',
             name: "Jb",
-            imageUrl: images.sample_avatar
+            imageUrl: Images.sample_avatar
 
         },
         {
             id: "2",
             name: "Sam",
-            imageUrl: images.sample_avatar_female
+            imageUrl: Images.sample_avatar_female
         },
         {
             id: "3",
             name: "Stan",
-            imageUrl: images.sample_avatar
+            imageUrl: Images.sample_avatar
         },
         {
             id: "4",
             name: "Jean",
-            imageUrl: images.sample_avatar_female
+            imageUrl: Images.sample_avatar_female
         },
         {
             id: "5",
             name: "Jiggs",
-            imageUrl: images.sample_avatar
+            imageUrl: Images.sample_avatar
         },
         {
             id: "6",
             name: "Blessie",
-            imageUrl: images.sample_avatar_female
+            imageUrl: Images.sample_avatar_female
         },
         {
             id: "7",
             name: "Ejay",
-            imageUrl: images.sample_avatar
+            imageUrl: Images.sample_avatar
         },
         {
             id: "8",
             name: "Marliss",
-            imageUrl: images.sample_avatar_female
+            imageUrl: Images.sample_avatar_female
         },
         {
             id: "9",
             name: "Geo",
-            imageUrl: images.sample_avatar
+            imageUrl: Images.sample_avatar
         },
         {
             id: "10",
             name: "Mariel",
-            imageUrl: images.sample_avatar_female
+            imageUrl: Images.sample_avatar_female
         },
     ]);
 
@@ -104,10 +104,10 @@ export const HomeTab = () => {
                         showsHorizontalScrollIndicator={false} />
                 </View>
                 <View style={styles.postsContainer}>
-                    <IndividualPost name='jayvee.artemis' avatarUrl={images.sample_avatar} postImageUrl={images.sample_post_image} postTitle="This is a post" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={910} likes={1654432} onLikePress={() => { }} />
-                    <IndividualPost name='yashimallow' avatarUrl={images.sample_avatar_female} postImageUrl={images.sample_post_image_2} postTitle="This is a post 2" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={754} likes={31321} onLikePress={() => { }} />
-                    <IndividualPost name='blec_siopao' avatarUrl={images.sample_avatar_female} postImageUrl={images.sample_post_image_3} postTitle="This is a post 3" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={3} likes={5} onLikePress={() => { }} />
-                    <IndividualPost name='hmzzjin' avatarUrl={images.sample_avatar_female} postImageUrl={images.sample_post_image_4} postTitle="This is a post 4" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={10341} likes={3134221} onLikePress={() => { }} />
+                    <IndividualPost name='jayvee.artemis' avatarUrl={Images.sample_avatar} postImageUrl={Images.sample_post_image} postTitle="This is a post" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={910} likes={1654432} onLikePress={() => { }} />
+                    <IndividualPost name='yashimallow' avatarUrl={Images.sample_avatar_female} postImageUrl={Images.sample_post_image_2} postTitle="This is a post 2" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={754} likes={31321} onLikePress={() => { }} />
+                    <IndividualPost name='blec_siopao' avatarUrl={Images.sample_avatar_female} postImageUrl={Images.sample_post_image_3} postTitle="This is a post 3" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={3} likes={5} onLikePress={() => { }} />
+                    <IndividualPost name='hmzzjin' avatarUrl={Images.sample_avatar_female} postImageUrl={Images.sample_post_image_4} postTitle="This is a post 4" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={10341} likes={3134221} onLikePress={() => { }} />
                 </View>
             </ScrollView>
 

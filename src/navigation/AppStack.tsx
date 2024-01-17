@@ -9,13 +9,14 @@ import { ProfileTab } from "../screens/bottomTabs/ProfileTab";
 import { HomeTab } from "../screens/bottomTabs/HomeTab";
 import { Image, TouchableOpacity, View } from "react-native";
 import { NotificationIconWithBadge } from "../components/NotificationWithBadge";
-import { images } from "../utils/Images";
+import { Images } from "../utils/Images";
 import { NotificationScreen } from "../screens/otherScreens/NotificationScreen";
 import { FriendRequestScreen } from "../screens/otherScreens/FriendRequestScreen";
-import { colors } from "../utils/config";
+import { colors } from "../utils/Config";
 import { LoginScreen } from "../screens/stacks/authentication/LoginScreen";
 import { RegisterScreen } from "../screens/stacks/authentication/RegisterScreen";
 import { useAuth } from "../context/AuthContext";
+import { EditProfileScreen } from "../screens/otherScreens/EditProfileScreen";
 
 
 
@@ -97,7 +98,7 @@ export const AppStack = () => {
           headerLeft: () => (
             <View style={{ flexDirection: 'row', marginLeft: 10 }}>
               <Image
-                source={images.logo_wide_dark}
+                source={Images.logo_wide_dark}
                 style={{ width: 120, height: 35 }}
               />
             </View>
@@ -105,6 +106,7 @@ export const AppStack = () => {
         }} />
         <Stack.Screen name="Notifications" component={NotificationScreen} />
         <Stack.Screen name="FriendRequest" component={FriendRequestScreen} options={{ title: 'Friend Requests' }} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile' }} />
 
       </Stack.Navigator>
     );

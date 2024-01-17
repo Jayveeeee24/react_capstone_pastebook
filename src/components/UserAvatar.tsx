@@ -1,6 +1,6 @@
 import { ImageSourcePropType, StyleSheet, View } from "react-native";
 import { Card, Title } from "react-native-paper";
-import { images } from "../utils/Images";
+import { Images } from "../utils/Images";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 interface UserAvatarProps {

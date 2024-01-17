@@ -1,13 +1,13 @@
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import { images } from "../utils/Images";
-import { colors } from "../utils/config";
+import { Images } from "../utils/Images";
+import { colors } from "../utils/Config";
 
 export const IndividualFriendRequest = () => {
     return (
         <TouchableOpacity>
             <View style={{ flexDirection: "row", width: '100%', paddingVertical: 8, paddingHorizontal: 12, alignItems: "center" }}>
                 <View style={{ flex: 0, marginEnd: 10 }}>
-                    <Image source={images.sample_avatar} resizeMode="cover" style={{ aspectRatio: 1, width: 50, height: 50, borderRadius: 25 }} />
+                    <Image source={Images.sample_avatar} resizeMode="cover" style={{ aspectRatio: 1, width: 50, height: 50, borderRadius: 25 }} />
                 </View>
                 <View style={{ flex: 1, justifyContent: 'flex-start' }}>
                     <Text>

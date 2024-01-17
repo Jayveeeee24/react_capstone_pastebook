@@ -1,4 +1,4 @@
-export const images = {
+export const Images = {
     people: require('../assets/images/people.png'),
 
     logo_wide_dark: require('../assets/images/logo_wide_dark.png'),

@@ -1,5 +1,5 @@
 import { Image, Text, TouchableNativeFeedback, View } from "react-native";
-import { images } from "../utils/Images";
+import { Images } from "../utils/Images";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 export const IndividualSearch = () => {
@@ -7,7 +7,7 @@ export const IndividualSearch = () => {
         <View>
             <TouchableOpacity>
                 <View style={{ flexDirection: 'row', width: '100%', paddingVertical: 8, paddingHorizontal: 12, alignItems: "center" }}>
-                    <Image source={images.sample_avatar} resizeMode="cover" style={{ aspectRatio: 1, width: 60, height: 60 }} />
+                    <Image source={Images.sample_avatar} resizeMode="cover" style={{ aspectRatio: 1, width: 60, height: 60 }} />
                     <View>
                         <Text style={{ fontSize: 18, fontFamily: 'Roboto-Medium', fontWeight: '900', color: 'black', marginStart: 15 }}>
                             jayvee.artemis

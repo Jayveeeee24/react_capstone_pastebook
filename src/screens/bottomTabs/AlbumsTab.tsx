@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Alert, FlatList, Image, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import { Menu, MenuOption, MenuOptions, MenuProvider, MenuTrigger } from "react-native-popup-menu";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { images } from "../../utils/Images";
+import { Images } from "../../utils/Images";
 
 interface AlbumTabProps {
     navigation: any;
@@ -31,53 +31,53 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
         {
             id: '1',
             albumName: "Blues",
-            albumThumbnail: images.sample_post_image
+            albumThumbnail: Images.sample_post_image
 
         },
         {
             id: "2",
             albumName: "Yellows",
-            albumThumbnail: images.sample_post_image_2
+            albumThumbnail: Images.sample_post_image_2
         },
         {
             id: "3",
             albumName: "Reds",
-            albumThumbnail: images.sample_post_image_3
+            albumThumbnail: Images.sample_post_image_3
         },
         {
             id: "4",
             albumName: "Oranges",
-            albumThumbnail: images.sample_post_image_4
+            albumThumbnail: Images.sample_post_image_4
         },
         {
             id: "5",
             albumName: "Blacks",
-            albumThumbnail: images.sample_post_image_5
+            albumThumbnail: Images.sample_post_image_5
         },
         {
             id: "6",
             albumName: "Whites",
-            albumThumbnail: images.sample_post_image_6
+            albumThumbnail: Images.sample_post_image_6
         },
         {
             id: "7",
             albumName: "Purples",
-            albumThumbnail: images.sample_post_image_7
+            albumThumbnail: Images.sample_post_image_7
         },
         {
             id: "8",
             albumName: "Pinks",
-            albumThumbnail: images.sample_post_image_8
+            albumThumbnail: Images.sample_post_image_8
         },
         {
             id: "9",
             albumName: "Greens",
-            albumThumbnail: images.sample_post_image_9
+            albumThumbnail: Images.sample_post_image_9
         },
         {
             id: "10",
             albumName: "Maroons",
-            albumThumbnail: images.sample_post_image_10
+            albumThumbnail: Images.sample_post_image_10
         },
     ];
 

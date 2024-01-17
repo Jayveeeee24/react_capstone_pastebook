@@ -1,5 +1,5 @@
 import { Image, Keyboard, LayoutAnimation, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
-import { images } from "../../../utils/Images";
+import { Images } from "../../../utils/Images";
 import { useContext, useState } from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -8,6 +8,8 @@ import { Dropdown } from "react-native-element-dropdown";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { AuthContext } from "../../../context/AuthContext";
 import ToastManager, { Toast } from "toastify-react-native";
+import { CustomDropdown } from "../../../components/CustomDropdown";
+import { DatePickerComponent } from "../../../components/DatePickerComponent";
 
 interface RegisterScreenProps {
     navigation: any;
@@ -25,6 +27,11 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [email, setEmail] = useState('');
     const [gender, setGender] = useState('');
+    const genders = [
+        { label: 'Male', value: '1' },
+        { label: 'Female', value: '2' },
+        { label: 'Rather not say', value: '3' }
+    ];
     const [dateOfBirth, setDateOfBirth] = useState(new Date());
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -40,99 +47,6 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
     const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
 
     const credentialTextTheme = { colors: { primary: '#3373B0' } };
-
-
-    const DropdownComponent = () => {
-        const genders = [
-            { label: 'Male', value: '1' },
-            { label: 'Female', value: '2' },
-            { label: 'Rather not say', value: '3' }
-        ];
-
-        const renderItem = (item: any) => {
-            return (
-                <View style={styles.item}>
-                    <Text style={styles.textItem}>{item.label}</Text>
-                    {item.value === gender && (
-                        <MaterialCommunityIcons
-                            style={styles.icon}
-                            color="black"
-                            name="gender-male-female"
-                            size={20}
-                        />
-                    )}
-                </View>
-            );
-        };
-
-        return (
-            <>
-                <Dropdown
-                    style={styles.dropdown}
-                    placeholderStyle={styles.textStyle}
-                    selectedTextStyle={styles.textStyle}
-                    iconStyle={styles.iconStyle}
-                    data={genders}
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    placeholder="Gender"
-                    value={gender}
-                    onChange={item => {
-                        setGender(item.value);
-                    }}
-                    renderLeftIcon={() => (
-                        <MaterialCommunityIcons style={styles.icon} color="black" name="gender-male-female" size={20} />
-                    )}
-                    renderItem={renderItem}
-                />
-                {!isGenderValid && (
-                    <Text style={[styles.textValidation, { marginTop: 5 }]}>Please choose a valid gender</Text>
-                )}
-            </>
-
-
-        );
-    }
-    const DatePickerComponent = () => {
-        const [show, setShow] = useState(false);
-
-        const onChange = (e: DateTimePickerEvent, selectedDate?: Date) => {
-            if (selectedDate) {
-                setDateOfBirth(selectedDate);
-                setShow(false);
-            }
-        };
-
-        return (
-            <View>
-                {show && (
-                    <DateTimePicker
-                        value={dateOfBirth}
-                        mode={"date"}
-                        is24Hour={true}
-                        onChange={onChange}
-                    />
-                )}
-                <TouchableWithoutFeedback onPress={() => { setShow(true) }}>
-                    <Card style={styles.datePickerCard}>
-                        <Card.Content style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                            <Text style={[styles.text, styles.textStyle]}>{dateOfBirth.toLocaleDateString('en-US', {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                            })}</Text>
-                            <MaterialCommunityIcons name="calendar" size={26} />
-                        </Card.Content>
-                    </Card>
-                </TouchableWithoutFeedback>
-                {!isDateOfBirthValid && (
-                    <Text style={[styles.textValidation, { marginTop: 5 }]}>Please enter a valid birthdate (13 y.o. up)</Text>
-                )}
-            </View>
-        );
-    }
 
     const validateEmail = async () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -278,8 +192,16 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                                 <Text style={styles.textValidation}>Please enter a valid phone number</Text>
                             )}
 
-                            <DropdownComponent />
-                            <DatePickerComponent />
+                            <View style={{ marginHorizontal: 30 }}>
+                                <CustomDropdown data={genders} value={gender} onValueChange={(value) => setGender(value)} isGenderValid={isGenderValid} placeholder={"Gender"} />
+                            </View>
+
+                            <View style={{marginHorizontal: 30}}>
+                                <DatePickerComponent
+                                    dateOfBirth={dateOfBirth}
+                                    setDateOfBirth={setDateOfBirth}
+                                    isDateOfBirthValid={isDateOfBirthValid} />
+                            </View>
                         </ScrollView>
                     </>
                 );
@@ -288,14 +210,14 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                     <>
                         <View style={[styles.credentialContainer, { marginBottom: isPasswordValid ? 10 : 0 }]}>
                             <MaterialIcons name="lock-outline" size={20} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput placeholder="Password" theme={credentialTextTheme} right={<TextInput.Icon icon={showPassword ? 'eye-off' : 'eye'} onPress={togglePasswordVisibility}/>} secureTextEntry={!showPassword} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={password} onChangeText={setPassword} />
+                            <TextInput placeholder="Password" theme={credentialTextTheme} right={<TextInput.Icon icon={showPassword ? 'eye-off' : 'eye'} onPress={togglePasswordVisibility} />} secureTextEntry={!showPassword} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={password} onChangeText={setPassword} />
                         </View>
                         {!isPasswordValid && (
                             <Text style={styles.textValidation}>Please enter a valid password (min 8 chars)</Text>
                         )}
                         <View style={[styles.credentialContainer, {}]}>
                             <MaterialIcons name="lock-outline" size={20} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput placeholder="Confirm Password" theme={credentialTextTheme} right={<TextInput.Icon icon={showConfirmPassword ? 'eye-off' : 'eye'} onPress={toggleConfirmPasswordVisibility}/>} secureTextEntry={!showConfirmPassword} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={confirmPassword} onChangeText={setConfirmPassword} />
+                            <TextInput placeholder="Confirm Password" theme={credentialTextTheme} right={<TextInput.Icon icon={showConfirmPassword ? 'eye-off' : 'eye'} onPress={toggleConfirmPasswordVisibility} />} secureTextEntry={!showConfirmPassword} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={confirmPassword} onChangeText={setConfirmPassword} />
                         </View>
                         {!isConfirmPasswordValid && (
                             <Text style={styles.textValidation}>Passwords do not match</Text>
@@ -317,11 +239,11 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
                     <View style={{ alignItems: 'center' }}>
                         <Image
-                            source={images.logo_wide_dark}
+                            source={Images.logo_wide_dark}
                             style={{ width: 130, height: 35, marginBottom: 15 }}
                         />
                         <Image
-                            source={images.register}
+                            source={Images.register}
                             style={{ width: 320, height: 210 }}
                         />
                         <Text

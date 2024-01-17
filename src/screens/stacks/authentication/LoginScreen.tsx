@@ -1,13 +1,13 @@
 import { Image, Keyboard, Platform, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { images } from "../../../utils/Images";
+import { Images } from "../../../utils/Images";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import React, { useContext, useState } from "react";
 import ToastManager, { Toast } from 'toastify-react-native'
 import { AuthContext } from "../../../context/AuthContext";
 import { TextInput } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
-import { colors } from "../../../utils/config";
+import { colors } from "../../../utils/Config";
 
 
 interface LoginScreenProps {
@@ -39,11 +39,11 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
 
                     <View style={{ alignItems: 'center' }}>
                         <Image
-                            source={images.logo_wide_dark}
+                            source={Images.logo_wide_dark}
                             style={{ width: 130, height: 35 }}
                         />
                         <Image
-                            source={images.people}
+                            source={Images.people}
                             style={{ width: 350, height: 230 }}
                         />
                         <Text
@@ -99,14 +99,14 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
 
                             try {
                                 const success = login ? await login(email, password) : undefined;
-
+                                console.log(success)
                                 if (success) {
                                     navigation.replace('BottomHome');
                                 } else {
                                     Toast.warn('Sign in error, please try again', 'top');
                                 }
                             } catch (error) {
-                                Toast.warn('Sign in error, please try again', 'top');
+                                Toast.warn('Issues signing in, please try again', 'top');
                             }
                         }}
                         style={[styles.buttonContainer, { marginTop: 35, backgroundColor: colors.primaryBrand }]}

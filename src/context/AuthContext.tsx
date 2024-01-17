@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { BASE_URL, storage } from '../utils/config';
+import { BASE_URL, storage } from '../utils/Config';
 
 interface AuthContextProps {
   authState?: boolean
