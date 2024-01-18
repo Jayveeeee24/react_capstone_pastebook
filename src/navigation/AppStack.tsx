@@ -7,7 +7,7 @@ import { CreatePostTab } from "../screens/bottomTabs/CreatePostTab";
 import { AlbumsTab } from "../screens/bottomTabs/AlbumsTab";
 import { ProfileTab } from "../screens/bottomTabs/ProfileTab";
 import { HomeTab } from "../screens/bottomTabs/HomeTab";
-import { Image, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { NotificationIconWithBadge } from "../components/NotificationWithBadge";
 import { Images } from "../utils/Images";
 import { NotificationScreen } from "../screens/stacks/otherScreens/NotificationScreen";
@@ -21,6 +21,8 @@ import { FollowersScreen } from "../screens/stacks/otherScreens/FollowersScreen"
 import { ForgotPasswordScreen } from "../screens/stacks/authentication/ForgotPasswordScreen";
 import { SettingsScreen } from "../screens/stacks/otherScreens/SettingsScreen";
 import { PhotosScreen } from "../screens/stacks/otherScreens/PhotosScreen";
+import { EditEmailScreen } from "../screens/stacks/otherScreens/EditEmailScreen";
+import { EditPasswordScreen } from "../screens/stacks/otherScreens/EditPasswordScreen";
 
 
 
@@ -108,9 +110,19 @@ export const AppStack = () => {
         }} />
         <Stack.Screen name="Notifications" component={NotificationScreen} />
         <Stack.Screen name="FriendRequest" component={FriendRequestScreen} options={{ title: 'Friend Requests' }} />
-        <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile' }} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{
+          title: 'Edit Profile'
+        }} />
+        <Stack.Screen name="EditEmail" component={EditEmailScreen} options={{
+          title: 'Change Account Email'
+        }} />
+        <Stack.Screen name="EditPassword" component={EditPasswordScreen} options={{
+          title: 'Change Account Password'
+        }} />
         <Stack.Screen name="Followers" component={FollowersScreen} />
-        <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} options={{
+          headerTitle: 'Account Settings',
+        }} />
         <Stack.Screen name="Photos" component={PhotosScreen} />
 
       </Stack.Navigator>
@@ -132,7 +144,18 @@ export const AppStack = () => {
         <Tab.Screen name="HomeTab" component={HomeStack} />
         <Tab.Screen name="SearchTab" component={SearchTab} />
         <Tab.Screen name="CreatePostTab" component={CreatePostTab} />
-        <Tab.Screen name="AlbumsTab" component={AlbumsTab} />
+        <Tab.Screen name="AlbumsTab" component={AlbumsTab} options={{
+          headerLeft: () => (
+            <View style={{ flexDirection: "row", alignItems: "center", marginStart: 10 }}>
+              <Text style={{ marginStart: 8, fontSize: 22, color: 'black', fontWeight: '700', alignItems: "center" }}>My Album Gallery</Text>
+            </View>
+          ),
+          headerTitle: '',
+          headerStyle: {
+            elevation: 0,
+            shadowOpacity: 0
+          },
+        }} />
         <Tab.Screen name="ProfileTab" component={ProfileTab} />
       </Tab.Navigator>
     );

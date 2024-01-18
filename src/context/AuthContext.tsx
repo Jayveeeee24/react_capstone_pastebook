@@ -94,14 +94,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
+      await axios.post(`${BASE_URL}/api/authentication/logout`, {});
+
       await Storage.clearAll();
       setAuthState(false);
 
-      axios.post(`${BASE_URL}/api/authentication/logout`, {});
-      
       axios.defaults.headers.common['Authorization'] = '';
       return true;
     } catch (error) {
+      console.error('Logout error:', error);
       return false;
     }
   };

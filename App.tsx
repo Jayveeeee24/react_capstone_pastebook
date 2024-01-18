@@ -6,7 +6,6 @@ import {
 import {
   Colors
 } from 'react-native/Libraries/NewAppScreen';
-import AuthStack from './src/navigation/AuthStack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { AuthContext, AuthProvider, useAuth } from './src/context/AuthContext';

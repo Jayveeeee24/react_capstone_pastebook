@@ -4,8 +4,6 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { Images } from "../../utils/Images";
 import { ProfileTabView } from "../tabViews/ProfileTabView";
-import { AuthContext } from "../../context/AuthContext";
-import { Toast } from "toastify-react-native";
 
 interface ProfileTabProps {
     navigation: any;
@@ -14,8 +12,6 @@ interface ProfileTabProps {
 
 export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => {
     const [dynamicTitle, setDynamicTitle] = useState("Profile Tab");
-    const { logout } = useContext(AuthContext);
-
 
     useEffect(() => {
         navigation.setOptions({
@@ -26,15 +22,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                 </View>
             ),
             headerRight: () => (
-                <TouchableOpacity onPress={async () => {
-                    const success = logout ? await logout() : undefined;
-
-                    if (success) {
-                        navigation.navigate('Login');
-                    } else {
-                        Toast.warn('Logout error, please try again', 'top');
-                    }
-                }}>
+                <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
                     <View style={{ flexDirection: "row", marginEnd: 12 }}>
                         <SimpleLineIcons name="settings" size={20} color='black' />
                     </View>
@@ -52,7 +40,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-            <View style={{ flexDirection: "column", backgroundColor: 'white', flex: 1 }}>
+            <View style={{ flexDirection: "column", flex: 1 }}>
                 <View style={{ paddingHorizontal: 20, paddingVertical: 15 }}>
                     <View style={{ flexDirection: "row", gap: 20, }}>
                         <Image source={Images.sample_avatar} resizeMode="cover" style={{ flex: 1, aspectRatio: 1, width: 60, height: 60 }} />
