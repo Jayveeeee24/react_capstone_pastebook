@@ -35,6 +35,8 @@ export const ForgotPasswordScreen = () => {
                         color="#007aff"
                         style={[styles.progressBar]}
                     />
+
+                    
                 </View>
             </TouchableWithoutFeedback>
         </SafeAreaView>

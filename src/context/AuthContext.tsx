@@ -5,20 +5,18 @@ import { ActivityIndicator } from 'react-native-paper';
 import { View } from 'react-native';
 
 interface AuthContextProps {
-  authState?: boolean
+  authState?: boolean;
   loading?: boolean;
   register?: (firstName: string, lastName: string, email: string, password: string, birthdate: Date, sex: string, phoneNumber: string) => Promise<any>;
-  login?: (email: string, password: string) => Promise<any>,
-  logout?: () => Promise<any>,
-  validate?: () => Promise<any>
+  login?: (email: string, password: string) => Promise<any>;
+  logout?: () => Promise<any>;
 }
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-export const AuthContext = createContext<AuthContextProps>({
-});
+export const AuthContext = createContext<AuthContextProps>({});
 
 export const useAuth = () => {
   return useContext(AuthContext);
@@ -31,42 +29,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const loadToken = async () => {
-      try {
-        const token = Storage.getString('userToken');
+      setLoading(true);
+      const token = Storage.getString('userToken');
 
-        if (token) {
-          axios.defaults.headers.common['Authorization'] = token;
+      if (token) {
+        // const cleanedToken = token.replace(/^"(.*)"$/, '$1');
+        // axios.interceptors.request.use(request => {
+        //   console.log('Starting Request', request);
+        //   return request;
+        // });
+        axios.defaults.headers.common['Authorization'] = token;
 
-          try {
-            const isTokenValid = await validate();
-
-            if (isTokenValid) {
+        axios.get(`${BASE_URL}/api/authentication/validate-token`)
+          .then((response: any) => {
+            if (response.data == true) {
               setAuthState(true);
-            } else {
-              console.error("Token validation failed:", isTokenValid.msg);
             }
-          } catch (error: any) {
-            console.error("Error while validating token:", error.message);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading token:', error);
-      } finally {
-        setLoading(false);
+          }).catch((e) => {
+            console.log('error: ' + e.response.data.result)
+            Storage.clearAll();
+            setAuthState(false);
+            axios.defaults.headers.common['Authorization'] = '';
+
+          }).finally(() => {
+            setLoading(false);
+          })
       }
     };
 
     loadToken();
   }, []);
 
-  const validate = async () => {
-    try {
-      const response = await axios.post(`${BASE_URL}/api/authentication/validate-token`, {});
-      return response.data;
-    } catch (e) {
-      return { error: true, msg: (e as any).response?.data?.msg || 'Unknown error' };
-    }
-  };
 
   const register = async (
     firstName: string,
@@ -104,7 +97,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setAuthState(true);
 
       axios.defaults.headers.common['Authorization'] = result.data.token;
-      Storage.set('userToken', JSON.stringify(result.data.token));
+      Storage.set('userToken', result.data.token);
 
       return result.data;
     } catch (error: any) {
@@ -126,9 +119,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       axios.defaults.headers.common['Authorization'] = '';
       return true;
-    } catch (error) {
-      console.error('Logout error:', error);
-      return false;
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.result) {
+        return { error: error.response.data.result };
+      } else {
+        throw error;
+      }
     }
   };
 
@@ -145,8 +141,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading,
     register,
     login,
-    logout,
-    validate
+    logout
   };
 
   return (
