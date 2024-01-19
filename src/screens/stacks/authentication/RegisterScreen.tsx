@@ -17,7 +17,7 @@ interface RegisterScreenProps {
 }
 
 export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
-    const { register, emailAvailability } = useContext(AuthContext);
+    const { register, emailAvailability, verifyEmailNewUser, verifyCode } = useContext(AuthContext);
 
     const [currentView, setCurrentView] = useState('EmailView');
     const [progress, setProgress] = useState(0.3);
@@ -35,9 +35,11 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
     const [dateOfBirth, setDateOfBirth] = useState(new Date());
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [verificationCode, setVerificationCode] = useState('');
 
     const [isValidEmail, setIsValidEmail] = useState(true);
     const [isEmailAvailable, setIsEmailAvailable] = useState(true);
+    const [isVerificationCodeValid, setIsVerificationCodeValid] = useState(true);
     const [isFirstNameValid, setIsFirstNameValid] = useState(true);
     const [isLastNameValid, setIsLastNameValid] = useState(true);
     const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
@@ -55,8 +57,14 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
         setIsValidEmail(isValid);
 
-        if (isValid && isEmailAvailable) {
-            handleNext();
+        if (isValid) {
+            const result = emailAvailability ? await emailAvailability(email) : undefined;
+            if (result) {
+                setIsEmailAvailable(true);
+                handleNext();
+            } else {
+                setIsEmailAvailable(false);
+            }
         }
     };
     const validateDetails = async () => {
@@ -90,19 +98,43 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         const trimmedConfirmPassword = confirmPassword.trim();
         setIsConfirmPasswordValid(!!trimmedConfirmPassword && trimmedConfirmPassword === trimmedPassword);
 
-        if (!!trimmedPassword && !!trimmedConfirmPassword && trimmedPassword === trimmedConfirmPassword) {
+        if (!!trimmedPassword && !!trimmedConfirmPassword && trimmedPassword === trimmedConfirmPassword && trimmedPassword.length >= 8) {
             handleNext();
         }
 
     }
+    const validateVerificationCode = async () => {
+        const trimmedVerificationCode = verificationCode.trim();
+        setIsVerificationCodeValid(!!trimmedVerificationCode && trimmedVerificationCode.length == 6);
 
-    const handleNext = () => {
+        if (!!trimmedVerificationCode && trimmedVerificationCode.length == 6) {
+            handleNext();
+        }
+    }
+
+    const handleNext = async () => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 
         if (currentView === 'EmailView') {
-            setCurrentView('OtherDetailsView');
-            setProgress(0.5);
-        } else if (currentView === 'OtherDetailsView') {
+            const result = verifyEmailNewUser ? await verifyEmailNewUser(email) : undefined;
+            console.log(result);
+            if (result) {
+                setCurrentView('VerifyCodeView');
+                setProgress(0.5);
+            } else {
+                console.log(result);
+            }
+        } else if (currentView === 'VerifyCodeView') {
+            const result = verifyCode ? await verifyCode(email, verificationCode) : undefined;
+            console.log(result);
+            if (result) {
+                setCurrentView('OtherDetailsView');
+                setProgress(0.7);
+            } else {
+                setIsVerificationCodeValid(false);
+            }
+        }
+        else if (currentView === 'OtherDetailsView') {
             setCurrentView('PasswordView');
             setProgress(0.9);
         } else {
@@ -124,6 +156,8 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
     const getButtonText = () => {
         switch (currentView) {
             case 'EmailView':
+                return 'Send Email Verification';
+            case 'VerifyCodeView':
                 return 'Verify Email';
             case 'OtherDetailsView':
                 return 'Next';
@@ -154,21 +188,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                                 placeholder="Email Address"
                                 style={[styles.text, styles.credentialText]}
                                 value={email}
-                                onChangeText={async (value) => {
-                                    setEmail(value);
-
-                                    if (value) {
-                                        const result = emailAvailability ? await emailAvailability(value) : undefined;
-
-                                        console.log(result);
-
-                                        if (result) {
-                                            setIsEmailAvailable(true);
-                                        } else {
-                                            setIsEmailAvailable(false);
-                                        }
-                                    }
-                                }}
+                                onChangeText={setEmail}
                                 theme={credentialTextTheme}
                                 placeholderTextColor={'#666'}
                             />
@@ -178,10 +198,22 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                             <Text style={styles.textValidation}>Please enter a valid email address.</Text>
                         )}
                         {!isEmailAvailable && (
-                            <Text style={styles.textValidation}>Email has already been used.</Text>
+                            <Text style={styles.textValidation}>This email is already in use. Please use a different email address.</Text>
                         )}
                     </>
                 );
+            case 'VerifyCodeView':
+                return (
+                    <>
+                        <View style={[styles.credentialContainer, { marginBottom: isVerificationCodeValid ? 10 : 0 }]}>
+                            <MaterialCommunityIcons name="email-check-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
+                            <TextInput placeholder="Verification Code" theme={credentialTextTheme} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={verificationCode} onChangeText={setVerificationCode} />
+                        </View>
+                        {!isVerificationCodeValid && (
+                            <Text style={styles.textValidation}>Please enter the verification code sent in the email</Text>
+                        )}
+                    </>
+                )
             case 'OtherDetailsView':
                 return (
                     <>
@@ -285,7 +317,10 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                         onPress={() => {
                             if (currentView == 'EmailView') {
                                 validateEmail();
-                            } else if (currentView == 'OtherDetailsView') {
+                            } else if (currentView == 'VerifyCodeView') {
+                                validateVerificationCode();
+                            }
+                            else if (currentView == 'OtherDetailsView') {
                                 validateDetails();
                             }
                             else {
@@ -293,7 +328,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                             }
                         }}
                         style={[styles.buttonContainer, { marginTop: 20, backgroundColor: '#3373B0' }]}>
-                        <Text style={[styles.buttonText, styles.text ]}>{getButtonText()}</Text>
+                        <Text style={[styles.buttonText, styles.text]}>{getButtonText()}</Text>
                     </TouchableOpacity>
                 </View>
             </TouchableWithoutFeedback>

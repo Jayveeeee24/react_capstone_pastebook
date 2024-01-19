@@ -11,6 +11,8 @@ interface AuthContextProps {
   login?: (email: string, password: string) => Promise<any>;
   logout?: () => Promise<any>;
   emailAvailability?: (email: string) => Promise<any>;
+  verifyEmailNewUser?: (email: string) => Promise<any>;
+  verifyCode?: (email: string, code: string) => Promise<any>;
 }
 
 interface AuthProviderProps {
@@ -133,13 +135,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   }
 
+  const verifyEmailNewUser = async (email: string) => {
+    try {
+      const result = await axios.post(`${BASE_URL}/api/authentication/verify-email-new-user/${email}`);
+      return result.data;
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.result) {
+        return { error: error.response.data.result };
+      } else {
+        console.error(error);
+        throw error;
+      }
+    }
+  };
+
+  const verifyCode = async (email: string, code: string) => {
+    try {
+      const result = await axios.post(`${BASE_URL}/api/authentication/verify-code`, { Email: email, VerificationCode: code });
+      
+      
+      return result.data;
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.result) {
+        return { error: error.response.data.result };
+      } else {
+        console.error(error);
+        throw error;
+      }
+    }
+  };
+
   const emailAvailability = async (email: string) => {
     try {
       const result = await axios.post(`${BASE_URL}/api/authentication/check-email-availability/${email}`);
-      return result.data; 
+      return result.data;
     } catch (e) {
       console.log(e);
-      return true; 
+      return true;
     }
   };
 
@@ -150,7 +182,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     login,
     logout,
-    emailAvailability
+    emailAvailability,
+    verifyEmailNewUser,
+    verifyCode,
   };
 
   return (
