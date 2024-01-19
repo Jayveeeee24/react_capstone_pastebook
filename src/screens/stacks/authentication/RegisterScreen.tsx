@@ -17,7 +17,7 @@ interface RegisterScreenProps {
 }
 
 export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
-    const { register } = useContext(AuthContext);
+    const { register, emailAvailability } = useContext(AuthContext);
 
     const [currentView, setCurrentView] = useState('EmailView');
     const [progress, setProgress] = useState(0.3);
@@ -37,6 +37,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
     const [confirmPassword, setConfirmPassword] = useState('');
 
     const [isValidEmail, setIsValidEmail] = useState(true);
+    const [isEmailAvailable, setIsEmailAvailable] = useState(true);
     const [isFirstNameValid, setIsFirstNameValid] = useState(true);
     const [isLastNameValid, setIsLastNameValid] = useState(true);
     const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
@@ -52,10 +53,9 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isValid = emailRegex.test(email);
 
-        //change this and add in verifying if the email is already existing
         setIsValidEmail(isValid);
 
-        if (isValid) {
+        if (isValid && isEmailAvailable) {
             handleNext();
         }
     };
@@ -154,7 +154,21 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                                 placeholder="Email Address"
                                 style={[styles.text, styles.credentialText]}
                                 value={email}
-                                onChangeText={setEmail}
+                                onChangeText={async (value) => {
+                                    setEmail(value);
+
+                                    if (value) {
+                                        const result = emailAvailability ? await emailAvailability(value) : undefined;
+
+                                        console.log(result);
+
+                                        if (result) {
+                                            setIsEmailAvailable(true);
+                                        } else {
+                                            setIsEmailAvailable(false);
+                                        }
+                                    }
+                                }}
                                 theme={credentialTextTheme}
                                 placeholderTextColor={'#666'}
                             />
@@ -162,6 +176,9 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                         </View>
                         {!isValidEmail && (
                             <Text style={styles.textValidation}>Please enter a valid email address.</Text>
+                        )}
+                        {!isEmailAvailable && (
+                            <Text style={styles.textValidation}>Email has already been used.</Text>
                         )}
                     </>
                 );
@@ -196,7 +213,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                                 <CustomDropdown data={genders} value={gender} onValueChange={(value) => setGender(value)} isGenderValid={isGenderValid} placeholder={"Gender"} />
                             </View>
 
-                            <View style={{marginHorizontal: 30}}>
+                            <View style={{ marginHorizontal: 30 }}>
                                 <DatePickerComponent
                                     dateOfBirth={dateOfBirth}
                                     setDateOfBirth={setDateOfBirth}
@@ -231,7 +248,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
 
     return (
-        <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
+        <SafeAreaView style={{ flex: 1, justifyContent: 'center', backgroundColor: 'white' }}>
             <TouchableWithoutFeedback
                 onPress={() => Keyboard.dismiss()}>
                 <View>
@@ -276,15 +293,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                             }
                         }}
                         style={[styles.buttonContainer, { marginTop: 20, backgroundColor: '#3373B0' }]}>
-                        <Text style={[styles.buttonText, styles.text]}>{getButtonText()}</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        onPress={() => {
-                            navigation.goBack();
-                        }}
-                        style={[styles.buttonContainer, { marginTop: 10, backgroundColor: '#eab676', display: "none" }]}>
-                        <Text style={[styles.buttonText, styles.text]}>Sign in to your account</Text>
+                        <Text style={[styles.buttonText, styles.text ]}>{getButtonText()}</Text>
                     </TouchableOpacity>
                 </View>
             </TouchableWithoutFeedback>

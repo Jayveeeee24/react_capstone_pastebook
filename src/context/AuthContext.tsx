@@ -10,6 +10,7 @@ interface AuthContextProps {
   register?: (firstName: string, lastName: string, email: string, password: string, birthdate: Date, sex: string, phoneNumber: string) => Promise<any>;
   login?: (email: string, password: string) => Promise<any>;
   logout?: () => Promise<any>;
+  emailAvailability?: (email: string) => Promise<any>;
 }
 
 interface AuthProviderProps {
@@ -54,12 +55,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }).finally(() => {
             setLoading(false);
           })
+      } else {
+        setLoading(false);
       }
     };
 
     loadToken();
   }, []);
-
 
   const register = async (
     firstName: string,
@@ -109,7 +111,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-
   const logout = async () => {
     try {
       Storage.clearAll();
@@ -129,19 +130,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const forgot = async () => {
-    try {
 
-    } catch (error) {
-
-    }
   }
+
+  const emailAvailability = async (email: string) => {
+    try {
+      const result = await axios.post(`${BASE_URL}/api/authentication/check-email-availability/${email}`);
+      return result.data; 
+    } catch (e) {
+      console.log(e);
+      return true; 
+    }
+  };
+
 
   const contextValue: AuthContextProps = {
     authState,
     loading,
     register,
     login,
-    logout
+    logout,
+    emailAvailability
   };
 
   return (

@@ -6,7 +6,6 @@ import { useState } from "react";
 export const ForgotPasswordScreen = () => {
     const [progress, setProgress] = useState(0.4);
 
-
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center' }}>
             <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -36,7 +35,7 @@ export const ForgotPasswordScreen = () => {
                         style={[styles.progressBar]}
                     />
 
-                    
+
                 </View>
             </TouchableWithoutFeedback>
         </SafeAreaView>

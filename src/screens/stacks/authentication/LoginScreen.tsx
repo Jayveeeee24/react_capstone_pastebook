@@ -51,7 +51,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
         }
     };
     return (
-        <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
+        <SafeAreaView style={{ flex: 1, justifyContent: 'center', backgroundColor: 'white' }}>
             <TouchableWithoutFeedback
                 onPress={() => Keyboard.dismiss()}>
                 <View>
