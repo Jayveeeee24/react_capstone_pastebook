@@ -101,7 +101,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                     <View style={styles.forgottenPassContainer}>
                         <TouchableOpacity
                             onPress={() => {
-
+                                navigation.navigate('Forgot');
                             }}
                             style={{ marginEnd: 35 }}>
                             <Text style={[styles.text, styles.touchableForgot]}>Forgotten Password?</Text>

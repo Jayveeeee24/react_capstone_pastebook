@@ -264,8 +264,6 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
                     {renderView()}
 
-
-
                     <TouchableOpacity
                         onPress={() => {
                             if (currentView == 'EmailView') {
@@ -280,8 +278,6 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                         style={[styles.buttonContainer, { marginTop: 20, backgroundColor: '#3373B0' }]}>
                         <Text style={[styles.buttonText, styles.text]}>{getButtonText()}</Text>
                     </TouchableOpacity>
-
-
 
                     <TouchableOpacity
                         onPress={() => {

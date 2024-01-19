@@ -1,12 +1,16 @@
 import axios from 'axios';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { BASE_URL, Storage } from '../utils/Config';
+import { BASE_URL, Colors, Storage } from '../utils/Config';
+import { ActivityIndicator } from 'react-native-paper';
+import { View } from 'react-native';
 
 interface AuthContextProps {
   authState?: boolean
+  loading?: boolean;
   register?: (firstName: string, lastName: string, email: string, password: string, birthdate: Date, sex: string, phoneNumber: string) => Promise<any>;
   login?: (email: string, password: string) => Promise<any>,
-  logout?: () => Promise<any>
+  logout?: () => Promise<any>,
+  validate?: () => Promise<any>
 }
 
 interface AuthProviderProps {
@@ -23,25 +27,46 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [authState, setAuthState] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadToken = async () => {
       try {
-        const token = await Storage.getString('userToken');
+        const token = Storage.getString('userToken');
 
         if (token) {
           axios.defaults.headers.common['Authorization'] = token;
-          setAuthState(true);
+
+          try {
+            const isTokenValid = await validate();
+
+            if (isTokenValid) {
+              setAuthState(true);
+            } else {
+              console.error("Token validation failed:", isTokenValid.msg);
+            }
+          } catch (error: any) {
+            console.error("Error while validating token:", error.message);
+          }
         }
       } catch (error) {
         console.error('Error loading token:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     loadToken();
   }, []);
 
-
+  const validate = async () => {
+    try {
+      const response = await axios.post(`${BASE_URL}/api/authentication/validate-token`, {});
+      return response.data;
+    } catch (e) {
+      return { error: true, msg: (e as any).response?.data?.msg || 'Unknown error' };
+    }
+  };
 
   const register = async (
     firstName: string,
@@ -79,7 +104,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setAuthState(true);
 
       axios.defaults.headers.common['Authorization'] = result.data.token;
-      await Storage.set('userToken', JSON.stringify(result.data.token));
+      Storage.set('userToken', JSON.stringify(result.data.token));
 
       return result.data;
     } catch (error: any) {
@@ -94,10 +119,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post(`${BASE_URL}/api/authentication/logout`, {});
-
-      await Storage.clearAll();
+      Storage.clearAll();
       setAuthState(false);
+
+      await axios.post(`${BASE_URL}/api/authentication/logout`, {});
 
       axios.defaults.headers.common['Authorization'] = '';
       return true;
@@ -117,15 +142,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const contextValue: AuthContextProps = {
     authState,
+    loading,
     register,
     login,
-    logout
+    logout,
+    validate
   };
 
   return (
     <AuthContext.Provider
       value={contextValue}>
-      {children}
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={Colors.primaryBrand} />
+        </View>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };

@@ -1,5 +1,7 @@
 export const Images = {
     people: require('../assets/images/people.png'),
+    privacy: require('../assets/images/privacy.png'),
+    lock: require('../assets/images/lock.png'),
 
     logo_wide_dark: require('../assets/images/logo_wide_dark.png'),
     logo_wide_light: require('../assets/images/logo_wide_light.png'),
