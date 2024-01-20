@@ -11,8 +11,10 @@ interface AuthContextProps {
   login?: (email: string, password: string) => Promise<any>;
   logout?: () => Promise<any>;
   emailAvailability?: (email: string) => Promise<any>;
+  verifyEmailForgot?: (email: string) => Promise<any>;
   verifyEmailNewUser?: (email: string) => Promise<any>;
   verifyCode?: (email: string, code: string) => Promise<any>;
+  changePassword?: (email: string, password: string) => Promise<any>;
 }
 
 interface AuthProviderProps {
@@ -131,17 +133,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const forgot = async () => {
-
+  const changePassword = async (email: string, password: string) => {
+    try{
+      const result = await axios.put(`${BASE_URL}/api/authentication/forgot-change-password`, {Email: email, NewPassword: password});
+      console.log(result.data.result)
+      return result.data.result;
+    }catch (error: any) {
+      return error.result;
+    }
   }
 
   const verifyEmailNewUser = async (email: string) => {
     try {
       const result = await axios.post(`${BASE_URL}/api/authentication/verify-email-new-user/${email}`);
-      return result.data;
+      return result.data.result;
     } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.result) {
-        return { error: "new user error: " + error.response.data.result };
+      if (error.response) {
+        return error.response.result;
       } else {
         console.error(error);
         throw error;
@@ -152,25 +160,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const verifyEmailForgot = async (email: string) => {
     try {
       const result = await axios.post(`${BASE_URL}/api/authentication/verify-email-forgot/${email}`);
-      return result.data;
+      return result.data.result;
     } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.result) {
-        const serverErrorMessage = error.response.data.result;
-
-        // if (serverErrorMessage === "no_account_with_that_email") {
-        //   return { error: "No account found with that email." };
-        // } else if (serverErrorMessage === "Error sending email.") {
-        //   return { error: "Error sending email. Please try again later." };
-        // } else {
-        //   return { error: "An unknown error occurred: " + serverErrorMessage };
-        // }
-        return serverErrorMessage;
+      if (error.response) {
+        return error.response.result;
       } else {
         console.error(error);
         throw error;
       }
     }
   };
+
 
   const verifyCode = async (email: string, code: string) => {
     try {
@@ -197,6 +197,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
 
+
   const contextValue: AuthContextProps = {
     authState,
     loading,
@@ -206,6 +207,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     emailAvailability,
     verifyEmailNewUser,
     verifyCode,
+    verifyEmailForgot,
+    changePassword
   };
 
   return (

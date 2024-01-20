@@ -10,6 +10,7 @@ import { AuthContext } from "../../../context/AuthContext";
 import ToastManager, { Toast } from "toastify-react-native";
 import { CustomDropdown } from "../../../components/CustomDropdown";
 import { DatePickerComponent } from "../../../components/DatePickerComponent";
+import { Colors } from "../../../utils/Config";
 
 interface RegisterScreenProps {
     navigation: any;
@@ -118,14 +119,12 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         if (currentView === 'EmailView') {
             try {
                 const result = verifyEmailNewUser ? await verifyEmailNewUser(email) : undefined;
-
-                if (result && result.error) {
-                    Toast.warn(result.error, 'top');
-                } else if (result) {
+                
+                if (result == "Email sent successfully!") {
                     setCurrentView('VerifyCodeView');
                     setProgress(0.5);
                 } else {
-                    Toast.warn('Network issues, try again', 'top');
+                    Toast.warn(result, 'top');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -134,20 +133,19 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         } else if (currentView === 'VerifyCodeView') {
             try {
                 const result = verifyCode ? await verifyCode(email, verificationCode) : undefined;
-
-                if (result && result.error) {
-                    Toast.warn(result.error, 'top');
-                } else if (result === false) {
-                    setIsVerificationCodeValid(false);
-                } else {
+                if(result === true){
                     setCurrentView('OtherDetailsView');
                     setProgress(0.7);
+                }else if(result.result){
+                    Toast.warn(result.result, 'top');
+                }
+                else{
+                    setIsVerificationCodeValid(false);
                 }
             } catch (error) {
                 console.error('Error:', error);
                 Toast.error('An unexpected error occurred', 'top');
             }
-
         }
         else if (currentView === 'OtherDetailsView') {
             setCurrentView('PasswordView');
@@ -157,11 +155,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
             if (result) {
                 Toast.success('Sign up success!', 'top');
                 setTimeout(() => {
-                    navigation.navigate({
-                        name: 'Login',
-                        params: { success: true },
-                        merge: true,
-                    });
+                    navigation.navigate('Login');
                 }, 2500);
             } else {
                 Toast.warn('Sign up error, please try again', 'top');
@@ -190,7 +184,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
             setShowPassword(!showPassword);
         };
         const toggleConfirmPasswordVisibility = () => {
-            setShowConfirmPassword(!showPassword);
+            setShowConfirmPassword(!showConfirmPassword);
         };
 
         switch (currentView) {
@@ -342,7 +336,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                                 validatePassword();
                             }
                         }}
-                        style={[styles.buttonContainer, { marginTop: 20, backgroundColor: '#3373B0' }]}>
+                        style={[styles.buttonContainer, { marginTop: 20, backgroundColor: Colors.primaryBrand }]}>
                         <Text style={[styles.buttonText, styles.text]}>{getButtonText()}</Text>
                     </TouchableOpacity>
                 </View>

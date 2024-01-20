@@ -1,19 +1,207 @@
-import { Image, Keyboard, SafeAreaView, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
+import { Image, Keyboard, LayoutAnimation, SafeAreaView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { Images } from "../../../utils/Images";
-import { ProgressBar } from "react-native-paper";
+import { ProgressBar, TextInput } from "react-native-paper";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext";
+import ToastManager, { Toast } from "toastify-react-native";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { Colors } from "../../../utils/Config";
 
-export const ForgotPasswordScreen = () => {
-    const { register, emailAvailability, verifyEmailNewUser, verifyCode } = useContext(AuthContext);
+interface ForgotPasswordScreenProps {
+    navigation: any;
+    route: any;
+}
+
+
+export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({navigation}) => {
+    const { verifyEmailForgot, verifyCode, changePassword } = useContext(AuthContext);
 
     const [progress, setProgress] = useState(0.4);
     const [currentView, setCurrentView] = useState('EmailView');
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [verificationCode, setVerificationCode] = useState('');
+
+    const [isValidEmail, setIsValidEmail] = useState(true);
+    const [isVerificationCodeValid, setIsVerificationCodeValid] = useState(true);
+
+    const [isPasswordValid, setIsPasswordValid] = useState(true);
+    const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
+
+    const validateEmail = async () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const isValid = emailRegex.test(email);
+
+        setIsValidEmail(isValid);
+
+        if (isValid) {
+            handleNext();
+        }
+    };
+    const validatePassword = async () => {
+        const trimmedPassword = password.trim();
+        setIsPasswordValid(!!trimmedPassword && trimmedPassword.length >= 8);
+
+        const trimmedConfirmPassword = confirmPassword.trim();
+        setIsConfirmPasswordValid(!!trimmedConfirmPassword && trimmedConfirmPassword === trimmedPassword);
+
+        if (!!trimmedPassword && !!trimmedConfirmPassword && trimmedPassword === trimmedConfirmPassword && trimmedPassword.length >= 8) {
+            handleNext();
+        }
+
+    }
+    const validateVerificationCode = async () => {
+        const trimmedVerificationCode = verificationCode.trim();
+        setIsVerificationCodeValid(!!trimmedVerificationCode && trimmedVerificationCode.length == 6);
+
+        if (!!trimmedVerificationCode && trimmedVerificationCode.length == 6) {
+            handleNext();
+        }
+    }
+
+    const handleNext = async () => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
+        if (currentView === 'EmailView') {
+            try {
+                const result = verifyEmailForgot ? await verifyEmailForgot(email) : undefined;
+                if (result == "Email sent successfully!") {
+                    setCurrentView('VerifyCodeView');
+                    setProgress(0.6);
+                } else {
+                    Toast.warn(result, 'top');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Toast.error('An unexpected error occurred', 'top');
+            }
+
+        } else if (currentView === 'VerifyCodeView') {
+            try {
+                const result = verifyCode ? await verifyCode(email, verificationCode) : undefined;
+                if (result === true) {
+                    setCurrentView('PasswordView');
+                    setProgress(0.8);
+                } else if (result.result) {
+                    Toast.warn(result.result, 'top');
+                }
+                else {
+                    setIsVerificationCodeValid(false);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Toast.error('An unexpected error occurred', 'top');
+            }
+        }
+        else {
+            try{
+                const result = changePassword ? await changePassword(email, password) : undefined;
+                if (result == "password_changed_successfully") {
+                    Toast.success('Password Changed successfully', 'top');
+                    setTimeout(() => {
+                        navigation.navigate('Login');
+                    }, 2500);
+                }else{
+                    Toast.warn(result.result, 'top');
+                }
+
+            }catch (error) {
+                console.error('Error:', error);
+                Toast.error('An unexpected error occurred', 'top');
+            }
+        }
+    };
+    const getButtonText = () => {
+        switch (currentView) {
+            case 'EmailView':
+                return 'Send Email Verification';
+            case 'VerifyCodeView':
+                return 'Verify Email';
+            case 'PasswordView':
+                return 'Change Password';
+            default:
+                return '';
+        }
+    };
+    const renderView = () => {
+        const [showPassword, setShowPassword] = useState(false);
+        const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+        const credentialTextTheme = { colors: { primary: '#3373B0' } };
+
+
+        const togglePasswordVisibility = () => {
+            setShowPassword(!showPassword);
+        };
+        const toggleConfirmPasswordVisibility = () => {
+            setShowConfirmPassword(!showConfirmPassword);
+        };
+
+        switch (currentView) {
+            case 'EmailView':
+                return (
+                    <>
+                        <View style={[styles.credentialContainer, { marginBottom: isValidEmail ? 10 : 0 }]}>
+                            <MaterialIcons name="alternate-email" size={20} color="#666" style={{ marginHorizontal: 5 }} />
+                            <TextInput
+                                placeholder="Email Address"
+                                style={[styles.text, styles.credentialText]}
+                                value={email}
+                                onChangeText={setEmail}
+                                theme={credentialTextTheme}
+                                placeholderTextColor={'#666'}
+                            />
+
+                        </View>
+                        {!isValidEmail && (
+                            <Text style={styles.textValidation}>Please enter a valid email address.</Text>
+                        )}
+                    </>
+                );
+            case 'VerifyCodeView':
+                return (
+                    <>
+                        <View style={[styles.credentialContainer, { marginBottom: isVerificationCodeValid ? 10 : 0 }]}>
+                            <MaterialCommunityIcons name="email-check-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
+                            <TextInput placeholder="Verification Code" theme={credentialTextTheme} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={verificationCode} onChangeText={setVerificationCode} />
+                        </View>
+                        {!isVerificationCodeValid && (
+                            <Text style={styles.textValidation}>Please enter the verification code sent in the email</Text>
+                        )}
+                    </>
+                );
+            case 'PasswordView':
+                return (
+                    <>
+                        <View style={[styles.credentialContainer, { marginBottom: isPasswordValid ? 10 : 0 }]}>
+                            <MaterialIcons name="lock-outline" size={20} color="#666" style={{ marginHorizontal: 5 }} />
+                            <TextInput placeholder="New Password" theme={credentialTextTheme} right={<TextInput.Icon icon={showPassword ? 'eye-off' : 'eye'} onPress={togglePasswordVisibility} />} secureTextEntry={!showPassword} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={password} onChangeText={setPassword} />
+                        </View>
+                        {!isPasswordValid && (
+                            <Text style={styles.textValidation}>Please enter a valid password (min 8 chars)</Text>
+                        )}
+                        <View style={[styles.credentialContainer, {}]}>
+                            <MaterialIcons name="lock-outline" size={20} color="#666" style={{ marginHorizontal: 5 }} />
+                            <TextInput placeholder="Confirm New Password" theme={credentialTextTheme} right={<TextInput.Icon icon={showConfirmPassword ? 'eye-off' : 'eye'} onPress={toggleConfirmPasswordVisibility} />} secureTextEntry={!showConfirmPassword} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={confirmPassword} onChangeText={setConfirmPassword} />
+                        </View>
+                        {!isConfirmPasswordValid && (
+                            <Text style={styles.textValidation}>Passwords do not match</Text>
+                        )}
+                    </>
+                );
+            default:
+                return null;
+        }
+    };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center' }}>
             <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
                 <View>
+                    <ToastManager />
+
                     <View style={{ alignItems: 'center' }}>
                         <Image
                             source={Images.logo_wide_dark}
@@ -39,6 +227,22 @@ export const ForgotPasswordScreen = () => {
                         style={[styles.progressBar]}
                     />
 
+                    {renderView()}
+
+                    <TouchableOpacity
+                        onPress={() => {
+                            if (currentView == 'EmailView') {
+                                validateEmail();
+                            } else if (currentView == 'VerifyCodeView') {
+                                validateVerificationCode();
+                            }
+                            else {
+                                validatePassword();
+                            }
+                        }}
+                        style={[styles.buttonContainer, { marginTop: 20, backgroundColor: Colors.secondaryBrand }]}>
+                        <Text style={[styles.buttonText, styles.text]}>{getButtonText()}</Text>
+                    </TouchableOpacity>
 
                 </View>
             </TouchableWithoutFeedback>
