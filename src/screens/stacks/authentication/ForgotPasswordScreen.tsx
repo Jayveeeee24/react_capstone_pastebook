@@ -1,10 +1,14 @@
 import { Image, Keyboard, SafeAreaView, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import { Images } from "../../../utils/Images";
 import { ProgressBar } from "react-native-paper";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../../context/AuthContext";
 
 export const ForgotPasswordScreen = () => {
+    const { register, emailAvailability, verifyEmailNewUser, verifyCode } = useContext(AuthContext);
+
     const [progress, setProgress] = useState(0.4);
+    const [currentView, setCurrentView] = useState('EmailView');
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center' }}>

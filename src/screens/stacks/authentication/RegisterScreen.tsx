@@ -116,23 +116,38 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 
         if (currentView === 'EmailView') {
-            const result = verifyEmailNewUser ? await verifyEmailNewUser(email) : undefined;
-            console.log(result);
-            if (result) {
-                setCurrentView('VerifyCodeView');
-                setProgress(0.5);
-            } else {
-                console.log(result);
+            try {
+                const result = verifyEmailNewUser ? await verifyEmailNewUser(email) : undefined;
+
+                if (result && result.error) {
+                    Toast.warn(result.error, 'top');
+                } else if (result) {
+                    setCurrentView('VerifyCodeView');
+                    setProgress(0.5);
+                } else {
+                    Toast.warn('Network issues, try again', 'top');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Toast.error('An unexpected error occurred', 'top');
             }
         } else if (currentView === 'VerifyCodeView') {
-            const result = verifyCode ? await verifyCode(email, verificationCode) : undefined;
-            console.log(result);
-            if (result) {
-                setCurrentView('OtherDetailsView');
-                setProgress(0.7);
-            } else {
-                setIsVerificationCodeValid(false);
+            try {
+                const result = verifyCode ? await verifyCode(email, verificationCode) : undefined;
+
+                if (result && result.error) {
+                    Toast.warn(result.error, 'top');
+                } else if (result === false) {
+                    setIsVerificationCodeValid(false);
+                } else {
+                    setCurrentView('OtherDetailsView');
+                    setProgress(0.7);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Toast.error('An unexpected error occurred', 'top');
             }
+
         }
         else if (currentView === 'OtherDetailsView') {
             setCurrentView('PasswordView');

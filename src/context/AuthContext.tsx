@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               setAuthState(true);
             }
           }).catch((e) => {
-            console.log('error: ' + e.response.data.result)
+            console.log('use effect error: ' + e.response.data.result)
             Storage.clearAll();
             setAuthState(false);
             axios.defaults.headers.common['Authorization'] = '';
@@ -86,7 +86,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           phoneNumber,
         })
     } catch (e) {
-      return { error: true, msg: (e as any).response.data.msg };
+      return { error: true, msg: "register error: " + (e as any).response.data.msg };
     }
 
   };
@@ -106,7 +106,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return result.data;
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.result) {
-        return { error: error.response.data.result };
+        return { error: "login error: " + error.response.data.result };
       } else {
         throw error;
       }
@@ -124,7 +124,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return true;
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.result) {
-        return { error: error.response.data.result };
+        return { error: "logout error: " + error.response.data.result };
       } else {
         throw error;
       }
@@ -141,7 +141,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return result.data;
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.result) {
-        return { error: error.response.data.result };
+        return { error: "new user error: " + error.response.data.result };
+      } else {
+        console.error(error);
+        throw error;
+      }
+    }
+  };
+
+  const verifyEmailForgot = async (email: string) => {
+    try {
+      const result = await axios.post(`${BASE_URL}/api/authentication/verify-email-forgot/${email}`);
+      return result.data;
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.result) {
+        const serverErrorMessage = error.response.data.result;
+
+        // if (serverErrorMessage === "no_account_with_that_email") {
+        //   return { error: "No account found with that email." };
+        // } else if (serverErrorMessage === "Error sending email.") {
+        //   return { error: "Error sending email. Please try again later." };
+        // } else {
+        //   return { error: "An unknown error occurred: " + serverErrorMessage };
+        // }
+        return serverErrorMessage;
       } else {
         console.error(error);
         throw error;
@@ -152,12 +175,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const verifyCode = async (email: string, code: string) => {
     try {
       const result = await axios.post(`${BASE_URL}/api/authentication/verify-code`, { Email: email, VerificationCode: code });
-      
-      
       return result.data;
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.result) {
-        return { error: error.response.data.result };
+        return { error: "verifycode-error: " + error.response.data.result };
       } else {
         console.error(error);
         throw error;
@@ -170,7 +191,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const result = await axios.post(`${BASE_URL}/api/authentication/check-email-availability/${email}`);
       return result.data;
     } catch (e) {
-      console.log(e);
+      console.log("email availability error" + e);
       return true;
     }
   };
