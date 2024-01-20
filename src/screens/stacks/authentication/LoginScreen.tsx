@@ -2,7 +2,7 @@ import { Image, Keyboard, StyleSheet, Text, TouchableWithoutFeedback, TouchableO
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Images } from "../../../utils/Images";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import ToastManager, { Toast } from 'toastify-react-native'
 import { AuthContext } from "../../../context/AuthContext";
 import { TextInput } from "react-native-paper";
@@ -25,31 +25,12 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
 
     const [isValidEmail, setIsValidEmail] = useState(true);
     const [isPasswordValid, setIsPasswordValid] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
-    useEffect(() => {
-        if (error) {
-            Toast.warn(getErrorMessage(error), 'top');
-            setError(null);
-        }
-    }, [error]);
-
-    const getErrorMessage = (errorCode: string) => {
-        switch (errorCode) {
-            case 'no_user_found':
-                return 'No user found.';
-            case 'invalid_credentials':
-                return 'Invalid credentials.';
-            case 'invalid_user_login':
-                return 'Invalid user login.';
-            default:
-                return 'Sign in error. Please try again.';
-        }
-    };
+    
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: 'center', backgroundColor: 'white' }}>
             <TouchableWithoutFeedback
@@ -131,8 +112,6 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                                 } finally {
                                     setIsLoading(false);
                                 }
-                            } else {
-                                setError('invalid_credentials');
                             }
                         }}
                         style={[styles.buttonContainer, { marginTop: 35, backgroundColor: Colors.primaryBrand }]}>
