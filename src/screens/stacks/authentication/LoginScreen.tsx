@@ -3,10 +3,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Images } from "../../../utils/Images";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import React, { useContext, useState } from "react";
-import ToastManager, { Toast } from 'toastify-react-native'
 import { AuthContext } from "../../../context/AuthContext";
 import { TextInput } from "react-native-paper";
 import { Colors } from "../../../utils/Config";
+import { useToast } from "react-native-toast-notifications";
 
 
 interface LoginScreenProps {
@@ -15,6 +15,7 @@ interface LoginScreenProps {
 }
 
 export const LoginScreen = ({ navigation }: LoginScreenProps) => {
+    const toast = useToast();
     const { login } = useContext(AuthContext);
 
     const [email, setEmail] = useState('');
@@ -36,7 +37,6 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
             <TouchableWithoutFeedback
                 onPress={() => Keyboard.dismiss()}>
                 <View>
-                    <ToastManager />
 
                     <View style={{ alignItems: 'center' }}>
                         <Image
@@ -105,10 +105,11 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                                     if (result.token) {
                                         navigation.replace('BottomHome');
                                     } else {
-                                        Toast.warn(result, 'top');
+                                        toast.show(result, {type: 'warning'});
+
                                     }
                                 } catch (error: any) {
-                                    Toast.error('An unexpected error occurred', 'top');
+                                    toast.show("An unexpected error occurred", {type: 'danger'});
                                 } finally {
                                     setIsLoading(false);
                                 }

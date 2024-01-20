@@ -3,10 +3,10 @@ import { Images } from "../../../utils/Images";
 import { ProgressBar, TextInput } from "react-native-paper";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext";
-import ToastManager, { Toast } from "toastify-react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Colors } from "../../../utils/Config";
+import { useToast } from "react-native-toast-notifications";
 
 interface ForgotPasswordScreenProps {
     navigation: any;
@@ -15,6 +15,8 @@ interface ForgotPasswordScreenProps {
 
 
 export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({navigation}) => {
+    const toast = useToast();
+
     const { verifyEmailForgot, verifyCode, changePassword } = useContext(AuthContext);
 
     const [progress, setProgress] = useState(0.4);
@@ -72,10 +74,10 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({navig
                     setCurrentView('VerifyCodeView');
                     setProgress(0.6);
                 } else {
-                    Toast.warn(result, 'top');
+                    toast.show(result, {type: 'warning'});
                 }
             } catch (error) {
-                Toast.error('An unexpected error occurred', 'top');
+                toast.show("An unexpected error occurred", {type: 'danger'});
             }
 
         } else if (currentView === 'VerifyCodeView') {
@@ -85,14 +87,14 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({navig
                     setCurrentView('PasswordView');
                     setProgress(0.8);
                 } else if (result.result) {
-                    Toast.warn(result.result, 'top');
+                    toast.show(result.result, {type: 'warning'});
                 }
                 else {
                     setIsVerificationCodeValid(false);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                Toast.error('An unexpected error occurred', 'top');
+                toast.show("An unexpected error occurred", {type: 'danger'});
             }
         }
         else {
@@ -100,15 +102,15 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({navig
                 const result = changePassword ? await changePassword(email, password) : undefined;
 
                 if (result == "password_changed_successfully") {
-                    Toast.success('Password Changed successfully', 'top');
+                    toast.show("Password Changed successfully", {type: 'success'});
                     setTimeout(() => {
                         navigation.navigate('Login');
-                    }, 2500);
+                    }, 1000);
                 }else{
-                    Toast.warn(result, 'top');
+                    toast.show(result, {type: 'warning'});
                 }
             }catch (error) {
-                Toast.error('An unexpected error occurred', 'top');
+                toast.show("An unexpected error occurred", {type: 'danger'});
             }
         }
     };
@@ -198,7 +200,6 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({navig
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center' }}>
             <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
                 <View>
-                    <ToastManager />
 
                     <View style={{ alignItems: 'center' }}>
                         <Image

@@ -1,16 +1,14 @@
-import { Image, Keyboard, LayoutAnimation, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Button, Image, Keyboard, LayoutAnimation, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { Images } from "../../../utils/Images";
 import { useContext, useState } from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Card, ProgressBar, TextInput } from "react-native-paper";
-import { Dropdown } from "react-native-element-dropdown";
-import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { AuthContext } from "../../../context/AuthContext";
-import ToastManager, { Toast } from "toastify-react-native";
 import { CustomDropdown } from "../../../components/CustomDropdown";
 import { DatePickerComponent } from "../../../components/DatePickerComponent";
 import { Colors } from "../../../utils/Config";
+import { useToast } from "react-native-toast-notifications";
 
 interface RegisterScreenProps {
     navigation: any;
@@ -18,6 +16,7 @@ interface RegisterScreenProps {
 }
 
 export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
+    const toast = useToast();
     const { register, emailAvailability, verifyEmailNewUser, verifyCode } = useContext(AuthContext);
 
     const [currentView, setCurrentView] = useState('EmailView');
@@ -123,10 +122,13 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                     setCurrentView('VerifyCodeView');
                     setProgress(0.5);
                 } else {
-                    Toast.warn(result, 'top');
+                    toast.show(result, {
+                        type: "warning",
+                    });
                 }
             } catch (error) {
-                Toast.error('An unexpected error occurred', 'top');
+                console.error('Error:', error);
+                toast.show("An unexpected error occurred", { type: 'danger' });
             }
         } else if (currentView === 'VerifyCodeView') {
             try {
@@ -135,14 +137,14 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                     setCurrentView('OtherDetailsView');
                     setProgress(0.7);
                 } else if (result.result) {
-                    Toast.warn(result.result, 'top');
+                    toast.show(result.result, { type: 'warning' });
                 }
                 else {
                     setIsVerificationCodeValid(false);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                Toast.error('An unexpected error occurred', 'top');
+                toast.show("An unexpected error occurred", { type: 'danger' });
             }
         }
         else if (currentView === 'OtherDetailsView') {
@@ -153,15 +155,15 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                 const result = register ? await register(firstName, lastName, email, password, dateOfBirth, gender, phoneNumber) : undefined;
 
                 if (result == "user_registered_successfully") {
-                    Toast.success('Sign up success!', 'top');
+                    toast.show("Sign up success!", { type: 'success' });
                     setTimeout(() => {
                         navigation.navigate('Login');
-                    }, 2500);
+                    }, 1000);
                 } else {
-                    Toast.warn(result, 'top');
+                    toast.show(result, { type: 'warning' });
                 }
-            }catch (error: any) {
-                Toast.error('An unexpected error occurred', 'top');
+            } catch (error: any) {
+                toast.show("An unexpected error occurred", { type: 'danger' });
             }
         }
     };
@@ -296,7 +298,6 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
             <TouchableWithoutFeedback
                 onPress={() => Keyboard.dismiss()}>
                 <View>
-                    <ToastManager />
 
                     <View style={{ alignItems: 'center' }}>
                         <Image

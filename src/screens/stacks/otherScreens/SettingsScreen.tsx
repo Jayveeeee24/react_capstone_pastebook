@@ -1,10 +1,10 @@
 import { useContext } from "react";
 import { Button, Image, SafeAreaView, Text, TouchableNativeFeedback, View } from "react-native";
 import { AuthContext } from "../../../context/AuthContext";
-import { Toast } from "toastify-react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { Images } from "../../../utils/Images";
+import { useToast } from "react-native-toast-notifications";
 
 interface SettingsScreenProps {
     navigation: any;
@@ -12,6 +12,8 @@ interface SettingsScreenProps {
 }
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, route }) => {
+    const toast = useToast();
+
     const { logout } = useContext(AuthContext);
 
     return (
@@ -67,7 +69,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, rout
                         if (success) {
                             navigation.navigate('Login');
                         } else {
-                            Toast.warn('Logout error, please try again', 'top');
+                            toast.show("Logout error, please try again", {type: 'warning'});
                         }
                     }}>
                         <View style={{ paddingHorizontal: 15, paddingVertical: 10, flexDirection: "row", alignItems: "center" }}>
