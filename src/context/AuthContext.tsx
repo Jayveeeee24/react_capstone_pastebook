@@ -77,41 +77,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     phoneNumber: string
   ) => {
     try {
-      return axios
-        .post(`${BASE_URL}/api/authentication/register`, {
-          firstName,
-          lastName,
-          email,
-          password,
-          birthdate,
-          sex,
-          phoneNumber,
-        })
-    } catch (e) {
-      return { error: true, msg: "register error: " + (e as any).response.data.msg };
+      const result = await axios
+      .post(`${BASE_URL}/api/authentication/register`, {
+        firstName,
+        lastName,
+        email,
+        password,
+        birthdate,
+        sex,
+        phoneNumber,
+      });
+      return result.data.result;
+    } catch (error: any) {
+      return error.response.data.result;
     }
 
   };
 
   const login = async (email: string, password: string) => {
     try {
-      const result = await axios.post(`${BASE_URL}/api/authentication/login`, {
-        email,
-        password
-      });
+      const result = await axios.post(`${BASE_URL}/api/authentication/login`, { email, password });
 
-      setAuthState(true);
+      if (result.data.token) {
+        setAuthState(true);
 
-      axios.defaults.headers.common['Authorization'] = result.data.token;
-      Storage.set('userToken', result.data.token);
+        axios.defaults.headers.common['Authorization'] = result.data.token;
+        Storage.set('userToken', result.data.token);
+      }
 
       return result.data;
     } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.result) {
-        return { error: "login error: " + error.response.data.result };
-      } else {
-        throw error;
-      }
+      return error.response.data.result;
     }
   }
 
@@ -125,21 +121,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       axios.defaults.headers.common['Authorization'] = '';
       return true;
     } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.result) {
-        return { error: "logout error: " + error.response.data.result };
-      } else {
-        throw error;
-      }
+      return error.response.data.result;
     }
   };
 
   const changePassword = async (email: string, password: string) => {
-    try{
-      const result = await axios.put(`${BASE_URL}/api/authentication/forgot-change-password`, {Email: email, NewPassword: password});
-      console.log(result.data.result)
+    try {
+      const result = await axios.put(`${BASE_URL}/api/authentication/forgot-change-password`, { Email: email, NewPassword: password });
       return result.data.result;
-    }catch (error: any) {
-      return error.result;
+    } catch (error: any) {
+      return error.response.data.result;
     }
   }
 
@@ -148,12 +139,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const result = await axios.post(`${BASE_URL}/api/authentication/verify-email-new-user/${email}`);
       return result.data.result;
     } catch (error: any) {
-      if (error.response) {
-        return error.response.result;
-      } else {
-        console.error(error);
-        throw error;
-      }
+      return error.response.data.result;
     }
   };
 
@@ -162,12 +148,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const result = await axios.post(`${BASE_URL}/api/authentication/verify-email-forgot/${email}`);
       return result.data.result;
     } catch (error: any) {
-      if (error.response) {
-        return error.response.result;
-      } else {
-        console.error(error);
-        throw error;
-      }
+      return error.response.data.result;
     }
   };
 
@@ -177,12 +158,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const result = await axios.post(`${BASE_URL}/api/authentication/verify-code`, { Email: email, VerificationCode: code });
       return result.data;
     } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.result) {
-        return { error: "verifycode-error: " + error.response.data.result };
-      } else {
-        console.error(error);
-        throw error;
-      }
+      return error.response.data.result;
     }
   };
 

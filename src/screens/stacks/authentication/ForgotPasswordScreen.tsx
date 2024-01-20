@@ -75,7 +75,6 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({navig
                     Toast.warn(result, 'top');
                 }
             } catch (error) {
-                console.error('Error:', error);
                 Toast.error('An unexpected error occurred', 'top');
             }
 
@@ -99,17 +98,16 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({navig
         else {
             try{
                 const result = changePassword ? await changePassword(email, password) : undefined;
+
                 if (result == "password_changed_successfully") {
                     Toast.success('Password Changed successfully', 'top');
                     setTimeout(() => {
                         navigation.navigate('Login');
                     }, 2500);
                 }else{
-                    Toast.warn(result.result, 'top');
+                    Toast.warn(result, 'top');
                 }
-
             }catch (error) {
-                console.error('Error:', error);
                 Toast.error('An unexpected error occurred', 'top');
             }
         }

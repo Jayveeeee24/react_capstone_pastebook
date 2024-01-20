@@ -34,7 +34,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
     useEffect(() => {
         if (error) {
             Toast.warn(getErrorMessage(error), 'top');
-            setError(null); 
+            setError(null);
         }
     }, [error]);
 
@@ -121,14 +121,13 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                                 try {
                                     setIsLoading(true);
                                     const result = login ? await login(email, password) : undefined;
-
-                                    if (result && result.error) {
-                                        setError(result.error);
-                                    } else {
+                                    if (result.token) {
                                         navigation.replace('BottomHome');
+                                    } else {
+                                        Toast.warn(result, 'top');
                                     }
-                                } catch (error) {
-                                    setError('unknown_error');
+                                } catch (error: any) {
+                                    Toast.error('An unexpected error occurred', 'top');
                                 } finally {
                                     setIsLoading(false);
                                 }

@@ -119,7 +119,6 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         if (currentView === 'EmailView') {
             try {
                 const result = verifyEmailNewUser ? await verifyEmailNewUser(email) : undefined;
-                
                 if (result == "Email sent successfully!") {
                     setCurrentView('VerifyCodeView');
                     setProgress(0.5);
@@ -127,19 +126,18 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                     Toast.warn(result, 'top');
                 }
             } catch (error) {
-                console.error('Error:', error);
                 Toast.error('An unexpected error occurred', 'top');
             }
         } else if (currentView === 'VerifyCodeView') {
             try {
                 const result = verifyCode ? await verifyCode(email, verificationCode) : undefined;
-                if(result === true){
+                if (result === true) {
                     setCurrentView('OtherDetailsView');
                     setProgress(0.7);
-                }else if(result.result){
+                } else if (result.result) {
                     Toast.warn(result.result, 'top');
                 }
-                else{
+                else {
                     setIsVerificationCodeValid(false);
                 }
             } catch (error) {
@@ -151,14 +149,19 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
             setCurrentView('PasswordView');
             setProgress(0.9);
         } else {
-            const result = register ? register(firstName, lastName, email, password, dateOfBirth, gender, phoneNumber) : undefined;
-            if (result) {
-                Toast.success('Sign up success!', 'top');
-                setTimeout(() => {
-                    navigation.navigate('Login');
-                }, 2500);
-            } else {
-                Toast.warn('Sign up error, please try again', 'top');
+            try {
+                const result = register ? await register(firstName, lastName, email, password, dateOfBirth, gender, phoneNumber) : undefined;
+
+                if (result == "user_registered_successfully") {
+                    Toast.success('Sign up success!', 'top');
+                    setTimeout(() => {
+                        navigation.navigate('Login');
+                    }, 2500);
+                } else {
+                    Toast.warn(result, 'top');
+                }
+            }catch (error: any) {
+                Toast.error('An unexpected error occurred', 'top');
             }
         }
     };
