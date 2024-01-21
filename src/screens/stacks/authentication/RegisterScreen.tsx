@@ -4,7 +4,7 @@ import { useContext, useState } from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Card, ProgressBar, TextInput } from "react-native-paper";
-import { AuthContext } from "../../../context/AuthContext";
+import { AuthContext, useAuth } from "../../../context/AuthContext";
 import { CustomDropdown } from "../../../components/CustomDropdown";
 import { DatePickerComponent } from "../../../components/DatePickerComponent";
 import { Colors } from "../../../utils/Config";
@@ -17,7 +17,7 @@ interface RegisterScreenProps {
 
 export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
     const toast = useToast();
-    const { register, emailAvailability, verifyEmailNewUser, verifyCode } = useContext(AuthContext);
+    const { register, emailAvailability, verifyEmailNewUser, verifyCode } = useAuth();
 
     const [currentView, setCurrentView] = useState('EmailView');
     const [progress, setProgress] = useState(0.3);

@@ -1,8 +1,8 @@
 import { Image, Keyboard, LayoutAnimation, SafeAreaView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { Images } from "../../../utils/Images";
 import { ProgressBar, TextInput } from "react-native-paper";
-import { useContext, useState } from "react";
-import { AuthContext } from "../../../context/AuthContext";
+import { useState } from "react";
+import { useAuth } from "../../../context/AuthContext";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Colors } from "../../../utils/Config";
@@ -17,7 +17,7 @@ interface ForgotPasswordScreenProps {
 export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({navigation}) => {
     const toast = useToast();
 
-    const { verifyEmailForgot, verifyCode, changePassword } = useContext(AuthContext);
+    const { verifyEmailForgot, verifyCode, changePassword } = useAuth();
 
     const [progress, setProgress] = useState(0.4);
     const [currentView, setCurrentView] = useState('EmailView');

@@ -14,7 +14,7 @@ interface EditPasswordScreenProps {
 
 export const EditPasswordScreen: React.FC<EditPasswordScreenProps> = ({ navigation }) => {
     const toast = useToast();
-    const { checkCurrentPassword, changePassword } = useContext(UserContext);
+    const { checkCurrentPassword, changePassword } = useUser();
 
     const [currentView, setCurrentView] = useState('CurrentPasswordView');
     const [progress, setProgress] = useState(0.45);

@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Images } from "../../../utils/Images";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import React, { useContext, useState } from "react";
-import { AuthContext } from "../../../context/AuthContext";
+import { AuthContext, useAuth } from "../../../context/AuthContext";
 import { TextInput } from "react-native-paper";
 import { Colors } from "../../../utils/Config";
 import { useToast } from "react-native-toast-notifications";
@@ -16,7 +16,7 @@ interface LoginScreenProps {
 
 export const LoginScreen = ({ navigation }: LoginScreenProps) => {
     const toast = useToast();
-    const { login } = useContext(AuthContext);
+    const { login } = useAuth();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
