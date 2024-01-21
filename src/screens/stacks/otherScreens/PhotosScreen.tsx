@@ -75,7 +75,7 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
     return (
         <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
             <View style={{ flexDirection: "column", flex: 1 }}>
-                <View style={{ marginTop: 10 }}>
+                <View>
                     <FlatList
                         data={photos}
                         renderItem={({ item, index }) => (

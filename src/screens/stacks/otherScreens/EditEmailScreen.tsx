@@ -1,13 +1,13 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Image, Keyboard, LayoutAnimation, SafeAreaView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { ProgressBar, TextInput } from "react-native-paper";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { AuthContext } from "../../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 import { useToast } from "react-native-toast-notifications";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Images } from "../../../utils/Images";
 import { Colors } from "../../../utils/Config";
-import { UserContext } from "../../../context/UserContext";
+import { useUser } from "../../../context/UserContext";
 
 interface EditEmailScreenProps {
     navigation: any;
@@ -16,8 +16,9 @@ interface EditEmailScreenProps {
 
 export const EditEmailScreen: React.FC<EditEmailScreenProps> = ({ navigation }) => {
     const toast = useToast();
-    const { verifyEmailNewUser, verifyCode, emailAvailability } = useContext(AuthContext);
-    const { changeEmail } = useContext(UserContext);
+    
+    const { verifyEmailNewUser, verifyCode, emailAvailability } = useAuth();
+    const { changeEmail } = useUser();
 
     const [currentView, setCurrentView] = useState('EmailView');
     const [progress, setProgress] = useState(0.4);
@@ -87,11 +88,11 @@ export const EditEmailScreen: React.FC<EditEmailScreenProps> = ({ navigation }) 
                         if (changeResult.id) {
                             toast.show('Email changed successfully!', { type: 'success' });
                             navigation.pop();
-                        }else{
+                        } else {
                             toast.show(changeResult, {
                                 type: 'warning'
                             });
-                            
+
                         }
 
                     } catch (error) {
