@@ -103,6 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         axios.defaults.headers.common['Authorization'] = result.data.token;
         Storage.set('userToken', result.data.token);
+        Storage.set('userId', result.data.userId);
       }
 
       return result.data;

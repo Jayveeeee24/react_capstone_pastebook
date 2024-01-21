@@ -1,5 +1,5 @@
 import { FlatList, Image, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
-import { UserAvatar } from "../../components/UserAvatar";
+import { UserAvatar } from "../../components/customComponents/UserAvatar";
 import { Images } from "../../utils/Images";
 import { IndividualPost } from "../../components/IndividualPost";
 import { useCallback, useState } from "react";

@@ -8,7 +8,7 @@ import { AlbumsTab } from "../screens/bottomTabs/AlbumsTab";
 import { ProfileTab } from "../screens/bottomTabs/ProfileTab";
 import { HomeTab } from "../screens/bottomTabs/HomeTab";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import { NotificationIconWithBadge } from "../components/NotificationWithBadge";
+import { NotificationIconWithBadge } from "../components/customComponents/NotificationWithBadge";
 import { Images } from "../utils/Images";
 import { NotificationScreen } from "../screens/stacks/otherScreens/NotificationScreen";
 import { FriendRequestScreen } from "../screens/stacks/otherScreens/FriendRequestScreen";

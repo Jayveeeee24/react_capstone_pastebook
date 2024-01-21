@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { Colors } from "../utils/Config";
+import { Colors } from "../../utils/Config";
 
 export const NotificationIconWithBadge = ({ onPress, badgeCount }: any) => {
     return (

@@ -5,8 +5,8 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Card, ProgressBar, TextInput } from "react-native-paper";
 import { AuthContext, useAuth } from "../../../context/AuthContext";
-import { CustomDropdown } from "../../../components/CustomDropdown";
-import { DatePickerComponent } from "../../../components/DatePickerComponent";
+import { CustomDropdown } from "../../../components/customComponents/CustomDropdown";
+import { DatePickerComponent } from "../../../components/customComponents/DatePickerComponent";
 import { Colors } from "../../../utils/Config";
 import { useToast } from "react-native-toast-notifications";
 
@@ -42,7 +42,6 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
     const [isVerificationCodeValid, setIsVerificationCodeValid] = useState(true);
     const [isFirstNameValid, setIsFirstNameValid] = useState(true);
     const [isLastNameValid, setIsLastNameValid] = useState(true);
-    const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(true);
     const [isGenderValid, setIsGenderValid] = useState(true);
     const [isDateOfBirthValid, setIsDateOfBirthValid] = useState(true);
 
@@ -74,8 +73,6 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         const trimmedLastName = lastName.trim();
         setIsLastNameValid(!!trimmedLastName);
 
-        const trimmedPhoneNumber = phoneNumber.trim();
-        setIsPhoneNumberValid(!!trimmedPhoneNumber);
 
         const trimmedGender = gender.trim();
         setIsGenderValid(!!trimmedGender);
@@ -86,7 +83,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
         setIsDateOfBirthValid(age >= 13);
 
-        if (!!trimmedFirstName && !!trimmedLastName && !!trimmedPhoneNumber && !!trimmedGender && age >= 13) {
+        if (!!trimmedFirstName && !!trimmedLastName && !!trimmedGender && age >= 13) {
             handleNext();
         }
 
@@ -251,9 +248,6 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                                 <TextInput placeholder="Phone Number" theme={credentialTextTheme}
                                     style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} keyboardType="phone-pad" value={phoneNumber} onChangeText={setPhoneNumber} />
                             </View>
-                            {!isPhoneNumberValid && (
-                                <Text style={styles.textValidation}>Please enter a valid phone number</Text>
-                            )}
 
                             <View style={{ marginHorizontal: 30 }}>
                                 <CustomDropdown data={genders} value={gender} onValueChange={(value) => setGender(value)} isGenderValid={isGenderValid} placeholder={"Gender"} />
