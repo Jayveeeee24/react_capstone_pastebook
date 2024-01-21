@@ -154,8 +154,8 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
             try {
                 const result = register ? await register(firstName, lastName, email, password, dateOfBirth, gender, phoneNumber) : undefined;
 
-                if (result == "user_registered_successfully") {
-                    toast.show("Sign up success!", { type: 'success' });
+                if (result == "User Registered Successfully") {
+                    toast.show(result, { type: 'success' });
                     setTimeout(() => {
                         navigation.navigate('Login');
                     }, 1000);

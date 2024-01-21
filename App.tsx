@@ -16,6 +16,7 @@ import { ToastProvider } from 'react-native-toast-notifications';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { UserProvider } from './src/context/UserContext';
 
 
 function App(): React.JSX.Element {
@@ -42,12 +43,13 @@ function App(): React.JSX.Element {
       offsetTop={30}
       offsetBottom={40}
       swipeEnabled={true}>
-      <AuthProvider>
-        <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
-          <NavigationContainer>
-            <AppStack />
+      <UserProvider>
+        <AuthProvider>
+          <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
+            <NavigationContainer>
+              <AppStack />
 
-            {/* {
+              {/* {
             authState ? (
               <AppStack />
             ):
@@ -55,9 +57,10 @@ function App(): React.JSX.Element {
               <AuthStack />
             )
           } */}
-          </NavigationContainer>
-        </GestureHandlerRootView>
-      </AuthProvider>
+            </NavigationContainer>
+          </GestureHandlerRootView>
+        </AuthProvider>
+      </UserProvider>
     </ToastProvider>
   );
 }

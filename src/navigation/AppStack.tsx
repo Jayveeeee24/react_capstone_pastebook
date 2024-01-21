@@ -123,6 +123,7 @@ export const AppStack = () => {
         <Stack.Screen name="Settings" component={SettingsScreen} options={{
           headerTitle: 'Account Settings',
         }} />
+
         <Stack.Screen name="Photos" component={PhotosScreen} />
 
       </Stack.Navigator>
