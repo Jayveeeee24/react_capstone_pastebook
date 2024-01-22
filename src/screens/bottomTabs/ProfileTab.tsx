@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { Images } from "../../utils/Images";
@@ -98,13 +98,12 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
 
                     <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', fontWeight: '700' }}>{firstName + ' ' + lastName}</Text>
 
-                    <View style={{ flexDirection: "row", justifyContent: bio ? "space-between" : "flex-start", alignItems: "flex-start" }}>
-                        <View style={{justifyContent: "center", flex: 1 }}>
-                            {/* <MaterialCommunityIcons name="profile" size={16} color={'black'} /> */}
+                    <View style={{ flexDirection: "row", justifyContent: bio ? "space-between" : "flex-start", alignItems: "flex-start", marginTop: 5 }}>
+                        <View style={{ justifyContent: "center", flex: 1 }}>
 
                             <Text style={{ color: 'black', fontFamily: 'Roboto-Medium' }}>{"\n" + bio ? bio : ''}</Text>
                         </View>
-                        <View style={{flex: 0}}>
+                        <View style={{ flex: 0 }}>
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <MaterialCommunityIcons name="cake-variant-outline" size={16} color={'black'} />
                                 <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginStart: 5 }}>{dateOfBirth.toLocaleDateString('en-US', {
@@ -132,7 +131,9 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                         <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', fontWeight: '700', textAlign: "center" }}>Edit Profile</Text>
                     </TouchableOpacity>
                 </View>
-                <ProfileTabView />
+                <View style={{ flex: 1 }}>
+                    <ProfileTabView />
+                </View>
             </View>
         </SafeAreaView>
     );

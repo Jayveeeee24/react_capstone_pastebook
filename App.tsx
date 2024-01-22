@@ -1,5 +1,7 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
+  PermissionsAndroid,
+  Platform,
   Text,
   View,
   useColorScheme
@@ -25,6 +27,27 @@ function App(): React.JSX.Element {
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+
+  useEffect(() => {
+    hasPermission();
+  }, []);
+
+  const hasPermission = async () => {
+    const platformVersion = parseInt(String(Platform.Version), 10);
+    const permission =
+      platformVersion >= 33
+        ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
+        : PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+
+    const hasPermission = await PermissionsAndroid.check(permission);
+    if (hasPermission) {
+      return true;
+    }
+
+    const status = await PermissionsAndroid.request(permission);
+    return status === 'granted';
+  };
+
 
   return (
     <ToastProvider placement="top"

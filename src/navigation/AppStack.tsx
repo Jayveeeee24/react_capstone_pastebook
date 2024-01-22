@@ -1,7 +1,8 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { CardStyleInterpolators, StackNavigationProp, createStackNavigator } from "@react-navigation/stack";
+import { CardStyleInterpolators, StackNavigationProp, TransitionPresets, createStackNavigator } from "@react-navigation/stack";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import { SearchTab } from "../screens/bottomTabs/SearchTab";
 import { CreatePostTab } from "../screens/bottomTabs/CreatePostTab";
 import { AlbumsTab } from "../screens/bottomTabs/AlbumsTab";
@@ -53,9 +54,9 @@ const getTabBarIcon = (route: any, focused: any, color: any) => {
 
     return <MaterialCommunityIcons name={iconName} size={26} color={color} />;
   } else if (route.name === 'CreatePostTab') {
-    iconName = focused ? 'add-circle' : 'add-circle-outline';
+    iconName = focused ? 'plussquare' : 'plussquareo';
 
-    return <Ionicons name={iconName} size={26} color={color} />;
+    return <AntDesign name={iconName} size={26} color={color} />;
   } else if (route.name === 'AlbumsTab') {
     iconName = focused ? 'albums-sharp' : 'albums-outline';
 
@@ -135,7 +136,7 @@ export const AppStack = () => {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused }) => getTabBarIcon(route, focused, Colors.primaryBrand),
-          headerShown: route.name != 'CreatePostTab' && route.name != 'HomeTab',
+          headerShown: route.name != 'HomeTab',
           tabBarShowLabel: false,
           tabBarStyle: {
             height: 55,
@@ -144,7 +145,7 @@ export const AppStack = () => {
         })}>
         <Tab.Screen name="HomeTab" component={HomeStack} />
         <Tab.Screen name="SearchTab" component={SearchTab} />
-        <Tab.Screen name="CreatePostTab" component={CreatePostTab} />
+        <Tab.Screen name="CreatePostTab" component={CreatePostTab}/>
         <Tab.Screen name="AlbumsTab" component={AlbumsTab} options={{
           headerLeft: () => (
             <View style={{ flexDirection: "row", alignItems: "center", marginStart: 10 }}>
