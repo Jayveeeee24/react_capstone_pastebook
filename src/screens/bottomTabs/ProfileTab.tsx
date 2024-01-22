@@ -4,6 +4,11 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { Images } from "../../utils/Images";
 import { ProfileTabView } from "../tabViews/ProfileTabView";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { Storage } from "../../utils/Config";
+import { useUser } from "../../context/UserContext";
+import { useFocusEffect } from "@react-navigation/native";
+import React from "react";
 
 interface ProfileTabProps {
     navigation: any;
@@ -11,14 +16,48 @@ interface ProfileTabProps {
 }
 
 export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => {
+    const { getProfile } = useUser();
     const [dynamicTitle, setDynamicTitle] = useState("Profile Tab");
+
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+
+    const [bio, setBio] = useState('');
+    const [dateOfBirth, setDateOfBirth] = useState(new Date());
+    const [gender, setGender] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const loadProfile = async () => {
+                const userId = Storage.getString('userId');
+
+                if (userId) {
+                    const result = getProfile ? await getProfile(userId) : undefined;
+
+                    if (result.id) {
+                        setFirstName(result.firstName);
+                        setLastName(result.lastName);
+                        setBio(result.aboutMe);
+                        setPhoneNumber(result.phoneNumber);
+                        setGender(result.sex);
+                        setDateOfBirth(new Date(result.birthDate));
+                        setDynamicTitle(`${result.firstName.toLowerCase().replace(/\s/g, '')}.${result.lastName.toLowerCase()}`);
+                    }
+                }
+            }
+
+            loadProfile();
+
+        }, [getProfile, setFirstName, setLastName, setBio, setPhoneNumber, setGender, setDateOfBirth, setDynamicTitle, navigation])
+    );
 
     useEffect(() => {
         navigation.setOptions({
             headerLeft: () => (
                 <View style={{ flexDirection: "row", alignItems: "center", marginStart: 10 }}>
                     <MaterialIcons name="lock-outline" size={24} color='black' />
-                    <Text style={{ marginStart: 8, fontSize: 22, color: 'black', fontWeight: '700', alignItems: "center" }}>artemis.jayvee</Text>
+                    <Text style={{ marginStart: 8, fontSize: 22, color: 'black', fontWeight: '700', alignItems: "center" }}>{dynamicTitle}</Text>
                 </View>
             ),
             headerRight: () => (
@@ -28,7 +67,6 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                     </View>
                 </TouchableOpacity>
             ),
-
             headerTitle: '',
             headerStyle: {
                 elevation: 0,
@@ -57,11 +95,37 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                             <Text style={styles.textMetricsSub}>Albums</Text>
                         </TouchableOpacity>
                     </View>
-                    <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginTop: 5 }}>
-                        <Text style={{ fontWeight: '700' }}>John Bernard Tinio</Text>
-                        <Text>{'\n'}Full-time Bug Sprayer{'\n'}Aspiring Photographer</Text>
-                    </Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('EditProfile')} style={{ borderWidth: 0.8, borderColor: 'gray', marginTop: 8, padding: 5 }}>
+
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginTop: 5 }}>
+                        <Text style={{ color: 'black', fontFamily: 'Roboto-Medium' }}>
+                            <Text style={{ fontWeight: '700' }}>{firstName + ' ' + lastName}</Text>
+                            <Text>{"\n" + bio}</Text>
+                        </Text>
+                        <View>
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                <MaterialCommunityIcons name="cake-variant-outline" size={16} color={'black'} />
+                                <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginStart: 5 }}>{dateOfBirth.toLocaleDateString('en-US', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                })}</Text>
+                            </View>
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                <MaterialCommunityIcons name="gender-male" size={16} color={'black'} />
+                                <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginStart: 5 }}>
+                                    {gender === '1' ? 'Male' : (gender === '2' ? 'Female' : 'Rather not say')}
+                                </Text>
+                            </View>
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                <MaterialCommunityIcons name="phone-outline" size={16} color={'black'} />
+                                <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginStart: 5 }}>{phoneNumber}</Text>
+                            </View>
+                        </View>
+                    </View>
+
+
+                    <TouchableOpacity onPress={() => navigation.navigate('EditProfile')} style={{ borderWidth: 0.8, borderColor: 'gray', marginTop: 15, padding: 5 }}>
                         <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', fontWeight: '700', textAlign: "center" }}>Edit Profile</Text>
                     </TouchableOpacity>
                 </View>

@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Dropdown } from "react-native-element-dropdown";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-interface CustomDropdown {
+interface GenderDropdown {
   data: { label: string; value: string; }[];
   value: string;
   onValueChange: (value: string) => void;
@@ -12,7 +12,7 @@ interface CustomDropdown {
   placeholder: string;
 }
 
-export const CustomDropdown: React.FC<CustomDropdown> = ({ data, value, onValueChange, isGenderValid, placeholder }) => {
+export const GenderDropdown: React.FC<GenderDropdown> = ({ data, value, onValueChange, isGenderValid, placeholder }) => {
   const renderItem = (item: any) => {
     return (
       <View style={styles.item}>

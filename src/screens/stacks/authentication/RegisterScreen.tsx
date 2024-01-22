@@ -5,7 +5,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Card, ProgressBar, TextInput } from "react-native-paper";
 import { AuthContext, useAuth } from "../../../context/AuthContext";
-import { CustomDropdown } from "../../../components/customComponents/CustomDropdown";
+import { GenderDropdown } from "../../../components/customComponents/GenderDropdown";
 import { DatePickerComponent } from "../../../components/customComponents/DatePickerComponent";
 import { Colors } from "../../../utils/Config";
 import { useToast } from "react-native-toast-notifications";
@@ -250,7 +250,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                             </View>
 
                             <View style={{ marginHorizontal: 30 }}>
-                                <CustomDropdown data={genders} value={gender} onValueChange={(value) => setGender(value)} isGenderValid={isGenderValid} placeholder={"Gender"} />
+                                <GenderDropdown data={genders} value={gender} onValueChange={(value) => setGender(value)} isGenderValid={isGenderValid} placeholder={"Gender"} />
                             </View>
 
                             <View style={{ marginHorizontal: 30 }}>

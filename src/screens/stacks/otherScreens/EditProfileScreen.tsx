@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Image, Keyboard, SafeAreaView, ScrollView, Text, TouchableOpacity, TextInput as TextArea, TouchableWithoutFeedback, View, StyleSheet } from "react-native";
 import { Images } from "../../../utils/Images";
 import { Colors, Storage } from "../../../utils/Config";
-import { CustomDropdown } from "../../../components/customComponents/CustomDropdown";
+import { GenderDropdown } from "../../../components/customComponents/GenderDropdown";
 import { DatePickerComponent } from "../../../components/customComponents/DatePickerComponent";
 import { TextInput } from "react-native-paper";
 import { useToast } from "react-native-toast-notifications";
@@ -20,11 +20,9 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ navigation
     useEffect(() => {
         const loadProfile = async () => {
             const userId = Storage.getString('userId');
-            console.log(userId)
 
             if (userId) {
                 const result = getProfile ? await getProfile(userId) : undefined;
-                console.log(result);
 
                 if (result.id) {
                     setFirstName(result.firstName);
@@ -100,7 +98,7 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ navigation
                                 placeholderTextColor={'#666'} />
 
                             <Text style={{ fontSize: 12, marginTop: 10 }}>Gender</Text>
-                            <CustomDropdown data={genders} value={gender} onValueChange={(value) => setGender(value)} isGenderValid={isGenderValid} placeholder={"Gender"} />
+                            <GenderDropdown data={genders} value={gender} onValueChange={(value) => setGender(value)} isGenderValid={isGenderValid} placeholder={"Gender"} />
 
                             <Text style={{ fontSize: 12, marginTop: 10 }}>Birthdate </Text>
                             <DatePickerComponent
@@ -133,6 +131,7 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ navigation
                                                     type: "success",
                                                 });
                                                 navigation.pop();
+                                                navigation.navigate('ProfileTab', {refresh: true})
                                             } else {
                                                 toast.show(result, {
                                                     type: "warning",
