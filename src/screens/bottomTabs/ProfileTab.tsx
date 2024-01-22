@@ -96,12 +96,15 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                         </TouchableOpacity>
                     </View>
 
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginTop: 5 }}>
-                        <Text style={{ color: 'black', fontFamily: 'Roboto-Medium' }}>
-                            <Text style={{ fontWeight: '700' }}>{firstName + ' ' + lastName}</Text>
-                            <Text>{"\n" + bio}</Text>
-                        </Text>
-                        <View>
+                    <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', fontWeight: '700' }}>{firstName + ' ' + lastName}</Text>
+
+                    <View style={{ flexDirection: "row", justifyContent: bio ? "space-between" : "flex-start", alignItems: "flex-start" }}>
+                        <View style={{justifyContent: "center", flex: 1 }}>
+                            {/* <MaterialCommunityIcons name="profile" size={16} color={'black'} /> */}
+
+                            <Text style={{ color: 'black', fontFamily: 'Roboto-Medium' }}>{"\n" + bio ? bio : ''}</Text>
+                        </View>
+                        <View style={{flex: 0}}>
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <MaterialCommunityIcons name="cake-variant-outline" size={16} color={'black'} />
                                 <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginStart: 5 }}>{dateOfBirth.toLocaleDateString('en-US', {
@@ -114,12 +117,12 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <MaterialCommunityIcons name="gender-male" size={16} color={'black'} />
                                 <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginStart: 5 }}>
-                                    {gender === '1' ? 'Male' : (gender === '2' ? 'Female' : 'Rather not say')}
+                                    {gender}
                                 </Text>
                             </View>
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <MaterialCommunityIcons name="phone-outline" size={16} color={'black'} />
-                                <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginStart: 5 }}>{phoneNumber}</Text>
+                                <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginStart: 5 }}>{phoneNumber ? phoneNumber : ''}</Text>
                             </View>
                         </View>
                     </View>

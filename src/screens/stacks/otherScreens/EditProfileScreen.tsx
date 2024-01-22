@@ -29,6 +29,7 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ navigation
                     setLastName(result.lastName);
                     setBio(result.aboutMe);
                     setPhoneNumber(result.phoneNumber);
+
                     setGender(result.sex);
                     setDateOfBirth(new Date(result.birthDate));
                 }
@@ -93,12 +94,12 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ navigation
                                 placeholder="Bio"
                                 style={styles.textArea}
                                 value={bio}
-                                onChangeText={setBio}
+                                onChangeText={(text) => setBio(text.slice(0, 65))}
                                 multiline
                                 placeholderTextColor={'#666'} />
 
                             <Text style={{ fontSize: 12, marginTop: 10 }}>Gender</Text>
-                            <GenderDropdown data={genders} value={gender} onValueChange={(value) => setGender(value)} isGenderValid={isGenderValid} placeholder={"Gender"} />
+                            <GenderDropdown data={genders} value={genders.find(item => item.label === gender)?.value || ''} onValueChange={(value) => setGender(genders.find(item => item.value === value)?.label || '')} isGenderValid={isGenderValid} placeholder={"Gender"} />
 
                             <Text style={{ fontSize: 12, marginTop: 10 }}>Birthdate </Text>
                             <DatePickerComponent

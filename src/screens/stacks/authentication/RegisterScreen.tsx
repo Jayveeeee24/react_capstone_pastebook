@@ -73,7 +73,6 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         const trimmedLastName = lastName.trim();
         setIsLastNameValid(!!trimmedLastName);
 
-
         const trimmedGender = gender.trim();
         setIsGenderValid(!!trimmedGender);
 
@@ -250,7 +249,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                             </View>
 
                             <View style={{ marginHorizontal: 30 }}>
-                                <GenderDropdown data={genders} value={gender} onValueChange={(value) => setGender(value)} isGenderValid={isGenderValid} placeholder={"Gender"} />
+                                <GenderDropdown data={genders} value={genders.find(item => item.label === gender)?.value || ''} onValueChange={(value) => setGender(genders.find(item => item.value === value)?.label || '')} isGenderValid={isGenderValid} placeholder={"Gender"} />
                             </View>
 
                             <View style={{ marginHorizontal: 30 }}>
