@@ -96,11 +96,10 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                         </TouchableOpacity>
                     </View>
 
-                    <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', fontWeight: '700' }}>{firstName + ' ' + lastName}</Text>
+                    <Text style={{ marginTop: 5, color: 'black', fontFamily: 'Roboto-Medium', fontWeight: '700' }}>{firstName + ' ' + lastName}</Text>
 
                     <View style={{ flexDirection: "row", justifyContent: bio ? "space-between" : "flex-start", alignItems: "flex-start", marginTop: 5 }}>
                         <View style={{ justifyContent: "center", flex: 1 }}>
-
                             <Text style={{ color: 'black', fontFamily: 'Roboto-Medium' }}>{"\n" + bio ? bio : ''}</Text>
                         </View>
                         <View style={{ flex: 0 }}>
