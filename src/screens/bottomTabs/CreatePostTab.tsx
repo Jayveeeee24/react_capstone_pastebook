@@ -224,8 +224,6 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                             }}>
                             <Text style={{ color: 'white', fontSize: 20, textAlign: 'center', fontFamily: 'Roboto-Medium' }}>Post</Text>
                         </TouchableOpacity>
-
-
                     </View>
                 );
         }

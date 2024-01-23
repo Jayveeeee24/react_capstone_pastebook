@@ -1,17 +1,18 @@
 import { useEffect } from "react";
 import { Text, View } from "react-native";
+import React from 'react';
 
-interface CameraProps{
-    navigation: any;
-    route: any;
-}
-
-export const CameraScreen: React.FC<CameraProps> = ({navigation}) => {
-
-    return (
-        <View>
-            <Text onPress={() => navigation.navigate('CreatePostTab')}>haha</Text>
-            
-        </View>
-    );
+export const CameraScreen = ({ navigation, route }: any) => {
+  return (
+    <View>
+      <Text onPress={() => {
+        navigation.navigate({
+            name: 'CreatePostTab',
+            params: { pickedImage: 'haha' },
+            merge: true,
+          });
+      }}>haha</Text>
+      <Text></Text>
+    </View>
+  );
 }

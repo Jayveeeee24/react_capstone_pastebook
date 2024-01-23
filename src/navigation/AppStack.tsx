@@ -5,6 +5,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { SearchTab } from "../screens/bottomTabs/SearchTab";
 import { CreatePostTab } from "../screens/bottomTabs/CreatePostTab";
+import React from 'react';
 import { AlbumsTab } from "../screens/bottomTabs/AlbumsTab";
 import { ProfileTab } from "../screens/bottomTabs/ProfileTab";
 import { HomeTab } from "../screens/bottomTabs/HomeTab";
@@ -128,6 +129,7 @@ export const AppStack = () => {
 
         <Stack.Screen name="Photos" component={PhotosScreen} />
         <Stack.Screen name="Camera" component={CameraScreen} />
+
 
       </Stack.Navigator>
     );
