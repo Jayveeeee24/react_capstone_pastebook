@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Colors } from "../../../utils/Config";
+import { Colors, credentialTextTheme } from "../../../utils/Config";
 import { useToast } from "react-native-toast-notifications";
 
 interface ForgotPasswordScreenProps {
@@ -129,7 +129,6 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({navig
     const renderView = () => {
         const [showPassword, setShowPassword] = useState(false);
         const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-        const credentialTextTheme = { colors: { primary: '#3373B0' } };
 
 
         const togglePasswordVisibility = () => {

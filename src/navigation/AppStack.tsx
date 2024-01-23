@@ -24,6 +24,7 @@ import { SettingsScreen } from "../screens/stacks/otherScreens/SettingsScreen";
 import { PhotosScreen } from "../screens/stacks/otherScreens/PhotosScreen";
 import { EditEmailScreen } from "../screens/stacks/otherScreens/EditEmailScreen";
 import { EditPasswordScreen } from "../screens/stacks/otherScreens/EditPasswordScreen";
+import { CameraScreen } from "../screens/stacks/otherScreens/CameraScreen";
 
 
 
@@ -77,7 +78,7 @@ export const AppStack = () => {
             elevation: 0,
             shadowOpacity: 0
           },
-          headerShown: route.name !== 'Login' && route.name !== 'Register',
+          headerShown: route.name !== 'Login' && route.name !== 'Register' && route.name !== 'Camera',
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
         })}>
         <Stack.Screen name="Home" component={HomeTab} options={{
@@ -126,6 +127,7 @@ export const AppStack = () => {
         }} />
 
         <Stack.Screen name="Photos" component={PhotosScreen} />
+        <Stack.Screen name="Camera" component={CameraScreen} />
 
       </Stack.Navigator>
     );
@@ -141,21 +143,25 @@ export const AppStack = () => {
           tabBarStyle: {
             height: 55,
             alignItems: "center",
+            display: route.name !== 'CreatePostTab' ? 'flex' : 'none'
           }
         })}>
         <Tab.Screen name="HomeTab" component={HomeStack} />
         <Tab.Screen name="SearchTab" component={SearchTab} />
-        <Tab.Screen name="CreatePostTab" component={CreatePostTab}/>
+        <Tab.Screen name="CreatePostTab" component={CreatePostTab} options={{
+          headerTitleStyle: {
+            marginStart: 10
+          },
+          headerTitle: 'New Post',
+        }} />
         <Tab.Screen name="AlbumsTab" component={AlbumsTab} options={{
-          headerLeft: () => (
-            <View style={{ flexDirection: "row", alignItems: "center", marginStart: 10 }}>
-              <Text style={{ marginStart: 8, fontSize: 22, color: 'black', fontWeight: '700', alignItems: "center" }}>My Album Gallery</Text>
-            </View>
-          ),
-          headerTitle: '',
+          headerTitle: 'My Album Gallery',
+          headerTitleStyle: {
+            marginStart: 8, fontSize: 22, color: 'black', fontWeight: '500',
+          },
           headerStyle: {
             elevation: 0,
-            shadowOpacity: 0
+            shadowOpacity: 0,
           },
         }} />
         <Tab.Screen name="ProfileTab" component={ProfileTab} />

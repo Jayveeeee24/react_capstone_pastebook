@@ -1,4 +1,4 @@
-import { Button, Image, Keyboard, LayoutAnimation, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { ActivityIndicator, Button, Image, Keyboard, LayoutAnimation, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { Images } from "../../../utils/Images";
 import { useContext, useState } from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -7,7 +7,7 @@ import { Card, ProgressBar, TextInput } from "react-native-paper";
 import { AuthContext, useAuth } from "../../../context/AuthContext";
 import { GenderDropdown } from "../../../components/customComponents/GenderDropdown";
 import { DatePickerComponent } from "../../../components/customComponents/DatePickerComponent";
-import { Colors } from "../../../utils/Config";
+import { Colors, credentialTextTheme } from "../../../utils/Config";
 import { useToast } from "react-native-toast-notifications";
 
 interface RegisterScreenProps {
@@ -21,6 +21,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
     const [currentView, setCurrentView] = useState('EmailView');
     const [progress, setProgress] = useState(0.3);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -48,7 +49,6 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
     const [isPasswordValid, setIsPasswordValid] = useState(true);
     const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
 
-    const credentialTextTheme = { colors: { primary: '#3373B0' } };
 
     const validateEmail = async () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -148,10 +148,12 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
             setProgress(0.9);
         } else {
             try {
+                setIsLoading(true);
                 const result = register ? await register(firstName, lastName, email, password, dateOfBirth, gender, phoneNumber) : undefined;
 
                 if (result == "User Registered Successfully") {
                     toast.show(result, { type: 'success' });
+                    setIsLoading(false);
                     setTimeout(() => {
                         navigation.navigate('Login');
                     }, 1000);
@@ -161,6 +163,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
             } catch (error: any) {
                 toast.show("An unexpected error occurred", { type: 'danger' });
             }
+
         }
     };
     const getButtonText = () => {
@@ -334,7 +337,11 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                             }
                         }}
                         style={[styles.buttonContainer, { marginTop: 20, backgroundColor: Colors.primaryBrand }]}>
-                        <Text style={[styles.buttonText, styles.text]}>{getButtonText()}</Text>
+                        {isLoading ? (
+                            <ActivityIndicator size="small" color="white" />
+                        ) : (
+                            <Text style={[styles.buttonText, styles.text]}>{getButtonText()}</Text>
+                        )}
                     </TouchableOpacity>
                 </View>
             </TouchableWithoutFeedback>

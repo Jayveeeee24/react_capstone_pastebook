@@ -71,15 +71,6 @@ function App(): React.JSX.Element {
           <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
             <NavigationContainer>
               <AppStack />
-
-              {/* {
-            authState ? (
-              <AppStack />
-            ):
-            (
-              <AuthStack />
-            )
-          } */}
             </NavigationContainer>
           </GestureHandlerRootView>
         </AuthProvider>

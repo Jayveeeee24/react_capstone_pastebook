@@ -6,7 +6,7 @@ import { useAuth } from "../../../context/AuthContext";
 import { useToast } from "react-native-toast-notifications";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Images } from "../../../utils/Images";
-import { Colors } from "../../../utils/Config";
+import { Colors, credentialTextTheme } from "../../../utils/Config";
 import { useUser } from "../../../context/UserContext";
 
 interface EditEmailScreenProps {
@@ -32,7 +32,6 @@ export const EditEmailScreen: React.FC<EditEmailScreenProps> = ({ navigation }) 
     const [isVerificationCodeValid, setIsVerificationCodeValid] = useState(true);
 
 
-    const credentialTextTheme = { colors: { primary: '#3373B0' } };
 
     const validateEmail = async () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

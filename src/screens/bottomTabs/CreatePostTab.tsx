@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Dimensions, FlatList, Image, PermissionsAndroid, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, FlatList, Image, PermissionsAndroid, Platform, SafeAreaView, ScrollView, TextInput as TextArea, Text, TouchableOpacity, View, TouchableNativeFeedback } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Colors } from "../../utils/Config";
+import { Colors, credentialTextTheme } from "../../utils/Config";
 import { CameraRoll, GetAlbumsParams } from "@react-native-camera-roll/camera-roll";
 import { Picker } from "@react-native-picker/picker";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { FAB } from "react-native-paper";
+import { FAB, TextInput } from "react-native-paper";
+import { Images } from "../../utils/Images";
 
 
 interface CreatePostTabProps {
@@ -21,16 +22,18 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
     const [pickedImage, setPickedImage] = useState<any>({});
     const [category, setCategory] = useState<string>('');
 
-    useEffect(() => {
+    const [postTitle, setPostTitle] = useState('');
+    const [postBody, setPostBody] = useState('');
 
+    useEffect(() => {
         navigation.setOptions({
             headerLeft: () => (
                 <TouchableOpacity onPress={() => {
                     if (currentView == 'PhotoSelectView') {
                         navigation.goBack();
-                    } else if(currentView == 'DetailsView'){
+                    } else if (currentView == 'DetailsView') {
                         setCurrentView('PhotoSelectView');
-                    } 
+                    }
                     else {
                         setCurrentView('PhotoSelectView');
                     }
@@ -38,28 +41,16 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                     <MaterialIcons name={currentView == 'PhotoSelectView' ? 'close' : 'arrow-back'} size={32} color={'black'} />
                 </TouchableOpacity>
             ),
-            
+
             headerRight: () => (
-                <TouchableOpacity style={{ marginHorizontal: 10 }} onPress={() => {
+                <TouchableOpacity style={{ marginHorizontal: 10, display: currentView == "PhotoSelectView" ? "flex" : "none" }} onPress={() => {
                     if (currentView == 'PhotoSelectView') {
                         setCurrentView('DetailsView');
-                    } else {
-                        console.log('post mo na yan');
                     }
                 }}>
-                    <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 18, color: Colors.primaryBrand }}>
-                        {currentView == 'PhotoSelectView' ? 'Next' : 'Post'}
-                    </Text>
+                    <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 18, color: Colors.primaryBrand }}>Next</Text>
                 </TouchableOpacity>
             ),
-           
-            headerTitleStyle: {
-                marginStart: 10
-            },
-            headerTitle: 'New Post',
-            tabBarStyle: {
-                display: 'none',
-            },
         });
 
         loadAlbums();
@@ -149,9 +140,6 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                                     }>
                                     {displayAssetCategories()}
                                 </Picker>
-                                {/* <TouchableOpacity>
-                                <MaterialCommunityIcons name="camera-outline" size={26} color={Colors.primaryBrand} />
-                            </TouchableOpacity> */}
                             </View>
                             <View>
                                 <FlatList
@@ -179,14 +167,65 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                                 right: 0,
                                 bottom: 0, backgroundColor: Colors.primaryBrand
                             }}
-                            onPress={() => console.log('Pressed')}
+                            onPress={() => navigation.navigate("Camera")}
                         />
                     </>
                 );
             case 'DetailsView':
                 return (
-                    <View>
-                        <Text>haha</Text>
+                    <View style={{flex: 1, flexDirection: "column"}}>
+                        <ScrollView style={{flex: 1}} nestedScrollEnabled showsVerticalScrollIndicator={false}>
+                            <View style={{ alignItems: "center", marginVertical: 10 }}>
+                                <Image
+                                    source={{ uri: pickedImage.node.image.uri }}
+                                    resizeMode="cover"
+                                    style={{ width: width - 150, height: width - 150 }}
+                                />
+                            </View>
+                            <View style={{ paddingHorizontal: 10 }}>
+                                <TextInput placeholder="Title" theme={credentialTextTheme} style={{ fontFamily: 'Roboto-Medium', color: 'black', fontSize: 16, flex: 1, backgroundColor: 'transparent' }} value={postTitle} onChangeText={setPostTitle} />
+                                <TextArea
+                                    placeholder="Write a caption"
+                                    style={{
+                                        borderBottomWidth: 0.8,
+                                        paddingStart: 15,
+                                        borderBottomColor: 'darkgray',
+                                        fontFamily: 'Roboto-Medium',
+                                        color: 'black',
+                                        fontSize: 16,
+                                        backgroundColor: 'transparent',
+                                        height: 80,
+                                    }}
+                                    value={postBody}
+                                    onChangeText={(text) => setPostBody(text.slice(0, 1000))}
+                                    multiline
+                                    placeholderTextColor={'#666'} />
+
+                                <TouchableNativeFeedback onPress={() => { }}>
+                                    <View style={{ paddingHorizontal: 10, paddingVertical: 15, flexDirection: "row", alignItems: "center" }}>
+                                        <MaterialCommunityIcons name="account-outline" size={28} color={'#37474F'} style={{ flex: 0 }} />
+                                        <View style={{ marginStart: 10, alignSelf: "center", flex: 1 }}>
+                                            <Text style={{ fontSize: 18, color: '#37474F', fontFamily: 'Roboto-Medium' }}>Post in: johnbernard.tinio</Text>
+                                        </View>
+                                        <MaterialIcons name="arrow-forward-ios" size={20} color={'#37474F'} style={{ flex: 0 }} />
+                                    </View>
+                                </TouchableNativeFeedback>
+                            </View>
+                        </ScrollView>
+                        <TouchableOpacity
+                            onPress={() => {}}
+                            style={{
+                                flex: 0,
+                                backgroundColor: Colors.secondaryBrand,
+                                padding: 15,
+                                borderRadius: 10,
+                                marginBottom: 10,
+                                marginHorizontal: 10,  
+                            }}>
+                            <Text style={{ color: 'white', fontSize: 20, textAlign: 'center', fontFamily: 'Roboto-Medium' }}>Post</Text>
+                        </TouchableOpacity>
+
+
                     </View>
                 );
         }

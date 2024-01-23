@@ -3,7 +3,7 @@ import { Image, Keyboard, LayoutAnimation, SafeAreaView, StyleSheet, Text, Touch
 import { Images } from "../../../utils/Images"
 import { ProgressBar, TextInput } from "react-native-paper"
 import { useToast } from "react-native-toast-notifications"
-import { Colors } from "../../../utils/Config"
+import { Colors, credentialTextTheme } from "../../../utils/Config"
 import MaterialIcons from "react-native-vector-icons/MaterialIcons"
 import { UserContext, useUser } from "../../../context/UserContext"
 
@@ -27,7 +27,6 @@ export const EditPasswordScreen: React.FC<EditPasswordScreenProps> = ({ navigati
     const [isNewPasswordValid, setIsNewPasswordValid] = useState(true);
     const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
 
-    const credentialTextTheme = { colors: { primary: '#3373B0' } };
 
     const validateCurrentPassword = async () => {
         const trimmedPassword = currentPassword.trim();

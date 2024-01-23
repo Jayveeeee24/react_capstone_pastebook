@@ -11,3 +11,4 @@ export const Colors = {
     primaryBrand: '#3373B0',
     secondaryBrand: '#eab676',
 }
+export const credentialTextTheme = { colors: { primary: Colors.primaryBrand } };

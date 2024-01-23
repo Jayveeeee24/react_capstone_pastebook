@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Image, Keyboard, SafeAreaView, ScrollView, Text, TouchableOpacity, TextInput as TextArea, TouchableWithoutFeedback, View, StyleSheet } from "react-native";
 import { Images } from "../../../utils/Images";
-import { Colors, Storage } from "../../../utils/Config";
+import { Colors, Storage, credentialTextTheme } from "../../../utils/Config";
 import { GenderDropdown } from "../../../components/customComponents/GenderDropdown";
 import { DatePickerComponent } from "../../../components/customComponents/DatePickerComponent";
 import { TextInput } from "react-native-paper";
@@ -59,7 +59,6 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ navigation
     const [isGenderValid, setIsGenderValid] = useState(true);
     const [isDateOfBirthValid, setIsDateOfBirthValid] = useState(true);
 
-    const credentialTextTheme = { colors: { primary: '#3373B0' } };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
