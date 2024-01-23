@@ -19,35 +19,44 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { UserProvider } from './src/context/UserContext';
+import { Camera, useCameraDevice, useCameraPermission } from "react-native-vision-camera";
+import { PhotoProvider } from './src/context/PhotoContext';
+import { AlbumProvider } from './src/context/AlbumContext';
 
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const { hasPermission, requestPermission } = useCameraPermission()
+
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
   useEffect(() => {
-    hasPermission();
-  }, []);
+    const checkAndRequestPermissions = async () => {
+      await hasCameraRollPermission();
 
-  const hasPermission = async () => {
+      if (!hasPermission) {
+        await requestPermission();
+      }
+    };
+
+    checkAndRequestPermissions();
+  }, [hasPermission]);
+
+  const hasCameraRollPermission = async () => {
     const platformVersion = parseInt(String(Platform.Version), 10);
     const permission =
       platformVersion >= 33
         ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
         : PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
 
-    const hasPermission = await PermissionsAndroid.check(permission);
-    if (hasPermission) {
-      return true;
+    const hasCameraRollPermission = await PermissionsAndroid.check(permission);
+    if (!hasCameraRollPermission) {
+      await PermissionsAndroid.request(permission);
     }
-
-    const status = await PermissionsAndroid.request(permission);
-    return status === 'granted';
   };
-
 
   return (
     <ToastProvider placement="top"
@@ -68,11 +77,15 @@ function App(): React.JSX.Element {
       swipeEnabled={true}>
       <UserProvider>
         <AuthProvider>
-          <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
-            <NavigationContainer>
-              <AppStack />
-            </NavigationContainer>
-          </GestureHandlerRootView>
+          <PhotoProvider>
+            <AlbumProvider>
+              <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
+                <NavigationContainer>
+                  <AppStack />
+                </NavigationContainer>
+              </GestureHandlerRootView>
+            </AlbumProvider>
+          </PhotoProvider>
         </AuthProvider>
       </UserProvider>
     </ToastProvider>

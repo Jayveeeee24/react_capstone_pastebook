@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, FlatList, Image, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import { Menu, MenuOption, MenuOptions, MenuProvider, MenuTrigger } from "react-native-popup-menu";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Images } from "../../utils/Images";
 import { IndividualAlbum } from "../../components/IndividualAlbum";
+import { useAlbum } from "../../context/AlbumContext";
+import { usePhoto } from "../../context/PhotoContext";
 
 interface AlbumTabProps {
     navigation: any;
@@ -12,61 +14,60 @@ interface AlbumTabProps {
 }
 
 export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
+    const { getAllAlbums } = useAlbum();
+    const { getPhotoById } = usePhoto();
+
     const [isMenuVisible, setIsMenuVisible] = useState(false);
+    const [albums, setAlbums] = useState<any>([{}]);
 
-    const albums = [
-        {
-            id: '1',
-            albumName: "Blues",
-            albumThumbnail: Images.sample_post_image
+    useEffect(() => {
+        getAlbums();
+    }, []);
 
-        },
-        {
-            id: "2",
-            albumName: "Yellows",
-            albumThumbnail: Images.sample_post_image_2
-        },
-        {
-            id: "3",
-            albumName: "Reds",
-            albumThumbnail: Images.sample_post_image_3
-        },
-        {
-            id: "4",
-            albumName: "Oranges",
-            albumThumbnail: Images.sample_post_image_4
-        },
-        {
-            id: "5",
-            albumName: "Blacks",
-            albumThumbnail: Images.sample_post_image_5
-        },
-        {
-            id: "6",
-            albumName: "Whites",
-            albumThumbnail: Images.sample_post_image_6
-        },
-        {
-            id: "7",
-            albumName: "Purples",
-            albumThumbnail: Images.sample_post_image_7
-        },
-        {
-            id: "8",
-            albumName: "Pinks",
-            albumThumbnail: Images.sample_post_image_8
-        },
-        {
-            id: "9",
-            albumName: "Greens",
-            albumThumbnail: Images.sample_post_image_9
-        },
-        {
-            id: "10",
-            albumName: "Maroons",
-            albumThumbnail: Images.sample_post_image_10
-        },
-    ];
+    const getAlbums = async () => {
+        try {
+            const result = getAllAlbums ? await getAllAlbums() : undefined;
+
+            // await fetchPhoto(result[0].firstPhoto.id);
+            if (result) {
+                const updatedAlbums = await Promise.all(
+                    result.map(async (item: { firstPhoto: any; }) => {
+                        try {
+                            const photo = await fetchPhoto(item.firstPhoto.id);
+                            return {
+                                ...item,
+                                firstPhoto: {
+                                    ...item.firstPhoto,
+                                    photo: await photo,
+                                },
+                            };
+                        } catch (error) {
+                            // Handle error if necessary
+                            console.error("Error fetching photo:", error);
+                            return item;
+                        }
+                    })
+                );
+
+                console.log(updatedAlbums);
+                setAlbums(updatedAlbums);
+            }
+        } catch (error) {
+            // Handle error if necessary
+            console.error("Error fetching albums:", error);
+        }
+    };
+
+
+    const fetchPhoto = async (photoId: string) => {
+        try {
+            const result = getPhotoById ? await getPhotoById(photoId) : undefined;
+            // console.log(result)
+            return result;
+        } catch (error) {
+            // Handle error
+        }
+    };
 
     return (
         <MenuProvider>
@@ -101,9 +102,9 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
                         <FlatList
                             data={albums}
                             renderItem={({ item, index }) => (
-                                <IndividualAlbum albums={albums} index={index} item={item} navigation={navigation} route={route}/>
+                                <IndividualAlbum albums={albums} index={index} item={item} navigation={navigation} route={route} />
                             )}
-                            keyExtractor={(item) => item.id}
+                            keyExtractor={(item) => item.firstPhoto.albumId}
                             numColumns={3}
                             showsVerticalScrollIndicator={false}
                         />

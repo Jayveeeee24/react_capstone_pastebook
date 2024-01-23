@@ -38,7 +38,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                     if (result.id) {
                         setFirstName(result.firstName);
                         setLastName(result.lastName);
-                        setBio(result.aboutMe);
+                        setBio(result.aboutMe ? result.aboutMe : '');
                         setPhoneNumber(result.phoneNumber);
                         setGender(result.sex);
                         setDateOfBirth(new Date(result.birthDate));
@@ -99,10 +99,10 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                     <Text style={{ marginTop: 5, color: 'black', fontFamily: 'Roboto-Medium', fontWeight: '700' }}>{firstName + ' ' + lastName}</Text>
 
                     <View style={{ flexDirection: "row", justifyContent: bio ? "space-between" : "flex-start", alignItems: "flex-start", marginTop: 5 }}>
-                        <View style={{ justifyContent: "center", flex: 1 }}>
+                        <View style={{ justifyContent: "center" }}>
                             <Text style={{ color: 'black', fontFamily: 'Roboto-Medium' }}>{"\n" + bio ? bio : ''}</Text>
                         </View>
-                        <View style={{ flex: 0 }}>
+                        <View>
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <MaterialCommunityIcons name="cake-variant-outline" size={16} color={'black'} />
                                 <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginStart: 5 }}>{dateOfBirth.toLocaleDateString('en-US', {

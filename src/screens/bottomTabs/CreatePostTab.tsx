@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Dimensions, FlatList, Image, PermissionsAndroid, Platform, SafeAreaView, ScrollView, TextInput as TextArea, Text, TouchableOpacity, View, TouchableNativeFeedback } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Colors, credentialTextTheme } from "../../utils/Config";
@@ -7,8 +7,10 @@ import { Picker } from "@react-native-picker/picker";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { FAB, TextInput } from "react-native-paper";
-import { Images } from "../../utils/Images";
-
+import { useAlbum } from "../../context/AlbumContext";
+import { PhotoContext, usePhoto } from "../../context/PhotoContext";
+import { useToast } from "react-native-toast-notifications";
+import axios from "axios";
 
 interface CreatePostTabProps {
     navigation: any;
@@ -16,6 +18,8 @@ interface CreatePostTabProps {
 }
 const width = Dimensions.get('window').width;
 export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route }) => {
+    const toast = useToast();
+
     const [currentView, setCurrentView] = useState('PhotoSelectView');
     const [images, setImages] = useState<any[]>([]);
     const [albums, setAlbums] = useState<any[]>([]);
@@ -25,7 +29,18 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
     const [postTitle, setPostTitle] = useState('');
     const [postBody, setPostBody] = useState('');
 
+    const [uploadsAlbumId, setUploadsAlbumId] = useState('');
+    const { getUploadsAlbumId } = useAlbum();
+    const { addPhoto } = usePhoto();
+
+
     useEffect(() => {
+        if (route.params?.image) {
+            setPickedImage(route.params?.image);
+        }
+
+        hasPermission();
+
         navigation.setOptions({
             headerLeft: () => (
                 <TouchableOpacity onPress={() => {
@@ -53,7 +68,10 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
             ),
         });
 
+
+
         loadAlbums();
+        getUploadsAlbum();
 
         return () => {
             navigation.addListener('blur', () => {
@@ -61,9 +79,23 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
             });
         };
 
-    }, [navigation, currentView]);
+    }, [navigation, currentView, route.params?.image]);
 
+    const getUploadsAlbum = async () => {
+        const result = getUploadsAlbumId ? await getUploadsAlbumId() : undefined;
 
+        if (result) {
+            setUploadsAlbumId(result);
+        }
+    }
+
+    const blobToFile = (theBlob: Blob, fileName: string): File => {
+        const b: any = theBlob;
+        b.lastModifiedDate = new Date();
+        b.name = fileName;
+
+        return theBlob as File;
+    }
 
     const hasPermission = async () => {
         const platformVersion = parseInt(String(Platform.Version), 10);
@@ -90,7 +122,6 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
         CameraRoll.getAlbums(params)
             .then((albums) => {
                 setAlbums(albums);
-                // console.log(albums);
             })
             .catch((err) => {
                 console.error(err);
@@ -106,6 +137,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
             setImages(imgs.edges);
             setPickedImage(imgs.edges[0]);
         });
+
     };
 
     const displayAssetCategories = () => {
@@ -173,8 +205,8 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                 );
             case 'DetailsView':
                 return (
-                    <View style={{flex: 1, flexDirection: "column"}}>
-                        <ScrollView style={{flex: 1}} nestedScrollEnabled showsVerticalScrollIndicator={false}>
+                    <View style={{ flex: 1, flexDirection: "column" }}>
+                        <ScrollView style={{ flex: 1 }} nestedScrollEnabled showsVerticalScrollIndicator={false}>
                             <View style={{ alignItems: "center", marginVertical: 10 }}>
                                 <Image
                                     source={{ uri: pickedImage.node.image.uri }}
@@ -213,14 +245,35 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                             </View>
                         </ScrollView>
                         <TouchableOpacity
-                            onPress={() => {}}
+                            onPress={async () => {
+                                const formData = new FormData();
+                                formData.append('albumId', uploadsAlbumId);
+
+                                const result = await fetch(pickedImage.node.image.uri);
+                                const data = await result.blob();
+                                const file = blobToFile(data, 'photo');
+
+                                try {
+                                    formData.append('file', file);
+                                    const result = addPhoto ? await addPhoto(formData) : undefined;
+                                    console.log(result);
+                                    // if (result.id) {
+
+                                    // } else {
+                                    //     toast.show(result, { type: 'warning' });
+                                    // }
+                                } catch (error: any) {
+                                    toast.show("An unexpected error occurred", { type: 'danger' });
+                                    console.log(error);
+                                }
+                            }}
                             style={{
                                 flex: 0,
                                 backgroundColor: Colors.secondaryBrand,
                                 padding: 15,
                                 borderRadius: 10,
                                 marginBottom: 10,
-                                marginHorizontal: 10,  
+                                marginHorizontal: 10,
                             }}>
                             <Text style={{ color: 'white', fontSize: 20, textAlign: 'center', fontFamily: 'Roboto-Medium' }}>Post</Text>
                         </TouchableOpacity>
