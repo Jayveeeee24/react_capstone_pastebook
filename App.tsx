@@ -22,6 +22,7 @@ import { UserProvider } from './src/context/UserContext';
 import { Camera, useCameraDevice, useCameraPermission } from "react-native-vision-camera";
 import { PhotoProvider } from './src/context/PhotoContext';
 import { AlbumProvider } from './src/context/AlbumContext';
+import { PostProvider } from './src/context/PostContext';
 
 
 function App(): React.JSX.Element {
@@ -78,13 +79,15 @@ function App(): React.JSX.Element {
       <UserProvider>
         <AuthProvider>
           <PhotoProvider>
-            <AlbumProvider>
-              <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
-                <NavigationContainer>
-                  <AppStack />
-                </NavigationContainer>
-              </GestureHandlerRootView>
-            </AlbumProvider>
+            <PostProvider>
+              <AlbumProvider>
+                <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
+                  <NavigationContainer>
+                    <AppStack />
+                  </NavigationContainer>
+                </GestureHandlerRootView>
+              </AlbumProvider>
+            </PostProvider>
           </PhotoProvider>
         </AuthProvider>
       </UserProvider>

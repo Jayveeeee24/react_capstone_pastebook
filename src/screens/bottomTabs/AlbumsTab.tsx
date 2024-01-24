@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { Alert, FlatList, Image, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, Animated, FlatList, Modal, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import { Menu, MenuOption, MenuOptions, MenuProvider, MenuTrigger } from "react-native-popup-menu";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Images } from "../../utils/Images";
+import { FAB } from "react-native-paper";
+import { Colors } from "../../utils/Config";
 import { IndividualAlbum } from "../../components/IndividualAlbum";
 import { useAlbum } from "../../context/AlbumContext";
 import { usePhoto } from "../../context/PhotoContext";
@@ -17,56 +17,37 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
     const { getAllAlbums } = useAlbum();
     const { getPhotoById } = usePhoto();
 
-    const [isMenuVisible, setIsMenuVisible] = useState(false);
-    const [albums, setAlbums] = useState<any>([{}]);
+    const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
+    const [deleteConfirmationVisible, setDeleteConfirmationVisible] = useState(false);
+    const [albums, setAlbums] = useState<any>([]);
+
+    const translateY = new Animated.Value(300);
 
     useEffect(() => {
-        getAlbums();
-    }, []);
-
-    const getAlbums = async () => {
-        try {
-            const result = getAllAlbums ? await getAllAlbums() : undefined;
-
-            // await fetchPhoto(result[0].firstPhoto.id);
-            if (result) {
-                const updatedAlbums = await Promise.all(
-                    result.map(async (item: { firstPhoto: any; }) => {
-                        try {
-                            const photo = await fetchPhoto(item.firstPhoto.id);
-                            return {
-                                ...item,
-                                firstPhoto: {
-                                    ...item.firstPhoto,
-                                    photo: await photo,
-                                },
-                            };
-                        } catch (error) {
-                            // Handle error if necessary
-                            console.error("Error fetching photo:", error);
-                            return item;
-                        }
-                    })
-                );
-
-                console.log(updatedAlbums);
-                setAlbums(updatedAlbums);
+        const getAlbums = async () => {
+            try {
+                const result = getAllAlbums ? await getAllAlbums() : undefined;
+                if (result) {
+                    setAlbums(result);
+                }
+            } catch (error) {
+                console.error("Error fetching albums:", error);
             }
-        } catch (error) {
-            // Handle error if necessary
-            console.error("Error fetching albums:", error);
-        }
-    };
+        };
 
+        getAlbums();
+    }, [getAllAlbums]);
 
-    const fetchPhoto = async (photoId: string) => {
-        try {
-            const result = getPhotoById ? await getPhotoById(photoId) : undefined;
-            // console.log(result)
-            return result;
-        } catch (error) {
-            // Handle error
-        }
+    useEffect(() => {
+        Animated.timing(translateY, {
+            toValue: isBottomSheetVisible ? 0 : 300,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }, [isBottomSheetVisible]);
+    
+    const toggleBottomSheet = () => {
+        setBottomSheetVisible(!isBottomSheetVisible);
     };
 
     return (
@@ -109,8 +90,38 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
                             showsVerticalScrollIndicator={false}
                         />
                     </View>
+
+                    <FAB
+                        color="white"
+                        icon='plus'
+                        style={{
+                            borderRadius: 50,
+                            position: 'absolute',
+                            margin: 16,
+                            right: 0,
+                            bottom: 0, backgroundColor: Colors.success
+                        }}
+                        onPress={toggleBottomSheet}
+                    />
                 </View>
+
+                <Animated.View
+                    style={[
+                        {
+                            transform: [{ translateY: translateY }],
+                            backgroundColor: 'white',
+                            borderTopLeftRadius: 20,
+                            borderTopRightRadius: 20,
+                            padding: 16,
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                        },
+                    ]}>
+                    <Text>This is the bottom sheet content</Text>
+                </Animated.View>
             </SafeAreaView>
         </MenuProvider>
     );
-} 
+};

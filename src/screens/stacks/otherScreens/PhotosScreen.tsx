@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { FlatList, SafeAreaView, Text, View } from "react-native";
+import { FlatList, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import { Images } from "../../../utils/Images";
 import { IndividualPhoto } from "../../../components/IndividualPhoto";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { CommonActions } from "@react-navigation/native";
 
 interface PhotoScreenProps {
     navigation: any;
@@ -15,7 +17,24 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
     useEffect(() => {
         navigation.setOptions({
             headerTitle: albumName,
-        });
+            headerLeft: () => (
+                <TouchableOpacity onPress={() => {
+                    navigation.dispatch(
+                        CommonActions.reset({
+                          index: 1,
+                          routes: [
+                            { name: 'HomeTab' },
+                            {
+                              name: 'AlbumsTab',
+                            },
+                          ],
+                        })
+                      );
+                }} style={{ flexDirection: "row", alignItems: "center", marginStart: 10 }}>
+                    <MaterialIcons name={'arrow-back'} size={32} color={'black'} />
+                </TouchableOpacity>
+            )
+        })
     }, [albumName, navigation]);
 
     const photos = [

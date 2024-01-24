@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ReactNode, createContext, useContext } from "react";
 import { BASE_URL } from "../utils/Config";
+import { usePhoto } from "./PhotoContext";
 
 
 interface AlbumContextProps {
@@ -19,6 +20,7 @@ export const useAlbum = () => {
 }
 
 export const AlbumProvider: React.FC<AlbumProviderProps> = ({ children }) => {
+    const { getPhotoById } = usePhoto();
 
     const getUploadsAlbumId = async () => {
         try {
@@ -32,11 +34,36 @@ export const AlbumProvider: React.FC<AlbumProviderProps> = ({ children }) => {
     const getAllAlbums = async () => {
         try {
             const result = await axios.get(`${BASE_URL}/api/album/get-mini-album`);
-            return result.data;
+
+            if (result && Array.isArray(result.data)) {
+                const updatedAlbums = await Promise.all(
+                    result.data.map(async (item: { firstPhoto: any }) => {
+                        try {
+                            const photo = getPhotoById? await getPhotoById(item.firstPhoto.id) : undefined;
+                            return {
+                                ...item,
+                                firstPhoto: {
+                                    ...item.firstPhoto,
+                                    photo: await photo,
+                                },
+                            };
+                        } catch (error) {
+                            console.error("Error fetching photo:", error);
+                            return item;
+                        }
+                    })
+                );
+
+                return updatedAlbums;
+            } else {
+                // Handle the case where result.data is not an array
+                console.error("Invalid data format:", result.data);
+                return [];
+            }
         } catch (error: any) {
-            return error.response.data.result;
+            return error.response?.data?.result || "An unexpected error occurred";
         }
-    }
+    };
 
     const contextValue: AlbumContextProps = {
         getUploadsAlbumId,

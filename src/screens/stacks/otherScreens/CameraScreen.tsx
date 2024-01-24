@@ -1,4 +1,4 @@
-import { useFocusEffect } from "@react-navigation/native";
+import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -59,11 +59,10 @@ export const CameraScreen = ({ navigation, route }: any) => {
                 },
             };
             setIsCameraOkay(true);
-            navigation.navigate({
-                name: 'CreatePostTab',
+            navigation.dispatch(CommonActions.navigate({
+                name: 'CreatePost',
                 params: { image: restructuredData },
-                merge: true,
-            });
+            }));
         }
     }
 
@@ -71,7 +70,9 @@ export const CameraScreen = ({ navigation, route }: any) => {
         <SafeAreaView style={{ flex: 1 }}>
             <View style={{ flex: 1 }}>
                 <View style={{ position: "absolute", top: 15, zIndex: 1, left: 20 }}>
-                    <TouchableOpacity style={{ width: 75, height: 65 }} onPress={() => { navigation.navigate('CreatePostTab') }}>
+                    <TouchableOpacity style={{ width: 75, height: 65 }} onPress={() => {
+                        navigation.replace('CreatePost')
+                    }}>
                         <MaterialIcons name="arrow-back-ios" size={26} color={'white'} />
                     </TouchableOpacity>
                 </View>
@@ -100,13 +101,6 @@ export const CameraScreen = ({ navigation, route }: any) => {
                     </TouchableOpacity>
                 </View>
 
-                {/* <View style={{ position: "absolute", bottom: 15, right: 20, alignSelf: "flex-start" }}>
-                    <TouchableOpacity style={{ width: 45, height: 55 }} onPress={() => {
-                        device.physicalDevices
-                    }}>
-                        <MaterialIcons name='cameraswitch' size={40} color={"white"} />
-                    </TouchableOpacity>
-                </View> */}
 
             </View>
         </SafeAreaView>

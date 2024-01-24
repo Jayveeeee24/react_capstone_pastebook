@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Dimensions, FlatList, Image, PermissionsAndroid, Platform, SafeAreaView, ScrollView, TextInput as TextArea, Text, TouchableOpacity, View, TouchableNativeFeedback } from "react-native";
+import { Dimensions, FlatList, Image, PermissionsAndroid, Platform, SafeAreaView, ScrollView, TextInput as TextArea, Text, TouchableOpacity, View, TouchableNativeFeedback, ActivityIndicator } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Colors, credentialTextTheme } from "../../utils/Config";
+import { Colors, Storage, credentialTextTheme } from "../../utils/Config";
 import { CameraRoll, GetAlbumsParams } from "@react-native-camera-roll/camera-roll";
 import { Picker } from "@react-native-picker/picker";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
@@ -10,7 +10,8 @@ import { FAB, TextInput } from "react-native-paper";
 import { useAlbum } from "../../context/AlbumContext";
 import { PhotoContext, usePhoto } from "../../context/PhotoContext";
 import { useToast } from "react-native-toast-notifications";
-import axios from "axios";
+import { usePost } from "../../context/PostContext";
+import { CommonActions } from "@react-navigation/native";
 
 interface CreatePostTabProps {
     navigation: any;
@@ -19,6 +20,7 @@ interface CreatePostTabProps {
 const width = Dimensions.get('window').width;
 export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route }) => {
     const toast = useToast();
+    const [isLoading, setIsLoading] = useState(false);
 
     const [currentView, setCurrentView] = useState('PhotoSelectView');
     const [images, setImages] = useState<any[]>([]);
@@ -28,26 +30,30 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
 
     const [postTitle, setPostTitle] = useState('');
     const [postBody, setPostBody] = useState('');
+    const [postedUserId, setPostedUserId] = useState('');
+    const [posterUserId, setPosterUserId] = useState('');
 
     const [uploadsAlbumId, setUploadsAlbumId] = useState('');
+
     const { getUploadsAlbumId } = useAlbum();
     const { addPhoto } = usePhoto();
-
+    const { addPost } = usePost();
 
     useEffect(() => {
-        if (route.params?.image) {
-            setPickedImage(route.params?.image);
-        }
-
         hasPermission();
 
         navigation.setOptions({
             headerLeft: () => (
                 <TouchableOpacity onPress={() => {
                     if (currentView == 'PhotoSelectView') {
-                        navigation.goBack();
-                    } else if (currentView == 'DetailsView') {
-                        setCurrentView('PhotoSelectView');
+                        navigation.dispatch(
+                            CommonActions.reset({
+                                index: 0,
+                                routes: [
+                                    { name: 'HomeTab' },
+                                ],
+                            })
+                        );
                     }
                     else {
                         setCurrentView('PhotoSelectView');
@@ -69,17 +75,27 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
         });
 
 
-
-        loadAlbums();
         getUploadsAlbum();
 
+        loadAlbums();
+        if (route.params?.image) {
+            setPickedImage(route.params?.image);
+        }
+
+        const userId = Storage.getString('userId');
+        if (route.params?.postedUserId) {
+            setPostedUserId(route.params?.postedUserId)
+        } else {
+            setPostedUserId(userId!);
+        }
+        setPosterUserId(userId!);
         return () => {
             navigation.addListener('blur', () => {
                 setCurrentView('PhotoSelectView');
             });
         };
 
-    }, [navigation, currentView, route.params?.image]);
+    }, [route.params?.image, currentView, navigation]);
 
     const getUploadsAlbum = async () => {
         const result = getUploadsAlbumId ? await getUploadsAlbumId() : undefined;
@@ -87,14 +103,6 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
         if (result) {
             setUploadsAlbumId(result);
         }
-    }
-
-    const blobToFile = (theBlob: Blob, fileName: string): File => {
-        const b: any = theBlob;
-        b.lastModifiedDate = new Date();
-        b.name = fileName;
-
-        return theBlob as File;
     }
 
     const hasPermission = async () => {
@@ -135,7 +143,9 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
 
         CameraRoll.getPhotos(params).then((imgs) => {
             setImages(imgs.edges);
-            setPickedImage(imgs.edges[0]);
+            if (!route.params?.image) {
+                setPickedImage(imgs.edges[0]);
+            }
         });
 
     };
@@ -193,13 +203,13 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                             color="white"
                             icon='camera'
                             style={{
-                                borderRadius: 20,
+                                borderRadius: 50,
                                 position: 'absolute',
                                 margin: 16,
                                 right: 0,
                                 bottom: 0, backgroundColor: Colors.primaryBrand
                             }}
-                            onPress={() => navigation.navigate("Camera")}
+                            onPress={() => navigation.replace("Camera")}
                         />
                     </>
                 );
@@ -246,26 +256,44 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                         </ScrollView>
                         <TouchableOpacity
                             onPress={async () => {
-                                const formData = new FormData();
-                                formData.append('albumId', uploadsAlbumId);
+                                if (!postTitle.trim() || !postBody.trim()) {
+                                    toast.show('All fields are required', { type: 'danger' });
+                                } else {
+                                    setIsLoading(true);
+                                    const file = pickedImage.node.image.uri;
+                                    const name = file.split('/').pop();
 
-                                const result = await fetch(pickedImage.node.image.uri);
-                                const data = await result.blob();
-                                const file = blobToFile(data, 'photo');
+                                    const formData = new FormData();
+                                    formData.append('albumId', uploadsAlbumId);
+                                    formData.append('file', {
+                                        uri: file,
+                                        name: name,
+                                        type: 'image/jpg'
+                                    });
 
-                                try {
-                                    formData.append('file', file);
-                                    const result = addPhoto ? await addPhoto(formData) : undefined;
-                                    console.log(result);
-                                    // if (result.id) {
+                                    try {
+                                        const result = addPhoto ? await addPhoto(formData) : undefined;
+                                        if (result) {
+                                            const dateToday = new Date();
+                                            const postResult = addPost ? await addPost(postTitle, postBody, dateToday, postedUserId, posterUserId, result) : undefined;
 
-                                    // } else {
-                                    //     toast.show(result, { type: 'warning' });
-                                    // }
-                                } catch (error: any) {
-                                    toast.show("An unexpected error occurred", { type: 'danger' });
-                                    console.log(error);
+                                            console.log(postResult);
+                                            if (postResult) {
+                                                toast.show('Post success!', { type: 'success' });
+                                                navigation.navigate('Home');
+                                            } else {
+                                                toast.show(postResult.result, { type: 'warning' });
+                                            }
+                                        } else {
+                                            toast.show(result, { type: 'warning' });
+                                        }
+
+                                    } catch (error: any) {
+                                        toast.show("An unexpected error occurred", { type: 'danger' });
+                                        console.log(error);
+                                    }
                                 }
+                                setIsLoading(false);
                             }}
                             style={{
                                 flex: 0,
@@ -275,7 +303,12 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                                 marginBottom: 10,
                                 marginHorizontal: 10,
                             }}>
-                            <Text style={{ color: 'white', fontSize: 20, textAlign: 'center', fontFamily: 'Roboto-Medium' }}>Post</Text>
+                            {isLoading ? (
+                                <ActivityIndicator size="small" color="white" />
+                            ) : (
+                                <Text style={{ color: 'white', fontSize: 20, textAlign: 'center', fontFamily: 'Roboto-Medium' }}>Post</Text>
+
+                            )}
                         </TouchableOpacity>
                     </View>
                 );

@@ -128,7 +128,7 @@ export const AppStack = () => {
         }} />
 
         <Stack.Screen name="Photos" component={PhotosScreen} />
-        <Stack.Screen name="Camera" component={CameraScreen} />
+        {/* <Stack.Screen name="Camera" component={CameraScreen} /> */}
 
 
       </Stack.Navigator>
@@ -150,11 +150,8 @@ export const AppStack = () => {
         })}>
         <Tab.Screen name="HomeTab" component={HomeStack} />
         <Tab.Screen name="SearchTab" component={SearchTab} />
-        <Tab.Screen name="CreatePostTab" component={CreatePostTab} options={{
-          headerTitleStyle: {
-            marginStart: 10
-          },
-          headerTitle: 'New Post',
+        <Tab.Screen name="CreatePostTab" component={CreatePostStack} options={{
+          headerShown: false,
         }} />
         <Tab.Screen name="AlbumsTab" component={AlbumsTab} options={{
           headerTitle: 'My Album Gallery',
@@ -168,6 +165,25 @@ export const AppStack = () => {
         }} />
         <Tab.Screen name="ProfileTab" component={ProfileTab} />
       </Tab.Navigator>
+    );
+  }
+
+  function CreatePostStack() {
+    return (
+      <Stack.Navigator
+        screenOptions={{
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+        }}>
+        <Stack.Screen name="CreatePost" component={CreatePostTab} options={{
+          headerTitleStyle: {
+            marginStart: 10
+          },
+          headerTitle: 'New Post',
+        }}/>
+        <Stack.Screen name="Camera" component={CameraScreen} options={{
+          headerShown: false
+        }} />
+      </Stack.Navigator>
     );
   }
 

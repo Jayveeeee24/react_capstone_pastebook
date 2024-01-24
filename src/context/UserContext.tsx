@@ -68,7 +68,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
     const getProfile = async (userId: string) => {
         try {
-            const result = await axios.get(`${BASE_URL}/api/profile/get-profile/${userId}`);
+            const result = await axios.get(`${BASE_URL}/api/profile/get-mini-profile/${userId}`);
             return result.data;
         } catch (error: any) {
             console.log('check current password error: ' + error);

@@ -1,4 +1,4 @@
-import { Image, ImageSourcePropType, TouchableOpacity, View } from "react-native";
+import { Image, ImageSourcePropType, Text, TouchableOpacity, View } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Images } from "../utils/Images";
 
@@ -15,9 +15,12 @@ export const IndividualAlbum: React.FC<IndividualAlbumProps> = ({ albums, index,
         <View style={{ width: '33.3%', marginBottom: 3, marginRight: index % 3 !== 2 ? 2 : 0 }}>
             <TouchableOpacity onPress={() => navigation.navigate('Photos')}>
                 <View>
-                    <Image source={{uri: item.firstPhoto.photo}} resizeMode="cover" style={{ width: '100%', height: 120 }} />
-                    <View style={{ position: "absolute", top: 0, width: '100%' }}>
+                    <Image source={{ uri: item.firstPhoto.photo }} resizeMode={item.albumDTO.albumName == "Uploads" ? 'cover' : 'cover'} style={{ width: '100%', height: 130 }} />
+                    <View style={{ position: "absolute", top: 0, width: '100%', display: item.albumDTO.albumName == "Uploads" ? 'none' : 'flex' }}>
                         <MaterialCommunityIcons name="checkbox-multiple-blank" size={26} color={'white'} style={{ alignSelf: "flex-end", margin: 5 }} />
+                    </View>
+                    <View style={{ position: "absolute", bottom: 0, backgroundColor: '#00000070', width: '100%' }}>
+                        <Text style={{ textAlign: "center", color: 'white', fontSize: 18 }}>{item.albumDTO.albumName}</Text>
                     </View>
                 </View>
             </TouchableOpacity>
