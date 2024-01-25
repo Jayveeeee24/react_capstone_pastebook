@@ -38,7 +38,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const token = Storage.getString('userToken');
 
       if (token) {
-        // const cleanedToken = token.replace(/^"(.*)"$/, '$1');
         // axios.interceptors.request.use(request => {
         //   console.log('Starting Request', request);
         //   return request;

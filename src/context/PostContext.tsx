@@ -3,7 +3,7 @@ import { BASE_URL } from "../utils/Config";
 import axios from "axios";
 
 interface PostContextProps {
-    addPost?: (postTitle: string, postBody: string, datePosted: Date, userId: string, posterId: string, photoId?: string) => Promise<any>;
+    addPost?: (postTitle: string, postBody: string, datePosted: Date, userId: string, photoId?: string) => Promise<any>;
     deletePost?: (postId: string) => Promise<any>;
 }
 
@@ -19,10 +19,10 @@ export const usePost = () => {
 
 export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
 
-    const addPost = async (postTitle: string, postBody: string, datePosted: Date, userId: string, posterId: string, photoId?: string) => {
+    const addPost = async (postTitle: string, postBody: string, datePosted: Date, userId: string, photoId?: string) => {
         try {
             const response = await axios.post(`${BASE_URL}/api/post/add-post`, {
-                postTitle, postBody, datePosted, photoId, userId, posterId
+                postTitle, postBody, datePosted, photoId, userId,
             });
             return response.data;
         } catch (error: any) {

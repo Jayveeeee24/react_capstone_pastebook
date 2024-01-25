@@ -133,7 +133,7 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
                                 position: 'absolute',
                                 margin: 16,
                                 right: 0,
-                                bottom: 0, backgroundColor: Colors.success
+                                bottom: 0, backgroundColor: Colors.secondaryBrand
                             }}
                             onPress={toggleBottomSheet}
                         />

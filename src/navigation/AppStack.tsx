@@ -155,9 +155,6 @@ export const AppStack = () => {
         }} />
         <Tab.Screen name="AlbumsTab" component={AlbumsTab} options={{
           headerTitle: 'My Album Gallery',
-          headerTitleStyle: {
-            marginStart: 8, fontSize: 22, color: 'black', fontWeight: '500',
-          },
           headerStyle: {
             elevation: 0,
             shadowOpacity: 0,

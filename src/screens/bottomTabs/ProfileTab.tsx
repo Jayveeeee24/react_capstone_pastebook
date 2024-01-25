@@ -99,9 +99,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                 <View style={{ paddingHorizontal: 20, paddingVertical: 15 }}>
                     <View style={{ flexDirection: "row", gap: 20, }}>
                         <View style={{ flex: 1 }}>
-                            {profilePicture && (
-                                <Image source={{ uri: profilePicture }} resizeMode="cover" style={{ aspectRatio: 1, width: 80, height: 80 }} />
-                            )}
+                            <Image source={profilePicture ? { uri: profilePicture } : Images.sample_avatar_neutral} resizeMode="contain" style={{ aspectRatio: 1, width: 80, height: 80 }} />
                         </View>
 
                         <View style={{ flex: 1, justifyContent: "center" }}>

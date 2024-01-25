@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Dimensions, FlatList, Image, PermissionsAndroid, Platform, SafeAreaView, ScrollView, TextInput as TextArea, Text, TouchableOpacity, View, TouchableNativeFeedback, ActivityIndicator } from "react-native";
+import { Dimensions, FlatList, Image, PermissionsAndroid, Platform, SafeAreaView, ScrollView, TextInput as TextArea, Text, TouchableOpacity, View, TouchableNativeFeedback, ActivityIndicator, Animated, Pressable } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Colors, Storage, credentialTextTheme } from "../../utils/Config";
 import { CameraRoll, GetAlbumsParams } from "@react-native-camera-roll/camera-roll";
@@ -12,26 +12,28 @@ import { PhotoContext, usePhoto } from "../../context/PhotoContext";
 import { useToast } from "react-native-toast-notifications";
 import { usePost } from "../../context/PostContext";
 import { CommonActions } from "@react-navigation/native";
+import SearchBar from "react-native-dynamic-search-bar";
+import { IndividualSearch } from "../../components/IndividualSearch";
 
 interface CreatePostTabProps {
     navigation: any;
     route: any;
 }
 const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
 export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route }) => {
     const toast = useToast();
     const [isLoading, setIsLoading] = useState(false);
 
     const [currentView, setCurrentView] = useState('PhotoSelectView');
     const [images, setImages] = useState<any[]>([]);
-    const [albums, setAlbums] = useState<any[]>([]);
+    const [albums, setAlbums] = useState<any[]>([]); //gallery albums
     const [pickedImage, setPickedImage] = useState<any>({});
     const [category, setCategory] = useState<string>('');
 
     const [postTitle, setPostTitle] = useState('');
     const [postBody, setPostBody] = useState('');
     const [postedUserId, setPostedUserId] = useState('');
-    const [posterUserId, setPosterUserId] = useState('');
 
     const [uploadsAlbumId, setUploadsAlbumId] = useState('');
 
@@ -39,6 +41,21 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
     const { addPhoto } = usePhoto();
     const { addPost } = usePost();
 
+    const [isBottomPostVisible, setIsBottomPostVisible] = useState(false);
+    const translateY = new Animated.Value(height - 300);
+
+    const [searchUserQuery, setSearchUserQuery] = useState('');
+
+    //Animation Use Effect
+    useEffect(() => {
+        Animated.timing(translateY, {
+            toValue: isBottomPostVisible ? 0 : height,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }, [isBottomPostVisible]);
+
+    //Main UseEffect
     useEffect(() => {
         hasPermission();
 
@@ -58,6 +75,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                     else {
                         setCurrentView('PhotoSelectView');
                     }
+                    setIsBottomPostVisible(false);
                 }} style={{ flexDirection: "row", alignItems: "center", marginStart: 10 }}>
                     <MaterialIcons name={currentView == 'PhotoSelectView' ? 'close' : 'arrow-back'} size={32} color={'black'} />
                 </TouchableOpacity>
@@ -88,14 +106,18 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
         } else {
             setPostedUserId(userId!);
         }
-        setPosterUserId(userId!);
+
         return () => {
             navigation.addListener('blur', () => {
                 setCurrentView('PhotoSelectView');
             });
         };
 
+
+
     }, [route.params?.image, currentView, navigation]);
+
+
 
     const getUploadsAlbum = async () => {
         const result = getUploadsAlbumId ? await getUploadsAlbumId() : undefined;
@@ -217,12 +239,11 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                 return (
                     <View style={{ flex: 1, flexDirection: "column" }}>
                         <ScrollView style={{ flex: 1 }} nestedScrollEnabled showsVerticalScrollIndicator={false}>
-                            <View style={{ alignItems: "center", marginVertical: 10 }}>
+                            <View style={{ alignItems: "center", }}>
                                 <Image
                                     source={{ uri: pickedImage.node.image.uri }}
                                     resizeMode="cover"
-                                    style={{ width: width - 150, height: width - 150 }}
-                                />
+                                    style={{ width: width, height: width }} />
                             </View>
                             <View style={{ paddingHorizontal: 10 }}>
                                 <TextInput placeholder="Title" theme={credentialTextTheme} style={{ fontFamily: 'Roboto-Medium', color: 'black', fontSize: 16, flex: 1, backgroundColor: 'transparent' }} value={postTitle} onChangeText={setPostTitle} />
@@ -236,18 +257,30 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                                         color: 'black',
                                         fontSize: 16,
                                         backgroundColor: 'transparent',
-                                        height: 80,
+                                        maxHeight: 100,
                                     }}
                                     value={postBody}
                                     onChangeText={(text) => setPostBody(text.slice(0, 1000))}
                                     multiline
                                     placeholderTextColor={'#666'} />
 
-                                <TouchableNativeFeedback onPress={() => { }}>
+                                <TouchableNativeFeedback onPress={() => {
+                                    setIsBottomPostVisible(true);
+                                }}>
                                     <View style={{ paddingHorizontal: 10, paddingVertical: 15, flexDirection: "row", alignItems: "center" }}>
                                         <MaterialCommunityIcons name="account-outline" size={28} color={'#37474F'} style={{ flex: 0 }} />
                                         <View style={{ marginStart: 10, alignSelf: "center", flex: 1 }}>
                                             <Text style={{ fontSize: 18, color: '#37474F', fontFamily: 'Roboto-Medium' }}>Post in: johnbernard.tinio</Text>
+                                        </View>
+                                        <MaterialIcons name="arrow-forward-ios" size={20} color={'#37474F'} style={{ flex: 0 }} />
+                                    </View>
+                                </TouchableNativeFeedback>
+
+                                <TouchableNativeFeedback>
+                                    <View style={{ paddingHorizontal: 10, paddingVertical: 15, flexDirection: "row", alignItems: "center" }}>
+                                        <MaterialCommunityIcons name="account-outline" size={28} color={'#37474F'} style={{ flex: 0 }} />
+                                        <View style={{ marginStart: 10, alignSelf: "center", flex: 1 }}>
+                                            <Text style={{ fontSize: 18, color: '#37474F', fontFamily: 'Roboto-Medium' }}>Album: Greens</Text>
                                         </View>
                                         <MaterialIcons name="arrow-forward-ios" size={20} color={'#37474F'} style={{ flex: 0 }} />
                                     </View>
@@ -275,9 +308,8 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                                         const result = addPhoto ? await addPhoto(formData) : undefined;
                                         if (result) {
                                             const dateToday = new Date();
-                                            const postResult = addPost ? await addPost(postTitle, postBody, dateToday, postedUserId, posterUserId, result) : undefined;
+                                            const postResult = addPost ? await addPost(postTitle, postBody, dateToday, postedUserId, result) : undefined;
 
-                                            console.log(postResult);
                                             if (postResult) {
                                                 toast.show('Post success!', { type: 'success' });
                                                 navigation.navigate('Home');
@@ -310,16 +342,70 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
 
                             )}
                         </TouchableOpacity>
+
+                        <Animated.View
+                            style={[
+                                {
+                                    transform: [{ translateY: translateY }],
+                                    backgroundColor: 'white',
+                                    borderTopLeftRadius: 10,
+                                    borderTopRightRadius: 10,
+                                    paddingVertical: 16,
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    borderWidth: 0.2,
+                                    maxHeight: height - 300,
+                                },
+                            ]}>
+                            <ScrollView showsVerticalScrollIndicator={false}>
+                                <View>
+                                    <TouchableOpacity onPress={() => setIsBottomPostVisible(false)} style={{ width: '100%' }} >
+                                        <View style={{ backgroundColor: 'darkgray', height: 5, width: '10%', alignSelf: "center" }}></View>
+                                        <View style={{ paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: 'lightgray', marginTop: 20 }}>
+                                            <Text style={{ fontSize: 16, color: 'black', textAlign: "center", fontWeight: '500' }}>Search user</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                    <View>
+
+                                        <View style={{ marginHorizontal: 15, marginVertical: 15 }}>
+                                            <SearchBar
+                                                placeholder="Search"
+                                                onPress={() => { setSearchUserQuery('') }}
+                                                onChangeText={setSearchUserQuery}
+                                                style={{ backgroundColor: '#ECEFF1', width: '100%', marginBottom: 10 }} />
+
+
+                                            <IndividualSearch />
+                                            <IndividualSearch />
+                                            <IndividualSearch />
+                                            <IndividualSearch />
+                                            <IndividualSearch />
+                                            <IndividualSearch />
+                                            <IndividualSearch />
+                                            <IndividualSearch />
+                                            <IndividualSearch />
+                                            <IndividualSearch />
+                                            <IndividualSearch />
+                                        </View>
+
+                                    </View>
+                                </View>
+                            </ScrollView>
+                        </Animated.View>
                     </View>
                 );
         }
     }
 
     return (
-        <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
-            <View style={{ flex: 1 }}>
-                {renderView()}
-            </View>
+        <SafeAreaView style={{ backgroundColor: isBottomPostVisible ? '#00000060' : 'transparent', flex: 1 }}>
+            <TouchableOpacity activeOpacity={1} style={{ flex: 1 }}>
+                <View style={{ flex: 1 }}>
+                    {renderView()}
+                </View>
+            </TouchableOpacity>
         </SafeAreaView>
     );
 }

@@ -15,7 +15,6 @@ interface AlbumTabProps {
 
 export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
     const { getAllAlbums } = useAlbum();
-    const { getPhotoById } = usePhoto();
 
     const [albums, setAlbums] = useState<any>([]);
 
@@ -28,7 +27,12 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
             duration: 300,
             useNativeDriver: true,
         }).start();
-    }, [isBottomSheetVisible, translateY]);
+    }, [isBottomSheetVisible]);
+    
+
+    const toggleBottomSheet = () => {
+        setBottomSheetVisible(!isBottomSheetVisible);
+    };
 
     useEffect(() => {
         const getAlbums = async () => {
@@ -46,10 +50,6 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
     }, [getAllAlbums]);
 
 
-
-    const toggleBottomSheet = () => {
-        setBottomSheetVisible(!isBottomSheetVisible);
-    };
 
     return (
         <MenuProvider>
@@ -104,7 +104,7 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
                                     position: 'absolute',
                                     margin: 16,
                                     right: 0,
-                                    bottom: 0, backgroundColor: Colors.success
+                                    bottom: 0, backgroundColor: Colors.secondaryBrand
                                 }}
                                 onPress={toggleBottomSheet}
                             />

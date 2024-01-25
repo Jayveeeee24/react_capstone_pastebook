@@ -14,6 +14,7 @@ export const Images = {
 
     sample_avatar: require('../assets/images/sample_avatar.png'),
     sample_avatar_female: require('../assets/images/sample_avatar_female.png'),
+    sample_avatar_neutral: require('../assets/images/sample_avatar_neutral.png'),
 
     sample_post_image: require('../assets/images/sample_post_image.jpg'),
     sample_post_image_2: require('../assets/images/sample_post_image_2.jpg'),
