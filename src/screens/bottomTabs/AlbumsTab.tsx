@@ -34,7 +34,11 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
 
     useEffect(() => {
         getAlbums();
-    }, [getAllAlbums]);
+
+        navigation.addListener('focus', () => {
+            getAlbums();
+        });
+    }, [navigation]);
 
     const getAlbums = async () => {
         try {

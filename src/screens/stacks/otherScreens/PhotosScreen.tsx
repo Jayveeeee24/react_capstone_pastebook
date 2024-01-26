@@ -1,15 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, SafeAreaView, Animated, Text, TouchableOpacity, View, TouchableWithoutFeedback } from "react-native";
-import { Images } from "../../../utils/Images";
+import { FlatList, SafeAreaView, Text, TouchableOpacity, View, TouchableWithoutFeedback, ActivityIndicator } from "react-native";
 import { IndividualPhoto } from "../../../components/IndividualPhoto";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { CommonActions } from "@react-navigation/native";
 import { FAB, Portal, Provider, TextInput } from "react-native-paper";
 import { Colors, credentialTextTheme } from "../../../utils/Config";
-import { useAlbum } from "../../../context/AlbumContext";
 import { usePhoto } from "../../../context/PhotoContext";
 import BottomSheet from "@gorhom/bottom-sheet";
 import Ionicons from "react-native-vector-icons/Ionicons";
+// import { MediaType, launchImageLibrary } from 'react-native-image-picker';
+import { useToast } from "react-native-toast-notifications";
 
 interface PhotoScreenProps {
     navigation: any;
@@ -17,12 +15,14 @@ interface PhotoScreenProps {
 }
 
 export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) => {
-    const { getAllPhotos } = usePhoto();
+    const toast = useToast();
+    const { getAllPhotos, addPhoto } = usePhoto();
 
     const [albumName, setAlbumName] = useState("Album");
     const [albumId, setAlbumId] = useState('');
-    const [albums, setAlbums] = useState<any>([]);
     const [isAlbumValid, setIsAlbumValid] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
+
 
     const [photos, setPhotos] = useState<any>([]);
     const [fabOpen, setFabOpen] = useState(false);
@@ -38,7 +38,48 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
         });
     }, [navigation]);
 
+    const ImagePicker = () => {
+        // const options = {
+        //     mediaType: 'photo' as MediaType,
+        //     storageOptions: {
+        //         path: 'image',
+        //         mediaType: 'photo'
+        //     }
+        // };
+
+        // launchImageLibrary(options, async response => {
+        //     setIsLoading(true);
+        //     if (response?.assets) {
+        //         const file = response.assets[0].uri;
+        //         const name = file?.split('/').pop();
+
+        //         const formData = new FormData();
+        //         formData.append('albumId', albumId);
+        //         formData.append('file', {
+        //             uri: file,
+        //             name: name,
+        //             type: 'image/jpg'
+        //         });
+
+        //         try {
+        //             const result = addPhoto ? await addPhoto(formData) : undefined;
+        //             if (result) {
+        //                 toast.show('Photo uploaded successfully!', { type: 'success' });
+        //                 getPhotos(albumId);
+        //             } else {
+        //                 toast.show(result, { type: 'warning' });
+        //             }
+        //         } catch (error: any) {
+        //             toast.show("An unexpected error occurred", { type: 'danger' });
+        //             console.log(error);
+        //         }
+        //     }
+        //     setIsLoading(false);
+        // });
+    }
+
     const getPhotos = async (allbumId: string) => {
+        setIsLoading(true);
         try {
             const result = getAllPhotos ? await getAllPhotos(allbumId) : undefined;
             if (result) {
@@ -47,6 +88,7 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
         } catch (error: any) {
             console.error("Error fetching photos:", error.response);
         }
+        setIsLoading(false);
     };
 
     //Fab
@@ -56,11 +98,12 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
     const handleOptionPress = (option: string) => {
         if (option == "Edit Album") {
             setIsBottomSheetVisible(true)
+        } else if (option == "Upload Photo") {
+            ImagePicker();
         }
         setFabOpen(false);
     };
 
-    //bottom sheet
     //bottom sheet
     const bottomSheetRef = useRef<BottomSheet>(null);
     const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
@@ -77,21 +120,29 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
             <TouchableWithoutFeedback onPress={() => bottomSheetRef.current && bottomSheetRef.current.close()}>
                 <View style={{ flex: 1 }}>
                     <View style={{ flexDirection: "column", flex: 1 }}>
-                        {photos.length !== 0 ? (
-                            <View style={{ marginTop: 10 }}>
-                                <FlatList
-                                    data={photos}
-                                    renderItem={({ item, index }) => (
-                                        <IndividualPhoto index={index} item={item} navigation={navigation} route={route} />
-                                    )}
-                                    keyExtractor={(item) => item.id}
-                                    numColumns={3}
-                                    showsVerticalScrollIndicator={false} />
+                        {isLoading ? (
+                            <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
+                                <ActivityIndicator size="large" color={Colors.primaryBrand} />
                             </View>
                         ) : (
-                            <View style={{ alignItems: "flex-end", justifyContent: "center", flex: 1, flexDirection: "row" }}>
-                                <Text style={{fontSize: 18, fontFamily: 'Roboto-Medium', color: 'black', fontWeight: '500'}}>No Photos Uploaded. Add some!</Text>
-                            </View>
+                            <>
+                                {photos.length !== 0 ? (
+                                    <View style={{ marginTop: 10 }}>
+                                        <FlatList
+                                            data={photos}
+                                            renderItem={({ item, index }) => (
+                                                <IndividualPhoto index={index} item={item} navigation={navigation} route={route} />
+                                            )}
+                                            keyExtractor={(item) => item.id}
+                                            numColumns={3}
+                                            showsVerticalScrollIndicator={false} />
+                                    </View>
+                                ) : (
+                                    <View style={{ alignItems: "flex-end", justifyContent: "center", flex: 1, flexDirection: "row" }}>
+                                        <Text style={{ fontSize: 18, fontFamily: 'Roboto-Medium', color: 'black', fontWeight: '500' }}>No Photos Uploaded. Add some!</Text>
+                                    </View>
+                                )}
+                            </>
                         )}
                         <Provider>
                             <Portal>
@@ -157,6 +208,6 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
                     </BottomSheet>
                 </View>
             </TouchableWithoutFeedback>
-        </SafeAreaView>
+        </SafeAreaView >
     );
 }
