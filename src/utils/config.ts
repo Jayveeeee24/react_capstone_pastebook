@@ -11,7 +11,8 @@ export const Colors = {
     primaryBrand: '#3373B0',
     secondaryBrand: '#eab676',
     success: '#22bb33',
-    warning: '#FF8A65'
+    warning: '#FF8A65',
+    danger: '#F56C6C',
 
 }
 export const credentialTextTheme = { colors: { primary: Colors.primaryBrand } };

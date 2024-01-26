@@ -23,6 +23,7 @@ import { Camera, useCameraDevice, useCameraPermission } from "react-native-visio
 import { PhotoProvider } from './src/context/PhotoContext';
 import { AlbumProvider } from './src/context/AlbumContext';
 import { PostProvider } from './src/context/PostContext';
+import { PaperProvider } from 'react-native-paper';
 
 
 function App(): React.JSX.Element {
@@ -60,38 +61,40 @@ function App(): React.JSX.Element {
   };
 
   return (
-    <ToastProvider placement="top"
-      duration={1500}
-      animationType='slide-in'
-      animationDuration={400}
-      successColor="#4CAF50"
-      dangerColor="#F44336"
-      warningColor="#FF9800"
-      normalColor="#607D8B"
-      successIcon={<MaterialCommunityIcons name='check-circle-outline' size={25} color={'white'} />}
-      dangerIcon={<MaterialIcons name='error-outline' size={25} color={'white'} />}
-      warningIcon={<Ionicons name='warning-outline' size={25} color={'white'} />}
-      textStyle={{ fontSize: 20, color: 'white' }}
-      offset={50}
-      offsetTop={30}
-      offsetBottom={40}
-      swipeEnabled={true}>
-      <UserProvider>
-        <AuthProvider>
-          <PhotoProvider>
-            <PostProvider>
-              <AlbumProvider>
-                <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
-                  <NavigationContainer>
-                    <AppStack />
-                  </NavigationContainer>
-                </GestureHandlerRootView>
-              </AlbumProvider>
-            </PostProvider>
-          </PhotoProvider>
-        </AuthProvider>
-      </UserProvider>
-    </ToastProvider>
+    <PaperProvider>
+      <ToastProvider placement="top"
+        duration={1500}
+        animationType='slide-in'
+        animationDuration={400}
+        successColor="#4CAF50"
+        dangerColor="#F44336"
+        warningColor="#FF9800"
+        normalColor="#607D8B"
+        successIcon={<MaterialCommunityIcons name='check-circle-outline' size={25} color={'white'} />}
+        dangerIcon={<MaterialIcons name='error-outline' size={25} color={'white'} />}
+        warningIcon={<Ionicons name='warning-outline' size={25} color={'white'} />}
+        textStyle={{ fontSize: 20, color: 'white' }}
+        offset={50}
+        offsetTop={30}
+        offsetBottom={40}
+        swipeEnabled={true}>
+        <UserProvider>
+          <AuthProvider>
+            <PhotoProvider>
+              <PostProvider>
+                <AlbumProvider>
+                  <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
+                    <NavigationContainer>
+                      <AppStack />
+                    </NavigationContainer>
+                  </GestureHandlerRootView>
+                </AlbumProvider>
+              </PostProvider>
+            </PhotoProvider>
+          </AuthProvider>
+        </UserProvider>
+      </ToastProvider>
+    </PaperProvider>
   );
 }
 
