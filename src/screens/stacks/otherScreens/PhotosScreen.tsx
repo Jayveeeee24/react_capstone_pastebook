@@ -6,7 +6,7 @@ import { Colors, credentialTextTheme } from "../../../utils/Config";
 import { usePhoto } from "../../../context/PhotoContext";
 import BottomSheet from "@gorhom/bottom-sheet";
 import Ionicons from "react-native-vector-icons/Ionicons";
-// import { MediaType, launchImageLibrary } from 'react-native-image-picker';
+import { MediaType, launchImageLibrary } from 'react-native-image-picker';
 import { useToast } from "react-native-toast-notifications";
 
 interface PhotoScreenProps {
@@ -39,43 +39,43 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
     }, [navigation]);
 
     const ImagePicker = () => {
-        // const options = {
-        //     mediaType: 'photo' as MediaType,
-        //     storageOptions: {
-        //         path: 'image',
-        //         mediaType: 'photo'
-        //     }
-        // };
+        const options = {
+            mediaType: 'photo' as MediaType,
+            storageOptions: {
+                path: 'image',
+                mediaType: 'photo'
+            }
+        };
 
-        // launchImageLibrary(options, async response => {
-        //     setIsLoading(true);
-        //     if (response?.assets) {
-        //         const file = response.assets[0].uri;
-        //         const name = file?.split('/').pop();
+        launchImageLibrary(options, async response => {
+            setIsLoading(true);
+            if (response?.assets) {
+                const file = response.assets[0].uri;
+                const name = file?.split('/').pop();
 
-        //         const formData = new FormData();
-        //         formData.append('albumId', albumId);
-        //         formData.append('file', {
-        //             uri: file,
-        //             name: name,
-        //             type: 'image/jpg'
-        //         });
+                const formData = new FormData();
+                formData.append('albumId', albumId);
+                formData.append('file', {
+                    uri: file,
+                    name: name,
+                    type: 'image/jpg'
+                });
 
-        //         try {
-        //             const result = addPhoto ? await addPhoto(formData) : undefined;
-        //             if (result) {
-        //                 toast.show('Photo uploaded successfully!', { type: 'success' });
-        //                 getPhotos(albumId);
-        //             } else {
-        //                 toast.show(result, { type: 'warning' });
-        //             }
-        //         } catch (error: any) {
-        //             toast.show("An unexpected error occurred", { type: 'danger' });
-        //             console.log(error);
-        //         }
-        //     }
-        //     setIsLoading(false);
-        // });
+                try {
+                    const result = addPhoto ? await addPhoto(formData) : undefined;
+                    if (result) {
+                        toast.show('Photo uploaded successfully!', { type: 'success' });
+                        getPhotos(albumId);
+                    } else {
+                        toast.show(result, { type: 'warning' });
+                    }
+                } catch (error: any) {
+                    toast.show("An unexpected error occurred", { type: 'danger' });
+                    console.log(error);
+                }
+            }
+            setIsLoading(false);
+        });
     }
 
     const getPhotos = async (allbumId: string) => {

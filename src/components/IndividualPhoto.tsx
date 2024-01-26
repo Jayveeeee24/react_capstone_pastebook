@@ -13,7 +13,7 @@ export const IndividualPhoto: React.FC<IndividualPhotoProps> = ({ index, item, n
     return (
         <View style={{ width: '33.3%', marginBottom: 3, marginRight: index % 3 !== 2 ? 2 : 0 }}>
             <TouchableOpacity onPress={() => Alert.alert('haha')}>
-                <Image source={(item.photo) ? { uri: item.photo } : Images.album_default } resizeMode="contain" style={{ width: '100%', height: 120 }} />
+                <Image source={(item.photo) ? { uri: item.photo } : Images.album_default } resizeMode="cover" style={{ width: '100%', height: 120 }} />
             </TouchableOpacity>
         </View>
     );
