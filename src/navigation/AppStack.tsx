@@ -5,6 +5,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { SearchTab } from "../screens/bottomTabs/SearchTab";
 import { CreatePostTab } from "../screens/bottomTabs/CreatePostTab";
+import React from 'react';
 import { AlbumsTab } from "../screens/bottomTabs/AlbumsTab";
 import { ProfileTab } from "../screens/bottomTabs/ProfileTab";
 import { HomeTab } from "../screens/bottomTabs/HomeTab";
@@ -125,10 +126,6 @@ export const AppStack = () => {
         <Stack.Screen name="Settings" component={SettingsScreen} options={{
           headerTitle: 'Account Settings',
         }} />
-
-        <Stack.Screen name="Photos" component={PhotosScreen} />
-        <Stack.Screen name="Camera" component={CameraScreen} />
-
       </Stack.Navigator>
     );
   }
@@ -148,24 +145,51 @@ export const AppStack = () => {
         })}>
         <Tab.Screen name="HomeTab" component={HomeStack} />
         <Tab.Screen name="SearchTab" component={SearchTab} />
-        <Tab.Screen name="CreatePostTab" component={CreatePostTab} options={{
-          headerTitleStyle: {
-            marginStart: 10
-          },
-          headerTitle: 'New Post',
+        <Tab.Screen name="CreatePostTab" component={CreatePostStack} options={{
+          headerShown: false,
         }} />
-        <Tab.Screen name="AlbumsTab" component={AlbumsTab} options={{
+        <Tab.Screen name="AlbumsTab" component={AlbumStack} options={{
+          headerShown: false
+        }} />
+        <Tab.Screen name="ProfileTab" component={ProfileTab} />
+      </Tab.Navigator>
+    );
+  }
+
+  function AlbumStack() {
+    return (
+      <Stack.Navigator screenOptions={{
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+      }}>
+        <Stack.Screen name="Albums" component={AlbumsTab} options={{
           headerTitle: 'My Album Gallery',
-          headerTitleStyle: {
-            marginStart: 8, fontSize: 22, color: 'black', fontWeight: '500',
-          },
           headerStyle: {
             elevation: 0,
             shadowOpacity: 0,
           },
         }} />
-        <Tab.Screen name="ProfileTab" component={ProfileTab} />
-      </Tab.Navigator>
+        <Stack.Screen name="Photos" component={PhotosScreen} />
+      </Stack.Navigator>
+    );
+  }
+
+
+  function CreatePostStack() {
+    return (
+      <Stack.Navigator
+        screenOptions={{
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+        }}>
+        <Stack.Screen name="CreatePost" component={CreatePostTab} options={{
+          headerTitleStyle: {
+            marginStart: 10
+          },
+          headerTitle: 'New Post',
+        }} />
+        <Stack.Screen name="Camera" component={CameraScreen} options={{
+          headerShown: false
+        }} />
+      </Stack.Navigator>
     );
   }
 

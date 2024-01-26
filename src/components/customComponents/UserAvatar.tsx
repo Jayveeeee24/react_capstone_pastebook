@@ -2,6 +2,7 @@ import { ImageSourcePropType, StyleSheet, View } from "react-native";
 import { Card, Title } from "react-native-paper";
 import { Images } from "../../utils/Images";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { Colors } from "../../utils/Config";
 
 interface UserAvatarProps {
     name: string;
@@ -27,7 +28,9 @@ const styles = StyleSheet.create({
     avatarContainer: {
         borderRadius: 50,
         width: 60,
-        height: 60
+        height: 60,
+        borderWidth: 3,
+        borderColor: Colors.secondaryBrand
     },
     avatarImage: {
         height: '100%',

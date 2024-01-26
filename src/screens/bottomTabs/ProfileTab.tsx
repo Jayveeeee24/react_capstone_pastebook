@@ -9,6 +9,7 @@ import { Storage } from "../../utils/Config";
 import { useUser } from "../../context/UserContext";
 import { useFocusEffect } from "@react-navigation/native";
 import React from "react";
+import { usePhoto } from "../../context/PhotoContext";
 
 interface ProfileTabProps {
     navigation: any;
@@ -17,6 +18,8 @@ interface ProfileTabProps {
 
 export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => {
     const { getProfile } = useUser();
+    const { getPhotoById } = usePhoto();
+
     const [dynamicTitle, setDynamicTitle] = useState("Profile Tab");
 
     const [firstName, setFirstName] = useState('');
@@ -26,6 +29,11 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
     const [dateOfBirth, setDateOfBirth] = useState(new Date());
     const [gender, setGender] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [profilePicture, setProfilePicture] = useState<any>();
+
+    const [postCount, setPostCount] = useState(0);
+    const [friendCount, setFriendCount] = useState(0);
+    const [albumCount, setAlbumCount] = useState(0);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -34,15 +42,24 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
 
                 if (userId) {
                     const result = getProfile ? await getProfile(userId) : undefined;
-
-                    if (result.id) {
+                    if (await result.id) {
                         setFirstName(result.firstName);
                         setLastName(result.lastName);
-                        setBio(result.aboutMe);
+                        setBio(result.aboutMe ? result.aboutMe : '');
                         setPhoneNumber(result.phoneNumber);
                         setGender(result.sex);
                         setDateOfBirth(new Date(result.birthDate));
+                        setFriendCount(result.friendCount);
+                        setAlbumCount(result.albumCount);
+                        setPostCount(result.postCount);
                         setDynamicTitle(`${result.firstName.toLowerCase().replace(/\s/g, '')}.${result.lastName.toLowerCase()}`);
+
+                        const pictureResult = getPhotoById ? await getPhotoById(result.photo.id) : undefined;
+
+                        if (pictureResult) {
+                            setProfilePicture(pictureResult);
+                        }
+
                     }
                 }
             }
@@ -81,17 +98,20 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
             <View style={{ flexDirection: "column", flex: 1 }}>
                 <View style={{ paddingHorizontal: 20, paddingVertical: 15 }}>
                     <View style={{ flexDirection: "row", gap: 20, }}>
-                        <Image source={Images.sample_avatar} resizeMode="cover" style={{ flex: 1, aspectRatio: 1, width: 60, height: 60 }} />
+                        <View style={{ flex: 1 }}>
+                            <Image source={profilePicture ? { uri: profilePicture } : Images.sample_avatar_neutral} resizeMode="contain" style={{ aspectRatio: 1, width: 80, height: 80 }} />
+                        </View>
+
                         <View style={{ flex: 1, justifyContent: "center" }}>
-                            <Text style={styles.textMetricsTitle}>19</Text>
+                            <Text style={styles.textMetricsTitle}>{postCount}</Text>
                             <Text style={styles.textMetricsSub}>Posts</Text>
                         </View>
                         <TouchableOpacity onPress={() => navigation.navigate('Followers')} style={{ flex: 1, justifyContent: "center" }}>
-                            <Text style={styles.textMetricsTitle}>62</Text>
+                            <Text style={styles.textMetricsTitle}>{friendCount}</Text>
                             <Text style={styles.textMetricsSub}>Followers</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => navigation.navigate('AlbumsTab')} style={{ flex: 1, justifyContent: "center" }}>
-                            <Text style={styles.textMetricsTitle}>12</Text>
+                            <Text style={styles.textMetricsTitle}>{albumCount}</Text>
                             <Text style={styles.textMetricsSub}>Albums</Text>
                         </TouchableOpacity>
                     </View>
@@ -99,10 +119,10 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                     <Text style={{ marginTop: 5, color: 'black', fontFamily: 'Roboto-Medium', fontWeight: '700' }}>{firstName + ' ' + lastName}</Text>
 
                     <View style={{ flexDirection: "row", justifyContent: bio ? "space-between" : "flex-start", alignItems: "flex-start", marginTop: 5 }}>
-                        <View style={{ justifyContent: "center", flex: 1 }}>
+                        <View style={{ justifyContent: "center" }}>
                             <Text style={{ color: 'black', fontFamily: 'Roboto-Medium' }}>{"\n" + bio ? bio : ''}</Text>
                         </View>
-                        <View style={{ flex: 0 }}>
+                        <View>
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <MaterialCommunityIcons name="cake-variant-outline" size={16} color={'black'} />
                                 <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginStart: 5 }}>{dateOfBirth.toLocaleDateString('en-US', {
