@@ -50,11 +50,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               setAuthState(true);
             }
           }).catch((e) => {
-            console.log('use effect error: ' + e.response.data.result)
             Storage.clearAll();
             setAuthState(false);
             axios.defaults.headers.common['Authorization'] = '';
-
           }).finally(() => {
             setLoading(false);
           })

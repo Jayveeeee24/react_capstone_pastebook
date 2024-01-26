@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dimensions, FlatList, Image, PermissionsAndroid, Platform, SafeAreaView, ScrollView, TextInput as TextArea, Text, TouchableOpacity, View, TouchableNativeFeedback, ActivityIndicator, Animated, Pressable } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Colors, Storage, credentialTextTheme } from "../../utils/Config";
@@ -8,7 +8,7 @@ import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { FAB, TextInput } from "react-native-paper";
 import { useAlbum } from "../../context/AlbumContext";
-import { PhotoContext, usePhoto } from "../../context/PhotoContext";
+import { usePhoto } from "../../context/PhotoContext";
 import { useToast } from "react-native-toast-notifications";
 import { usePost } from "../../context/PostContext";
 import { CommonActions } from "@react-navigation/native";

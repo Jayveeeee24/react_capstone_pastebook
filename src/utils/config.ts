@@ -10,6 +10,8 @@ export const Storage = new MMKV();
 export const Colors = {
     primaryBrand: '#3373B0',
     secondaryBrand: '#eab676',
-    success: '#22bb33'
+    success: '#22bb33',
+    warning: '#FF8A65'
+
 }
 export const credentialTextTheme = { colors: { primary: Colors.primaryBrand } };

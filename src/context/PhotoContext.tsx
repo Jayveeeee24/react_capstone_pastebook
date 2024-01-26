@@ -6,6 +6,7 @@ import { Buffer } from "buffer";
 interface PhotoContextProps {
     addPhoto?: (formData: FormData) => Promise<any>;
     getPhotoById?: (photoId: string) => Promise<any>;
+    getAllPhotos?: (albumId: string) => Promise<any>;
 }
 
 interface PhotoProviderProps {
@@ -53,11 +54,46 @@ export const PhotoProvider: React.FC<PhotoProviderProps> = ({ children }) => {
 
     };
 
+    const getAllPhotos = async (albumId: string) => {
+        try {
+            const result = await axios.get(`${BASE_URL}/api/album/get-all-photos/${albumId}`);
 
+            if (result && Array.isArray(result.data)) {
+                const updatedPhotos = await Promise.all(
+                    result.data.map(async (item: any) => {
+                        try {
+
+                            const photo = getPhotoById ? await getPhotoById(item.id) : undefined;
+                            if (photo) {
+                                return {
+                                    ...item,
+                                    photo: photo,
+                                    
+                                };
+                            } else {
+                                return item;
+                            }
+                        } catch (error: any) {
+                            console.error("Error fetching photo:", error);
+                            return item;
+                        }
+                    })
+                );
+
+                return updatedPhotos;
+            } else {
+                console.error("Invalid data format:", result.data);
+                return [];
+            }
+        } catch (error: any) {
+            return error.response;
+        }
+    };
 
     const contextValue: PhotoContextProps = {
         addPhoto,
         getPhotoById,
+        getAllPhotos
     }
 
     return (

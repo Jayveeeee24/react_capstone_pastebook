@@ -164,11 +164,24 @@ export const AppStack = () => {
         <Stack.Screen name="Albums" component={AlbumsTab} options={{
           headerTitle: 'My Album Gallery',
           headerStyle: {
-            elevation: 0,
-            shadowOpacity: 0,
+            borderBottomWidth: 0.8,
+            borderBottomColor: 'lightgray'
+          },
+          headerLeft: () => (
+            <View style={{ flexDirection: 'row', marginLeft: 10 }}>
+              <Image
+                source={Images.logo_dark}
+                style={{ width: 20, height: 25 }}
+              />
+            </View>
+          ),
+        }} />
+        <Stack.Screen name="Photos" component={PhotosScreen} options={{
+          headerStyle: {
+            borderBottomWidth: 0.8,
+            borderBottomColor: 'lightgray'
           },
         }} />
-        <Stack.Screen name="Photos" component={PhotosScreen} />
       </Stack.Navigator>
     );
   }

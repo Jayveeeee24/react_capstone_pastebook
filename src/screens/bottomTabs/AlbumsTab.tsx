@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, Keyboard, SafeAreaView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { FlatList, Keyboard, LogBox, SafeAreaView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { FAB, TextInput } from "react-native-paper";
 import { Colors, credentialTextTheme } from "../../utils/Config";
 import { IndividualAlbum } from "../../components/IndividualAlbum";
@@ -29,32 +29,28 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
         if (index === -1) {
             setIsBottomSheetVisible(false);
             setAlbumName('');
-            Keyboard.dismiss();
         }
     }, []);
 
-
-
     useEffect(() => {
-        const getAlbums = async () => {
-            try {
-                const result = getAllAlbums ? await getAllAlbums() : undefined;
-                if (result) {
-                    setAlbums(result);
-                }
-            } catch (error) {
-                console.error("Error fetching albums:", error);
-            }
-        };
-
         getAlbums();
     }, [getAllAlbums]);
 
+    const getAlbums = async () => {
+        try {
+            const result = getAllAlbums ? await getAllAlbums() : undefined;
+            if (result) {
+                setAlbums(result);
+            }
+        } catch (error) {
+            console.error("Error fetching albums:", error);
+        }
+    };
 
     return (
         <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
             <TouchableWithoutFeedback onPress={() => bottomSheetRef.current && bottomSheetRef.current.close()}>
-                <View style={{ flex: 1, }}>
+                <View style={{ flex: 1 }}>
                     <View style={{ flexDirection: "column", flex: 1 }}>
                         <View style={{ marginTop: 10 }}>
                             <FlatList
@@ -62,7 +58,7 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
                                 renderItem={({ item, index }) => (
                                     <IndividualAlbum index={index} item={item} navigation={navigation} route={route} />
                                 )}
-                                keyExtractor={(item) => item.firstPhoto.albumId}
+                                keyExtractor={(item) => item.albumDTO.albumId}
                                 numColumns={3}
                                 showsVerticalScrollIndicator={false} />
                         </View>
@@ -75,7 +71,7 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
                                 position: 'absolute',
                                 margin: 16,
                                 right: 0,
-                                bottom: 0, backgroundColor: Colors.secondaryBrand
+                                bottom: 0, backgroundColor: Colors.primaryBrand
                             }}
                             onPress={() => setIsBottomSheetVisible(true)}
                         />
@@ -117,11 +113,12 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
                                     if (!!trimmedAlbumName) {
                                         try {
                                             const result = addAlbum ? await addAlbum(albumName) : undefined;
-                                            if (result.albumId) {
+                                            if (result) {
                                                 toast.show('Album Added!', {
                                                     type: "success",
                                                 });
-                                                setAlbums([]);
+                                                getAlbums();
+                                                bottomSheetRef.current && bottomSheetRef.current.close()
                                             } else {
                                                 toast.show(result, {
                                                     type: "warning",
@@ -133,7 +130,7 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
                                         }
                                     }
                                 }}
-                                style={[{ padding: 15, borderRadius: 10, marginHorizontal: 30, marginTop: 20, backgroundColor: Colors.primaryBrand }]}>
+                                style={[{ padding: 15, borderRadius: 10, marginHorizontal: 30, marginTop: 20, backgroundColor: Colors.success }]}>
                                 <Text style={[{ color: 'white', fontSize: 20, textAlign: 'center', fontFamily: 'Roboto-Medium' }]}>Add Album</Text>
                             </TouchableOpacity>
                         </View>
