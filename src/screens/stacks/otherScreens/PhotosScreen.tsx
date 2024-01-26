@@ -34,23 +34,23 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
     useEffect(() => {
         navigation.setOptions({
             headerTitle: albumName,
-            headerLeft: () => (
-                <TouchableOpacity onPress={() => {
-                    navigation.dispatch(
-                        CommonActions.reset({
-                            index: 1,
-                            routes: [
-                                { name: 'HomeTab' },
-                                {
-                                    name: 'AlbumsTab',
-                                },
-                            ],
-                        })
-                    );
-                }} style={{ flexDirection: "row", alignItems: "center", marginStart: 10 }}>
-                    <MaterialIcons name={'arrow-back'} size={32} color={'black'} />
-                </TouchableOpacity>
-            )
+            // headerLeft: () => (
+            //     <TouchableOpacity onPress={() => {
+            //         navigation.dispatch(
+            //             CommonActions.reset({
+            //                 index: 1,
+            //                 routes: [
+            //                     { name: 'HomeTab' },
+            //                     {
+            //                         name: 'AlbumsTab',
+            //                     },
+            //                 ],
+            //             })
+            //         );
+            //     }} style={{ flexDirection: "row", alignItems: "center", marginStart: 10 }}>
+            //         <MaterialIcons name={'arrow-back'} size={32} color={'black'} />
+            //     </TouchableOpacity>
+            // )
         })
     }, [albumName, navigation]);
 

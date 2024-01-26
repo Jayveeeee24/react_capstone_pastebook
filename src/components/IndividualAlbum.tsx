@@ -3,19 +3,18 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { Images } from "../utils/Images";
 
 interface IndividualAlbumProps {
-    albums: { id: string; albumName: string; albumThumbnail: ImageSourcePropType; }[];
     index: number;
     item: any;
     navigation: any;
     route: any;
 }
 
-export const IndividualAlbum: React.FC<IndividualAlbumProps> = ({ albums, index, item, navigation, route }) => {
+export const IndividualAlbum: React.FC<IndividualAlbumProps> = ({ index, item, navigation, route }) => {
     return (
         <View style={{ width: '33.3%', marginBottom: 3, marginRight: index % 3 !== 2 ? 2 : 0 }}>
             <TouchableOpacity onPress={() => navigation.navigate('Photos')}>
                 <View>
-                    <Image source={{ uri: item.firstPhoto.photo }} resizeMode={item.albumDTO.albumName == "Uploads" ? 'cover' : 'cover'} style={{ width: '100%', height: 130 }} />
+                    <Image source={(item.firstPhoto.photo) ? { uri: item.firstPhoto.photo } : Images.album_default } resizeMode={item.albumDTO.albumName == "Uploads" ? 'contain' : 'cover'} style={{ width: '100%', height: 130 }} />
                     <View style={{ position: "absolute", top: 0, width: '100%', display: item.albumDTO.albumName == "Uploads" ? 'none' : 'flex' }}>
                         <MaterialCommunityIcons name="checkbox-multiple-blank" size={26} color={'white'} style={{ alignSelf: "flex-end", margin: 5 }} />
                     </View>
