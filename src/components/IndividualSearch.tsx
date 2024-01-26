@@ -2,7 +2,15 @@ import { Image, Text, TouchableNativeFeedback, View } from "react-native";
 import { Images } from "../utils/Images";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
-export const IndividualSearch = () => {
+
+interface IndividualSearchProps {
+    index: number;
+    item: any;
+    navigation: any;
+    route: any;
+}
+
+export const IndividualSearch: React.FC<IndividualSearchProps> = ({item, index, navigation, route}) => {
     return (
         <View>
             <TouchableOpacity>

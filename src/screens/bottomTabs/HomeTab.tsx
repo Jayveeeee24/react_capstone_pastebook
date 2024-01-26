@@ -9,59 +9,7 @@ export const HomeTab = () => {
 
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-    const [friends, setFriends] = useState([
-        {
-            id: '1',
-            name: "Jb",
-            imageUrl: Images.sample_avatar
-
-        },
-        {
-            id: "2",
-            name: "Sam",
-            imageUrl: Images.sample_avatar_female
-        },
-        {
-            id: "3",
-            name: "Stan",
-            imageUrl: Images.sample_avatar
-        },
-        {
-            id: "4",
-            name: "Jean",
-            imageUrl: Images.sample_avatar_female
-        },
-        {
-            id: "5",
-            name: "Jiggs",
-            imageUrl: Images.sample_avatar
-        },
-        {
-            id: "6",
-            name: "Blessie",
-            imageUrl: Images.sample_avatar_female
-        },
-        {
-            id: "7",
-            name: "Ejay",
-            imageUrl: Images.sample_avatar
-        },
-        {
-            id: "8",
-            name: "Marliss",
-            imageUrl: Images.sample_avatar_female
-        },
-        {
-            id: "9",
-            name: "Geo",
-            imageUrl: Images.sample_avatar
-        },
-        {
-            id: "10",
-            name: "Mariel",
-            imageUrl: Images.sample_avatar_female
-        },
-    ]);
+    const [friends, setFriends] = useState([{}]);
 
     const handleRefresh = useCallback(() => {
         setRefreshing(true);
@@ -95,19 +43,21 @@ export const HomeTab = () => {
                     <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
                 }>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', borderBottomColor: 'lightgray', borderBottomWidth: 1 }}>
-                    <FlatList
+                    {/* <FlatList
                         data={friends}
                         renderItem={({ item }) => <UserAvatar name={item.name} imageUrl={item.imageUrl} />}
                         keyExtractor={(item) => item.id}
                         contentContainerStyle={[styles.friendsView]}
                         horizontal
-                        showsHorizontalScrollIndicator={false} />
+                        showsHorizontalScrollIndicator={false} /> */}
                 </View>
                 <View style={styles.postsContainer}>
-                    <IndividualPost name='jayvee.artemis' avatarUrl={Images.sample_avatar} postImageUrl={Images.sample_post_image} postTitle="This is a post" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={910} likes={1654432} onLikePress={() => { }} />
+                    {/* <IndividualPost name='jayvee.artemis' avatarUrl={Images.sample_avatar} postImageUrl={Images.sample_post_image} postTitle="This is a post" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={910} likes={1654432} onLikePress={() => { }} />
                     <IndividualPost name='yashimallow' avatarUrl={Images.sample_avatar_female} postImageUrl={Images.sample_post_image_2} postTitle="This is a post 2" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={754} likes={31321} onLikePress={() => { }} />
                     <IndividualPost name='blec_siopao' avatarUrl={Images.sample_avatar_female} postImageUrl={Images.sample_post_image_3} postTitle="This is a post 3" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={3} likes={5} onLikePress={() => { }} />
-                    <IndividualPost name='hmzzjin' avatarUrl={Images.sample_avatar_female} postImageUrl={Images.sample_post_image_4} postTitle="This is a post 4" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={10341} likes={3134221} onLikePress={() => { }} />
+                    <IndividualPost name='hmzzjin' avatarUrl={Images.sample_avatar_female} postImageUrl={Images.sample_post_image_4} postTitle="This is a post 4" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={10341} likes={3134221} onLikePress={() => { }} /> */}
+
+                    
                 </View>
             </ScrollView>
 

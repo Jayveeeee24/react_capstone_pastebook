@@ -42,8 +42,6 @@ export const PhotoProvider: React.FC<PhotoProviderProps> = ({ children }) => {
                     Accept: 'image/jpeg',
                 },
             });
-
-            
             const imageData = `data:image/jpeg;base64,${Buffer.from(response.data, 'binary').toString('base64')}`;
             return imageData;
         } catch (error) {

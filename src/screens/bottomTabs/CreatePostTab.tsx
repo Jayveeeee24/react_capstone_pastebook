@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Dimensions, FlatList, Image, PermissionsAndroid, Platform, SafeAreaView, ScrollView, TextInput as TextArea, Text, TouchableOpacity, View, TouchableNativeFeedback, ActivityIndicator, Animated, Pressable } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Colors, Storage, credentialTextTheme } from "../../utils/Config";
@@ -14,6 +14,7 @@ import { usePost } from "../../context/PostContext";
 import { CommonActions } from "@react-navigation/native";
 import SearchBar from "react-native-dynamic-search-bar";
 import { IndividualSearch } from "../../components/IndividualSearch";
+import BottomSheet from "@gorhom/bottom-sheet";
 
 interface CreatePostTabProps {
     navigation: any;
@@ -41,21 +42,19 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
     const { addPhoto } = usePhoto();
     const { addPost } = usePost();
 
-    const [isBottomPostVisible, setIsBottomPostVisible] = useState(false);
-    const translateY = new Animated.Value(height - 300);
-
     const [searchUserQuery, setSearchUserQuery] = useState('');
 
-    //Animation Use Effect
-    useEffect(() => {
-        Animated.timing(translateY, {
-            toValue: isBottomPostVisible ? 0 : height,
-            duration: 300,
-            useNativeDriver: true,
-        }).start();
-    }, [isBottomPostVisible]);
+    //bottom sheet
+    const bottomSheetRef = useRef<BottomSheet>(null);
+    const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
+    const snapPoints = useMemo(() => ['50%', '90%'], []);
+    const handleSheetChanges = useCallback((index: number) => {
+        if (index === -1) {
+            setIsBottomSheetVisible(false);
+        }
+    }, []);
 
-    //Main UseEffect
+    //Main functions
     useEffect(() => {
         hasPermission();
 
@@ -75,7 +74,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                     else {
                         setCurrentView('PhotoSelectView');
                     }
-                    setIsBottomPostVisible(false);
+
                 }} style={{ flexDirection: "row", alignItems: "center", marginStart: 10 }}>
                     <MaterialIcons name={currentView == 'PhotoSelectView' ? 'close' : 'arrow-back'} size={32} color={'black'} />
                 </TouchableOpacity>
@@ -116,17 +115,6 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
 
 
     }, [route.params?.image, currentView, navigation]);
-
-
-
-    const getUploadsAlbum = async () => {
-        const result = getUploadsAlbumId ? await getUploadsAlbumId() : undefined;
-
-        if (result) {
-            setUploadsAlbumId(result);
-        }
-    }
-
     const hasPermission = async () => {
         const platformVersion = parseInt(String(Platform.Version), 10);
         const permission =
@@ -143,6 +131,48 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
         return status === 'granted';
     };
 
+    //api functions
+    const onAddPost = async () => {
+        if (!postTitle.trim() || !postBody.trim()) {
+            toast.show('All fields are required', { type: 'danger' });
+        } else {
+            setIsLoading(true);
+            const file = pickedImage.node.image.uri;
+            const name = file.split('/').pop();
+
+            const formData = new FormData();
+            formData.append('albumId', uploadsAlbumId);
+            formData.append('file', {
+                uri: file,
+                name: name,
+                type: 'image/jpg'
+            });
+
+            try {
+                const result = addPhoto ? await addPhoto(formData) : undefined;
+                if (result) {
+                    const dateToday = new Date();
+                    const postResult = addPost ? await addPost(postTitle, postBody, dateToday, postedUserId, result) : undefined;
+
+                    if (postResult) {
+                        toast.show('Post success!', { type: 'success' });
+                        navigation.navigate('Home');
+                    } else {
+                        toast.show(postResult.result, { type: 'warning' });
+                    }
+                } else {
+                    toast.show(result, { type: 'warning' });
+                }
+
+            } catch (error: any) {
+                toast.show("An unexpected error occurred", { type: 'danger' });
+                console.log(error);
+            }
+        }
+        setIsLoading(false);
+    }
+
+    //album retrieval
     const loadAlbums = async () => {
         if (Platform.OS === 'android' && !(await hasPermission())) {
             return;
@@ -157,7 +187,15 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                 console.error(err);
             });
     };
+    const getUploadsAlbum = async () => {
+        const result = getUploadsAlbumId ? await getUploadsAlbumId() : undefined;
 
+        if (result) {
+            setUploadsAlbumId(result);
+        }
+    }
+
+    //camera roll
     const pickedCategory = (itemValue: string, itemIndex: number) => {
         let params = { first: 40, groupName: albums[itemIndex].title };
 
@@ -171,7 +209,6 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
         });
 
     };
-
     const displayAssetCategories = () => {
         return albums.map((category, index) => {
             const key = `${category.title}_${index}`;
@@ -264,9 +301,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                                     multiline
                                     placeholderTextColor={'#666'} />
 
-                                <TouchableNativeFeedback onPress={() => {
-                                    setIsBottomPostVisible(true);
-                                }}>
+                                <TouchableNativeFeedback onPress={() => setIsBottomSheetVisible(true)}>
                                     <View style={{ paddingHorizontal: 10, paddingVertical: 15, flexDirection: "row", alignItems: "center" }}>
                                         <MaterialCommunityIcons name="account-outline" size={28} color={'#37474F'} style={{ flex: 0 }} />
                                         <View style={{ marginStart: 10, alignSelf: "center", flex: 1 }}>
@@ -288,45 +323,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                             </View>
                         </ScrollView>
                         <TouchableOpacity
-                            onPress={async () => {
-                                if (!postTitle.trim() || !postBody.trim()) {
-                                    toast.show('All fields are required', { type: 'danger' });
-                                } else {
-                                    setIsLoading(true);
-                                    const file = pickedImage.node.image.uri;
-                                    const name = file.split('/').pop();
-
-                                    const formData = new FormData();
-                                    formData.append('albumId', uploadsAlbumId);
-                                    formData.append('file', {
-                                        uri: file,
-                                        name: name,
-                                        type: 'image/jpg'
-                                    });
-
-                                    try {
-                                        const result = addPhoto ? await addPhoto(formData) : undefined;
-                                        if (result) {
-                                            const dateToday = new Date();
-                                            const postResult = addPost ? await addPost(postTitle, postBody, dateToday, postedUserId, result) : undefined;
-
-                                            if (postResult) {
-                                                toast.show('Post success!', { type: 'success' });
-                                                navigation.navigate('Home');
-                                            } else {
-                                                toast.show(postResult.result, { type: 'warning' });
-                                            }
-                                        } else {
-                                            toast.show(result, { type: 'warning' });
-                                        }
-
-                                    } catch (error: any) {
-                                        toast.show("An unexpected error occurred", { type: 'danger' });
-                                        console.log(error);
-                                    }
-                                }
-                                setIsLoading(false);
-                            }}
+                            onPress={onAddPost}
                             style={{
                                 flex: 0,
                                 backgroundColor: Colors.secondaryBrand,
@@ -339,68 +336,43 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                                 <ActivityIndicator size="small" color="white" />
                             ) : (
                                 <Text style={{ color: 'white', fontSize: 20, textAlign: 'center', fontFamily: 'Roboto-Medium' }}>Post</Text>
-
                             )}
                         </TouchableOpacity>
 
-                        <Animated.View
-                            style={[
-                                {
-                                    transform: [{ translateY: translateY }],
-                                    backgroundColor: 'white',
-                                    borderTopLeftRadius: 10,
-                                    borderTopRightRadius: 10,
-                                    paddingVertical: 16,
-                                    position: 'absolute',
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    borderWidth: 0.2,
-                                    maxHeight: height - 300,
-                                },
-                            ]}>
-                            <ScrollView showsVerticalScrollIndicator={false}>
-                                <View>
-                                    <TouchableOpacity onPress={() => setIsBottomPostVisible(false)} style={{ width: '100%' }} >
-                                        <View style={{ backgroundColor: 'darkgray', height: 5, width: '10%', alignSelf: "center" }}></View>
-                                        <View style={{ paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: 'lightgray', marginTop: 20 }}>
-                                            <Text style={{ fontSize: 16, color: 'black', textAlign: "center", fontWeight: '500' }}>Search user</Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                    <View>
+                        {/* bottom sheet here */}
+                        <BottomSheet
+                            ref={bottomSheetRef}
+                            index={isBottomSheetVisible ? 0 : -1}
+                            snapPoints={snapPoints}
+                            onChange={handleSheetChanges}
+                            enablePanDownToClose
+                            style={{
+                                borderTopStartRadius: 20,
+                                borderTopEndRadius: 20,
+                                shadowRadius: 20,
+                                shadowColor: 'black',
+                                elevation: 20,
+                            }}>
+                            <View style={{ borderBottomColor: 'gray', borderBottomWidth: 0.2, paddingTop: 20, paddingBottom: 10 }} >
+                                <Text style={{ textAlign: "center", fontSize: 16, color: 'black', fontWeight: '500' }}>Search user</Text>
+                            </View>
+                            <View style={{ marginVertical: 20, marginHorizontal: 20 }}>
+                                <SearchBar
+                                    placeholder="Search"
+                                    onPress={() => { setSearchUserQuery('') }}
+                                    onChangeText={setSearchUserQuery}
+                                    style={{ backgroundColor: '#ECEFF1', width: '100%', marginBottom: 10 }} />
+                                {/* <IndividualSearch /> */}
 
-                                        <View style={{ marginHorizontal: 15, marginVertical: 15 }}>
-                                            <SearchBar
-                                                placeholder="Search"
-                                                onPress={() => { setSearchUserQuery('') }}
-                                                onChangeText={setSearchUserQuery}
-                                                style={{ backgroundColor: '#ECEFF1', width: '100%', marginBottom: 10 }} />
-
-
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                        </View>
-
-                                    </View>
-                                </View>
-                            </ScrollView>
-                        </Animated.View>
+                            </View>
+                        </BottomSheet>
                     </View>
                 );
         }
     }
 
     return (
-        <SafeAreaView style={{ backgroundColor: isBottomPostVisible ? '#00000060' : 'transparent', flex: 1 }}>
+        <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
             <TouchableOpacity activeOpacity={1} style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
                     {renderView()}
