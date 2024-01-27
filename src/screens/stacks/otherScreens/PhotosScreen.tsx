@@ -29,11 +29,6 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
     const [photos, setPhotos] = useState<any>([]);
     const [fabOpen, setFabOpen] = useState(false);
 
-    useFocusEffect(() => {
-        setAlbumName(route.params?.albumName);
-        setAlbumId(route.params?.albumId);
-    })
-
     useEffect(() => {
         setAlbumName(route.params?.albumName);
         setAlbumId(route.params?.albumId);
@@ -43,6 +38,11 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
         navigation.setOptions({
             headerTitle: route.params?.albumName,
         });
+
+        return () => {
+            setAlbumName(route.params?.albumName);
+            setAlbumId(route.params?.albumId);
+        }
     }, [navigation]);
 
     //api functions
