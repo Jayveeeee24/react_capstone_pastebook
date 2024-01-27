@@ -10,13 +10,15 @@ interface IndividualPostProps {
     post: any;
     likes: number,
     comments: number,
-    onLikePress: () => void,
     setIsBottomSheetVisible: (isTrue: boolean) => void,
+    setSelectedPostId: (postId: string) => void;
+    setSelectedPoster: (post: {}) => void;
+    onGetComments: (postId: string) => Promise<any>;
     navigation: any;
     route: any;
 }
 
-export const IndividualPost: React.FC<IndividualPostProps> = ({ post, likes, comments, onLikePress, setIsBottomSheetVisible, navigation, route }) => {
+export const IndividualPost: React.FC<IndividualPostProps> = ({ post, onGetComments, setSelectedPostId, setSelectedPoster, likes, comments, setIsBottomSheetVisible, navigation, route }) => {
     const width = Dimensions.get('window').width;
 
 
@@ -58,7 +60,12 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, likes, com
                             <TouchableOpacity onPress={() => { }}>
                                 <MaterialCommunityIcons name="cards-heart-outline" size={30} color="black" />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => setIsBottomSheetVisible(true)}>
+                            <TouchableOpacity onPress={() => {
+                                setSelectedPoster(post.poster);
+                                setSelectedPostId(post.id);
+                                onGetComments(post.id);
+                                setIsBottomSheetVisible(true);
+                            }}>
                                 <MaterialCommunityIcons name="comment-outline" size={26} color="black" />
                             </TouchableOpacity>
                         </View>
@@ -81,7 +88,12 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, likes, com
                         </ReadMore>
 
 
-                        <TouchableOpacity onPress={() => setIsBottomSheetVisible(true)}>
+                        <TouchableOpacity onPress={() => {
+                            setSelectedPoster(post.poster);
+                            setSelectedPostId(post.id);
+                            onGetComments(post.id);
+                            setIsBottomSheetVisible(true);
+                        }}>
                             <Text style={{ color: 'gray' }}>View all {comments} comments</Text>
                         </TouchableOpacity>
                     </View>

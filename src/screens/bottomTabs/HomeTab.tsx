@@ -12,6 +12,8 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { usePost } from "../../context/PostContext";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { IndividualComment } from "../../components/IndividualComment";
+import { useComment } from "../../context/CommentContext";
+import { useToast } from "react-native-toast-notifications";
 
 interface HomeTabProps {
     navigation: any;
@@ -19,10 +21,12 @@ interface HomeTabProps {
 }
 
 export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
+    const toast = useToast();
     const { getAllFriends } = useFriend();
     const { getProfile } = useUser();
     const { getPhotoById } = usePhoto();
     const { getNewsfeedPosts } = usePost();
+    const { addComment, getComments } = useComment();
 
     const [isScrollLoading, setIsScrollLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
@@ -34,6 +38,12 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
 
     const [friends, setFriends] = useState<any>([]);
     const [posts, setPosts] = useState<any>([]);
+    const [comments, setComments] = useState<any>([]);
+
+
+    const [selectedPostId, setSelectedPostId] = useState('');
+    const [selectedPoster, setSelectedPoster] = useState<any>();
+    const [commentContent, setCommentContent] = useState('');
 
     useFocusEffect(() => {
         loadProfile();
@@ -96,11 +106,39 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
             console.error("Error fetching photos:", error.response);
         }
     }
+    const onGetComments = async (postId: string) => {
+        try {
+            const result = getComments ? await getComments(postId) : undefined;
+
+            if (await result) {
+                console.log(result.length)
+            }
+
+        } catch (error: any) {
+            console.error("Error fetching photos:", error.response);
+        }
+    }
+    const onAddComment = async () => {
+        if (!commentContent.trim()) {
+            toast.show('All fields are required', { type: 'danger' });
+        } else {
+            try {
+                const result = addComment ? await addComment(commentContent, selectedPostId) : undefined;
+                if (result) {
+                    onGetComments(selectedPostId);
+                }
+                setCommentContent('');
+            } catch (error: any) {
+                toast.show("An unexpected error occurred", { type: 'danger' });
+                console.log(error);
+            }
+        }
+    }
+
 
     //scroll refresh
     const handleRefresh = useCallback(() => {
         setRefreshing(true);
-
         getPosts();
         setRefreshing(false);
     }, []);
@@ -121,14 +159,14 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             {isLoading ? (
-                <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                     <ActivityIndicator size="large" color={Colors.primaryBrand} />
                 </View>
             ) : (
                 <FlatList
                     data={posts}
                     onScroll={handleScroll}
-                    renderItem={({ item }) => <IndividualPost post={item} comments={754} likes={31321} onLikePress={() => { }} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={undefined} route={undefined} />}
+                    renderItem={({ item }) => <IndividualPost post={item} setSelectedPostId={setSelectedPostId} setSelectedPoster={setSelectedPoster} onGetComments={onGetComments} comments={754} likes={31321} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={undefined} route={undefined} />}
                     keyExtractor={(item) => item.id}
                     showsVerticalScrollIndicator={false}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
@@ -139,15 +177,11 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                                     <View style={{ marginStart: 15 }}>
                                         <UserAvatar item={{ id: userId, photo: { photoImageURL: profilePicture }, firstName: firstName }} navigation={navigation} route={route} />
                                     </View>
-                                    <FlatList
-                                        data={friends}
-                                        scrollEnabled={friends.length > 4}
-                                        renderItem={({ item }) => <UserAvatar item={item} navigation={navigation} route={route} />}
-                                        keyExtractor={(item) => item.id}
-                                        contentContainerStyle={[styles.friendsView]}
-                                        horizontal
-                                        showsHorizontalScrollIndicator={false}
-                                    />
+                                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.friendsView}>
+                                        {friends.map((item: any) => (
+                                            <UserAvatar key={item.id} item={item} navigation={navigation} route={route} />
+                                        ))}
+                                    </ScrollView>
                                 </View>
                             </View>
                         </TouchableWithoutFeedback>
@@ -167,11 +201,12 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                     shadowRadius: 20,
                     shadowColor: 'black',
                     elevation: 20,
-                    zIndex: 1
-                }}>
+                    zIndex: 1,
+                }}
+            >
                 <View style={{ flex: 1 }}>
-                    <View style={{ flex: 0, borderBottomColor: 'gray', borderBottomWidth: 0.2, paddingTop: 20, paddingBottom: 10 }} >
-                        <Text style={{ textAlign: "center", fontSize: 16, color: 'black', fontWeight: '500' }}>Comments</Text>
+                    <View style={{ flex: 0, borderBottomColor: 'gray', borderBottomWidth: 0.2, paddingTop: 20, paddingBottom: 10 }}>
+                        <Text style={{ textAlign: 'center', fontSize: 16, color: 'black', fontWeight: '500' }}>Comments</Text>
                     </View>
 
                     <View style={{ flex: 0, borderBottomColor: 'gray', borderBottomWidth: 0.2 }}>
@@ -179,21 +214,25 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                             <Image source={Images.sample_avatar} resizeMode="cover" style={{ aspectRatio: 1, width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: Colors.orange }} />
 
                             <TextInput
-                                placeholder="Add a comment for jayvee.artemis ..."
+                                placeholder={selectedPoster ? `Add a comment for ${selectedPoster.firstName.toLowerCase().replace(/\s/g, '')}.${selectedPoster.lastName.toLowerCase()} ...` : ``}
                                 style={{ fontFamily: 'Roboto-Medium', color: 'black', fontSize: 15, flex: 1, backgroundColor: 'transparent' }}
-                                value={''}
-                                onChangeText={() => { }}
+                                value={commentContent}
+                                onChangeText={setCommentContent}
                                 placeholderTextColor={'#666'} />
 
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={onAddComment}>
                                 <MaterialCommunityIcons name="send" size={26} color={Colors.primaryBrand} />
                             </TouchableOpacity>
                         </View>
                     </View>
+
                     <View style={{ flex: 1, marginVertical: 20 }}>
-                        <ScrollView>
-                            <IndividualComment />
-                        </ScrollView>
+                        <FlatList
+                            data={comments}
+                            renderItem={({ item }) => <IndividualComment comment={item} navigation={navigation} route={route} />}
+                            keyExtractor={(item) => item.id}
+                            showsVerticalScrollIndicator={false}
+                        />
                     </View>
                 </View>
             </BottomSheet>

@@ -25,6 +25,7 @@ import { AlbumProvider } from './src/context/AlbumContext';
 import { PostProvider } from './src/context/PostContext';
 import { PaperProvider } from 'react-native-paper';
 import { FriendProvider } from './src/context/FriendContext';
+import { CommentProvider } from './src/context/CommentContext';
 
 
 function App(): React.JSX.Element {
@@ -85,11 +86,13 @@ function App(): React.JSX.Element {
               <PostProvider>
                 <AlbumProvider>
                   <FriendProvider>
-                    <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
-                      <NavigationContainer>
-                        <AppStack />
-                      </NavigationContainer>
-                    </GestureHandlerRootView>
+                    <CommentProvider>
+                      <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
+                        <NavigationContainer>
+                          <AppStack />
+                        </NavigationContainer>
+                      </GestureHandlerRootView>
+                    </CommentProvider>
                   </FriendProvider>
                 </AlbumProvider>
               </PostProvider>
