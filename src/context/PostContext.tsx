@@ -5,6 +5,7 @@ import axios from "axios";
 interface PostContextProps {
     addPost?: (postTitle: string, postBody: string, datePosted: Date, userId: string, photoId?: string) => Promise<any>;
     deletePost?: (postId: string) => Promise<any>;
+    getNewsfeedPosts?: () => {};
 }
 
 interface PostProviderProps {
@@ -39,10 +40,55 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
         }
     }
 
+    const getNewsfeedPosts = async () => {
+        try {
+            const result = await axios.get(`${BASE_URL}/api/timeline/get-newsfeed-posts`);
+
+            return result.data;
+            // if (result && Array.isArray(result.data)) {
+            //     const updatedAlbums = await Promise.all(
+            //         result.data.map(async (item: { firstPhoto: any }) => {
+            //             try {
+            //                 const photoId = item.firstPhoto.id;
+            //                 if (photoId == '00000000-0000-0000-0000-000000000000') {
+            //                     return item;
+            //                 }
+
+            //                 const photo = getPhotoById ? await getPhotoById(item.firstPhoto.id) : undefined;
+            //                 if (photo) {
+            //                     return {
+            //                         ...item,
+            //                         firstPhoto: {
+            //                             ...item.firstPhoto,
+            //                             photo: await photo,
+            //                         },
+            //                     };
+            //                 } else {
+            //                     console.error(`Error fetching photo for album with ID ${photoId}: Photo not found`);
+            //                     return item;
+            //                 }
+            //             } catch (error: any) {
+            //                 console.error("Error fetching photo:", error);
+            //                 return item;
+            //             }
+            //         })
+            //     );
+
+            //     return updatedAlbums;
+            // } else {
+            //     console.error("Invalid data format:", result.data);
+            //     return [];
+            // }
+        } catch (error: any) {
+            return error.response?.data?.result || "An unexpected error occurred";
+        }
+    }
+
 
     const contextValue: PostContextProps = {
         addPost,
-        deletePost
+        deletePost,
+        getNewsfeedPosts
     }
 
     return (

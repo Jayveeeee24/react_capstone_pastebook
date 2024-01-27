@@ -1,65 +1,48 @@
-import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, ImageSourcePropType } from "react-native";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import { View, Text, Image, StyleSheet, TouchableOpacity, ImageSourcePropType, Dimensions } from "react-native";
 import { Card, Menu, PaperProvider } from "react-native-paper";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ReadMore from 'react-native-read-more-text';
-import { CommentModal } from "./modals/CommentModal";
-
+import { Images } from "../utils/Images";
 
 interface IndividualPostProps {
-    name: string;
-    avatarUrl: ImageSourcePropType;
-    postImageUrl: ImageSourcePropType,
-    postTitle: string,
-    postCaption: string,
+    post: any;
     likes: number,
     comments: number,
-    onLikePress: () => void
+    onLikePress: () => void,
+    setIsBottomSheetVisible: (isTrue: boolean) => void,
+    navigation: any;
+    route: any;
 }
 
-export const IndividualPost: React.FC<IndividualPostProps> = ({ name, avatarUrl, postImageUrl, postTitle, postCaption, likes, comments, onLikePress }) => {
-    const [isModalVisible, setModalVisible] = useState(false);
-    const [isMenuVisible, setIsMenuVisible] = useState(false);
+export const IndividualPost: React.FC<IndividualPostProps> = ({ post, likes, comments, onLikePress, setIsBottomSheetVisible, navigation, route }) => {
+    const width = Dimensions.get('window').width;
 
-    const toggleModal = () => {
-        setModalVisible(!isModalVisible);
-    };
 
     return (
-        <PaperProvider>
-            <View style={styles.container}>
-
+        <View style={styles.container}>
+            <View style={{ flex: 1 }}>
                 <View style={styles.headerContainer}>
                     <TouchableOpacity onPress={() => { }}>
                         <View style={styles.avatarContainer}>
                             <Card style={styles.avatarCard}>
-                                <Card.Cover resizeMode="cover" source={avatarUrl} style={styles.avatarImage} />
+                                <Card.Cover resizeMode="cover" source={Images.sample_avatar_female} style={styles.avatarImage} />
                             </Card>
-                            <Text style={[styles.avatarText, styles.text]}>{name}</Text>
+                            <Text style={[styles.avatarText, styles.text]}>jayvee.artemis</Text>
                         </View>
                     </TouchableOpacity>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                         <TouchableOpacity style={{ backgroundColor: 'lightgray', borderRadius: 5, paddingHorizontal: 14, paddingVertical: 5 }}>
                             <Text style={[styles.text, { fontWeight: '500' }]}>Follow</Text>
                         </TouchableOpacity>
-                        <View>
-                            <Menu
-                                visible={isMenuVisible}
-                                onDismiss={() => setIsMenuVisible(false)}   
-                                anchor={
-                                    <TouchableOpacity onPress={() => setIsMenuVisible(true)}>
-                                        <MaterialCommunityIcons name="dots-vertical" size={20} color="#666" />
-                                    </TouchableOpacity>
-                                }>
-                                <Menu.Item onPress={() => { }} title="Edit" />
-                                <Menu.Item onPress={() => { }} title="Delete" />
-                            </Menu>
-                        </View>
+                        <TouchableOpacity onPress={() => { }}>
+                            <MaterialCommunityIcons name="dots-vertical" size={20} color="#666" />
+                        </TouchableOpacity>
                     </View>
                 </View>
 
                 <View style={styles.postImageContainer}>
-                    <Image source={postImageUrl} resizeMode="cover" style={styles.postImage} />
+                    <Image source={Images.sample_post_image_10} resizeMode="cover" style={[styles.postImage, { width: width, height: width }]} />
                 </View>
 
                 <View style={{ flexDirection: "column" }}>
@@ -68,40 +51,36 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ name, avatarUrl,
                             <TouchableOpacity onPress={() => { }}>
                                 <MaterialCommunityIcons name="cards-heart-outline" size={30} color="black" />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={toggleModal}>
+                            <TouchableOpacity onPress={() => setIsBottomSheetVisible(true)}>
                                 <MaterialCommunityIcons name="comment-outline" size={26} color="black" />
                             </TouchableOpacity>
                         </View>
                         <Text style={styles.text}>22 hours ago</Text>
                     </View>
 
-                    <CommentModal isVisible={isModalVisible} onClose={toggleModal} />
-
                     <View style={{ flexDirection: "column", marginStart: 12, gap: 2, marginBottom: 10 }}>
-                        <Text style={styles.text}>
-                            <Text>Liked by </Text>
-                            <Text style={[{ fontWeight: "900" }]}>yashimallow</Text>
-                            <Text> and </Text>
-                            <Text style={[{ fontWeight: "900" }]}>{likes.toLocaleString()} others</Text>
-                        </Text>
-                        <View>
-                            <ReadMore
-                                numberOfLines={2}
-                                renderTruncatedFooter={(handlePress: () => void) => <Text style={[styles.text, { fontWeight: '500' }]} onPress={handlePress}>... more</Text>}
-                                renderRevealedFooter={(handlePress: () => void) => <Text style={[styles.text, { fontWeight: '500' }]} onPress={handlePress}>... less</Text>}
-                                onReady={() => { }}>
-                                <Text style={[styles.text, { fontWeight: "900" }]}>{postTitle}</Text>
-                                <Text> </Text>
-                                <Text style={styles.text}>{postCaption}</Text>
-                            </ReadMore>
-                        </View>
+                        <TouchableOpacity onPress={() => navigation.navigate('Likes')}>
+                            <Text style={[{ fontWeight: "500", color: 'black' }]}>{likes.toLocaleString()} likes</Text>
+                        </TouchableOpacity>
+                        
+                        <ReadMore
+                            numberOfLines={2}
+                            renderTruncatedFooter={(handlePress: () => void) => <Text style={[styles.text, { fontWeight: '500' }]} onPress={handlePress}>... more</Text>}
+                            renderRevealedFooter={(handlePress: () => void) => <Text style={[styles.text, { fontWeight: '500' }]} onPress={handlePress}>... less</Text>}
+                            onReady={() => { }}>
+                            <Text style={[styles.text, { fontWeight: "900" }]}>This is a title</Text>
+                            <Text> </Text>
+                            <Text style={styles.text}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Maxime deleniti sequi, aliquid laborum aperiam mollitia non officia eos repellat velit voluptatem animi corporis asperiores rem labore perspiciatis expedita impedit delectus?</Text>
+                        </ReadMore>
 
-                        <Text style={{ color: 'gray' }}>View all {comments} comments</Text>
+                        <TouchableOpacity onPress={() => setIsBottomSheetVisible(true)}>
+                            <Text style={{ color: 'gray' }}>View all {comments} comments</Text>
+                        </TouchableOpacity>
                     </View>
-
                 </View>
+
             </View>
-        </PaperProvider>
+        </View>
     );
 };
 

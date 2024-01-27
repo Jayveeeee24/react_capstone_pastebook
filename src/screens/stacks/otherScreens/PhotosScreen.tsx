@@ -9,7 +9,6 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { MediaType, launchImageLibrary } from 'react-native-image-picker';
 import { useToast } from "react-native-toast-notifications";
 import { useAlbum } from "../../../context/AlbumContext";
-import { useFocusEffect } from "@react-navigation/native";
 
 interface PhotoScreenProps {
     navigation: any;

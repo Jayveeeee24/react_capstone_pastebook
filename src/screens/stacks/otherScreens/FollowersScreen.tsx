@@ -16,7 +16,7 @@ export const FollowersScreen = () => {
                         onChangeText={setSearchQuery}
                         style={{ backgroundColor: '#ECEFF1', width: '100%' }}/>
                 </View>
-                <View style={{flexDirection: "column", marginTop: 15}}>
+                <View style={{flexDirection: "column", marginTop: 15, marginHorizontal: 10}}>
                     <IndividualFollower />
                     <IndividualFollower />
                     <IndividualFollower />
