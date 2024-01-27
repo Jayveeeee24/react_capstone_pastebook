@@ -106,8 +106,10 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ navigation
                     if (result) {
                         try {
                             const profilePicResult = changeProfilePic ? await changeProfilePic(result) : undefined;
-                            if(profilePicResult.id){
+                            if (profilePicResult.id) {
                                 loadProfile();
+                            } else {
+                                toast.show("An unexpected error occurred", { type: 'danger' });
                             }
                         } catch (error: any) {
                             toast.show("An unexpected error occurred", { type: 'danger' });

@@ -2,15 +2,43 @@ import { FlatList, Image, RefreshControl, SafeAreaView, ScrollView, StyleSheet, 
 import { UserAvatar } from "../../components/customComponents/UserAvatar";
 import { Images } from "../../utils/Images";
 import { IndividualPost } from "../../components/IndividualPost";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useFriend } from "../../context/FriendContext";
+import { Storage } from "../../utils/Config";
 
-export const HomeTab = () => {
+interface HomeTabProps {
+    navigation: any;
+    route: any;
+}
 
+export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
+    const { getAllFriends } = useFriend();
 
-    const [loading, setLoading] = useState(false);
+    const [isScrollLoading, setIsScrollLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-    const [friends, setFriends] = useState([{}]);
+    const [friends, setFriends] = useState<any>([]);
 
+    useEffect(() => {
+        getFriends();
+    }, []);
+
+    //api functions
+    const getFriends = async () => {
+        try {
+            const userId = Storage.getString('userId');
+
+            if (userId) {
+                const result = getAllFriends ? await getAllFriends(userId) : undefined;
+                if (result) {
+                    setFriends(result);
+                }
+            }
+        } catch (error: any) {
+            console.error("Error fetching photos:", error.response);
+        }
+    }
+
+    //scroll refresh
     const handleRefresh = useCallback(() => {
         setRefreshing(true);
 
@@ -18,21 +46,19 @@ export const HomeTab = () => {
             setRefreshing(false);
         }, 1000);
     }, []);
-
     const handleScroll = (event: { nativeEvent: { layoutMeasurement: any; contentOffset: any; contentSize: any; }; }) => {
         const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
         const isEndReached = layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
 
-        if (isEndReached && !loading) {
-            setLoading(true);
+        if (isEndReached && !isScrollLoading) {
+            setIsScrollLoading(true);
 
             setTimeout(() => {
                 // setFriends((prevFriends) => [...prevFriends, ...newData]);
-                setLoading(false);
+                setIsScrollLoading(false);
             }, 1000);
         }
     };
-
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -43,13 +69,15 @@ export const HomeTab = () => {
                     <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
                 }>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', borderBottomColor: 'lightgray', borderBottomWidth: 1 }}>
-                    {/* <FlatList
+                    <FlatList
                         data={friends}
-                        renderItem={({ item }) => <UserAvatar name={item.name} imageUrl={item.imageUrl} />}
+                        renderItem={({ item }) => <UserAvatar item={item} navigation={navigation} route={route} />}
                         keyExtractor={(item) => item.id}
                         contentContainerStyle={[styles.friendsView]}
                         horizontal
-                        showsHorizontalScrollIndicator={false} /> */}
+                        showsHorizontalScrollIndicator={false}
+                    />
+
                 </View>
                 <View style={styles.postsContainer}>
                     {/* <IndividualPost name='jayvee.artemis' avatarUrl={Images.sample_avatar} postImageUrl={Images.sample_post_image} postTitle="This is a post" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={910} likes={1654432} onLikePress={() => { }} />
@@ -57,7 +85,7 @@ export const HomeTab = () => {
                     <IndividualPost name='blec_siopao' avatarUrl={Images.sample_avatar_female} postImageUrl={Images.sample_post_image_3} postTitle="This is a post 3" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={3} likes={5} onLikePress={() => { }} />
                     <IndividualPost name='hmzzjin' avatarUrl={Images.sample_avatar_female} postImageUrl={Images.sample_post_image_4} postTitle="This is a post 4" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={10341} likes={3134221} onLikePress={() => { }} /> */}
 
-                    
+
                 </View>
             </ScrollView>
 

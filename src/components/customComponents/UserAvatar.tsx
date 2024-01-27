@@ -5,20 +5,22 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { Colors } from "../../utils/Config";
 
 interface UserAvatarProps {
-    name: string;
-    imageUrl: ImageSourcePropType;
+    item: any;
+    navigation: any;
+    route: any;
 }
 
-export const UserAvatar: React.FC<UserAvatarProps> = ({ name, imageUrl }) => {
+
+export const UserAvatar: React.FC<UserAvatarProps> = ({ item, navigation, route }) => {
     return (
         <View>
             <TouchableOpacity>
                 <Card style={styles.avatarContainer}>
-                    <Card.Cover resizeMode="cover" source={imageUrl} style={styles.avatarImage} />
+                    <Card.Cover resizeMode="cover" source={{ uri: item.photo.photoImageURL }} style={styles.avatarImage} />
                 </Card>
             </TouchableOpacity>
             <View style={styles.textContainer}>
-                <Title style={styles.text}>{name}</Title>
+                <Title style={styles.text}>{item.firstName.split(' ')[0]}</Title>
             </View>
         </View>
     );
