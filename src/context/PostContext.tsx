@@ -51,8 +51,8 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
                     result.data.map(async (post) => {
                         const updatedPost = { ...post };
 
-                        if (updatedPost.photo && updatedPost.photo.photoImageURL) {
-                            updatedPost.photo.photoImageURL = getPhotoById ? await getPhotoById(updatedPost.photo.id) : undefined;
+                        if (updatedPost.photo && updatedPost.photoId) {
+                            updatedPost.photo.photoImageURL = getPhotoById ? await getPhotoById(post.photoId) : undefined;
                         }
 
                         if (updatedPost.poster && updatedPost.poster.photo && updatedPost.poster.photo.photoImageURL) {

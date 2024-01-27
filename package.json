@@ -10,7 +10,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "@fawazahmed/react-native-read-more": "^3.0.3",
     "@gorhom/bottom-sheet": "^4.6.0",
     "@nghinv/react-native-search-bar": "^0.2.0",
     "@react-native-camera-roll/camera-roll": "^7.4.0",
@@ -23,6 +22,7 @@
     "@react-navigation/native-stack": "^6.5.11",
     "@react-navigation/stack": "^6.3.20",
     "axios": "^1.6.5",
+    "date-fns": "^3.3.1",
     "react": "18.2.0",
     "react-native": "0.73.1",
     "react-native-dynamic-search-bar": "^2.0.2",

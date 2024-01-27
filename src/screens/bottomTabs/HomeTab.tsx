@@ -1,4 +1,4 @@
-import { FlatList, Image, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { ActivityIndicator, FlatList, Image, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { UserAvatar } from "../../components/customComponents/UserAvatar";
 import { Images } from "../../utils/Images";
 import { IndividualPost } from "../../components/IndividualPost";
@@ -26,6 +26,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
 
     const [isScrollLoading, setIsScrollLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [firstName, setFirstName] = useState('');
     const [profilePicture, setProfilePicture] = useState<any>();
@@ -39,8 +40,10 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     })
 
     useEffect(() => {
+        setIsLoading(true);
         getFriends();
         getPosts();
+        setIsLoading(false);
     }, []);
 
     const commentBottomSheetRef = useRef<BottomSheet>(null);
@@ -86,11 +89,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     const getPosts = async () => {
         try {
             const result = getNewsfeedPosts ? await getNewsfeedPosts() : undefined;
-            console.log(result);
             if (result) {
                 setPosts(result);
             }
-
         } catch (error: any) {
             console.error("Error fetching photos:", error.response);
         }
@@ -100,9 +101,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     const handleRefresh = useCallback(() => {
         setRefreshing(true);
 
-        setTimeout(() => {
-            setRefreshing(false);
-        }, 1000);
+        getPosts();
+        setRefreshing(false);
     }, []);
     const handleScroll = (event: { nativeEvent: { layoutMeasurement: any; contentOffset: any; contentSize: any; }; }) => {
         const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
@@ -120,34 +120,40 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-            <FlatList
-                data={posts}
-                onScroll={handleScroll}
-                renderItem={({ item }) => <IndividualPost post={item} comments={754} likes={31321} onLikePress={() => { }} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={undefined} route={undefined} />}
-                keyExtractor={(item) => item.id}
-                showsVerticalScrollIndicator={false}
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
-                ListHeaderComponent={
-                    <TouchableWithoutFeedback onPress={() => commentBottomSheetRef.current && commentBottomSheetRef.current.close()}>
-                        <View>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', borderBottomColor: 'lightgray', borderBottomWidth: 1 }}>
-                                <View style={{ marginStart: 15 }}>
-                                    <UserAvatar item={{ id: userId, photo: { photoImageURL: profilePicture }, firstName: firstName }} navigation={navigation} route={route} />
+            {isLoading ? (
+                <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                    <ActivityIndicator size="large" color={Colors.primaryBrand} />
+                </View>
+            ) : (
+                <FlatList
+                    data={posts}
+                    onScroll={handleScroll}
+                    renderItem={({ item }) => <IndividualPost post={item} comments={754} likes={31321} onLikePress={() => { }} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={undefined} route={undefined} />}
+                    keyExtractor={(item) => item.id}
+                    showsVerticalScrollIndicator={false}
+                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+                    ListHeaderComponent={
+                        <TouchableWithoutFeedback onPress={() => commentBottomSheetRef.current && commentBottomSheetRef.current.close()}>
+                            <View>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', borderBottomColor: 'lightgray', borderBottomWidth: 1 }}>
+                                    <View style={{ marginStart: 15 }}>
+                                        <UserAvatar item={{ id: userId, photo: { photoImageURL: profilePicture }, firstName: firstName }} navigation={navigation} route={route} />
+                                    </View>
+                                    <FlatList
+                                        data={friends}
+                                        scrollEnabled={friends.length > 4}
+                                        renderItem={({ item }) => <UserAvatar item={item} navigation={navigation} route={route} />}
+                                        keyExtractor={(item) => item.id}
+                                        contentContainerStyle={[styles.friendsView]}
+                                        horizontal
+                                        showsHorizontalScrollIndicator={false}
+                                    />
                                 </View>
-                                <FlatList
-                                    data={friends}
-                                    scrollEnabled={friends.length > 4}
-                                    renderItem={({ item }) => <UserAvatar item={item} navigation={navigation} route={route} />}
-                                    keyExtractor={(item) => item.id}
-                                    contentContainerStyle={[styles.friendsView]}
-                                    horizontal
-                                    showsHorizontalScrollIndicator={false}
-                                />
                             </View>
-                        </View>
-                    </TouchableWithoutFeedback>
-                }
-            />
+                        </TouchableWithoutFeedback>
+                    }
+                />
+            )}
 
             <BottomSheet
                 ref={commentBottomSheetRef}

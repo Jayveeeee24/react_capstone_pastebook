@@ -3,7 +3,8 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, ImageSourcePropType, D
 import { Card, Menu, PaperProvider } from "react-native-paper";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Images } from "../utils/Images";
-import ReadMore from '@fawazahmed/react-native-read-more';
+import { convertToRelativeTime } from "../utils/Config";
+import ReadMore from 'react-native-read-more-text';
 
 interface IndividualPostProps {
     post: any;
@@ -26,7 +27,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, likes, com
                     <TouchableOpacity onPress={() => { }}>
                         <View style={styles.avatarContainer}>
                             <Card style={styles.avatarCard}>
-                                <Card.Cover resizeMode="cover" source={{uri: post.poster.photo.photoImageURL}} style={styles.avatarImage} />
+                                <Card.Cover resizeMode="cover" source={post.poster.photo.photoImageURL ? { uri: post.poster.photo.photoImageURL } : Images.sample_avatar_neutral} style={styles.avatarImage} />
                             </Card>
                             <Text style={[styles.avatarText, styles.text]}>
                                 {`${post.poster.firstName.toLowerCase().replace(/\s/g, '')}.${post.poster.lastName.toLowerCase()}` +
@@ -48,7 +49,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, likes, com
                 </View>
 
                 <View style={styles.postImageContainer}>
-                    <Image source={Images.sample_post_image_10} resizeMode="cover" style={[styles.postImage, { width: width, height: width }]} />
+                    <Image source={{uri: post.photo.photoImageURL}} resizeMode="cover" style={[styles.postImage, { width: width, height: width }]} />
                 </View>
 
                 <View style={{ flexDirection: "column" }}>
@@ -61,7 +62,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, likes, com
                                 <MaterialCommunityIcons name="comment-outline" size={26} color="black" />
                             </TouchableOpacity>
                         </View>
-                        <Text style={[styles.text]}>{post.datePosted}</Text>
+                        <Text style={[styles.text]}>{convertToRelativeTime(post.datePosted)}</Text>
                     </View>
 
                     <View style={{ flexDirection: "column", marginStart: 12, gap: 2, marginBottom: 10 }}>
@@ -69,15 +70,15 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, likes, com
                             <Text style={[{ fontWeight: "500", color: 'black' }]}>{likes.toLocaleString()} likes</Text>
                         </TouchableOpacity>
 
-
-                        <View style={{ width: width, maxWidth: '95%' }}>
-                            <ReadMore numberOfLines={3} style={{ fontSize: 14, color: '#455A64', fontFamily: 'Roboto-Medium' }} seeLessStyle={{ color: 'black', fontWeight: '700' }} seeMoreStyle={{ color: 'black', fontWeight: '700' }}>
-                                {
-                                    <Text style={{}}>{post.postTitle}: {post.postBody}</Text>
-                                }
-                            </ReadMore>
-                        </View>
-
+                        <ReadMore
+                            numberOfLines={2}
+                            renderTruncatedFooter={(handlePress: () => void) => <Text style={[styles.text, { fontWeight: '700' }]} onPress={handlePress}>See more</Text>}
+                            renderRevealedFooter={(handlePress: () => void) => <Text style={[styles.text, { fontWeight: '500' }]} onPress={handlePress}>See less</Text>}
+                            onReady={() => { }}>
+                            <Text style={[styles.text, { fontWeight: "900" }]}>{post.postTitle}</Text>
+                            <Text> </Text>
+                            <Text style={styles.text}>{post.postBody}</Text>
+                        </ReadMore>
 
 
                         <TouchableOpacity onPress={() => setIsBottomSheetVisible(true)}>
