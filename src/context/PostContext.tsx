@@ -1,11 +1,12 @@
 import { ReactNode, createContext, useContext } from "react";
 import { BASE_URL } from "../utils/Config";
 import axios from "axios";
+import { usePhoto } from "./PhotoContext";
 
 interface PostContextProps {
     addPost?: (postTitle: string, postBody: string, datePosted: Date, userId: string, photoId?: string) => Promise<any>;
     deletePost?: (postId: string) => Promise<any>;
-    getNewsfeedPosts?: () => {};
+    getNewsfeedPosts?: () => Promise<any>;
 }
 
 interface PostProviderProps {
@@ -19,6 +20,7 @@ export const usePost = () => {
 }
 
 export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
+    const { getPhotoById } = usePhoto();
 
     const addPost = async (postTitle: string, postBody: string, datePosted: Date, userId: string, photoId?: string) => {
         try {
@@ -44,45 +46,37 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
         try {
             const result = await axios.get(`${BASE_URL}/api/timeline/get-newsfeed-posts`);
 
-            return result.data;
-            // if (result && Array.isArray(result.data)) {
-            //     const updatedAlbums = await Promise.all(
-            //         result.data.map(async (item: { firstPhoto: any }) => {
-            //             try {
-            //                 const photoId = item.firstPhoto.id;
-            //                 if (photoId == '00000000-0000-0000-0000-000000000000') {
-            //                     return item;
-            //                 }
+            if (result && Array.isArray(result.data)) {
+                const updatedPosts = await Promise.all(
+                    result.data.map(async (post) => {
+                        const updatedPost = { ...post };
 
-            //                 const photo = getPhotoById ? await getPhotoById(item.firstPhoto.id) : undefined;
-            //                 if (photo) {
-            //                     return {
-            //                         ...item,
-            //                         firstPhoto: {
-            //                             ...item.firstPhoto,
-            //                             photo: await photo,
-            //                         },
-            //                     };
-            //                 } else {
-            //                     console.error(`Error fetching photo for album with ID ${photoId}: Photo not found`);
-            //                     return item;
-            //                 }
-            //             } catch (error: any) {
-            //                 console.error("Error fetching photo:", error);
-            //                 return item;
-            //             }
-            //         })
-            //     );
+                        if (updatedPost.photo && updatedPost.photo.photoImageURL) {
+                            updatedPost.photo.photoImageURL = getPhotoById ? await getPhotoById(updatedPost.photo.id) : undefined;
+                        }
 
-            //     return updatedAlbums;
-            // } else {
-            //     console.error("Invalid data format:", result.data);
-            //     return [];
-            // }
+                        if (updatedPost.poster && updatedPost.poster.photo && updatedPost.poster.photo.photoImageURL) {
+                            updatedPost.poster.photo.photoImageURL = getPhotoById ? await getPhotoById(updatedPost.poster.photo.id) : undefined;
+                        }
+
+                        if (updatedPost.timeline && updatedPost.timeline.user && updatedPost.timeline.user.photo && updatedPost.timeline.user.photo.photoImageURL) {
+                            updatedPost.timeline.user.photo.photoImageURL = getPhotoById ? await getPhotoById(updatedPost.timeline.user.photo.id) : undefined;
+                        }
+
+                        return updatedPost;
+                    })
+                );
+
+                return updatedPosts;
+            } else {
+                console.error("Invalid data format received from the server");
+                return result.data;
+            }
         } catch (error: any) {
             return error.response?.data?.result || "An unexpected error occurred";
         }
-    }
+    };
+
 
 
     const contextValue: PostContextProps = {

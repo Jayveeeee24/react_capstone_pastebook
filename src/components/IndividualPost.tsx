@@ -2,8 +2,8 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity, ImageSourcePropType, Dimensions } from "react-native";
 import { Card, Menu, PaperProvider } from "react-native-paper";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import ReadMore from 'react-native-read-more-text';
 import { Images } from "../utils/Images";
+import ReadMore from '@fawazahmed/react-native-read-more';
 
 interface IndividualPostProps {
     post: any;
@@ -26,9 +26,15 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, likes, com
                     <TouchableOpacity onPress={() => { }}>
                         <View style={styles.avatarContainer}>
                             <Card style={styles.avatarCard}>
-                                <Card.Cover resizeMode="cover" source={Images.sample_avatar_female} style={styles.avatarImage} />
+                                <Card.Cover resizeMode="cover" source={{uri: post.poster.photo.photoImageURL}} style={styles.avatarImage} />
                             </Card>
-                            <Text style={[styles.avatarText, styles.text]}>jayvee.artemis</Text>
+                            <Text style={[styles.avatarText, styles.text]}>
+                                {`${post.poster.firstName.toLowerCase().replace(/\s/g, '')}.${post.poster.lastName.toLowerCase()}` +
+                                    (post.poster.id === post.timeline.userId
+                                        ? ''
+                                        : ` @ ${post.timeline.user.firstName.toLowerCase().replace(/\s/g, '')}.${post.timeline.user.lastName.toLowerCase()}`)}
+                            </Text>
+
                         </View>
                     </TouchableOpacity>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
@@ -55,23 +61,24 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, likes, com
                                 <MaterialCommunityIcons name="comment-outline" size={26} color="black" />
                             </TouchableOpacity>
                         </View>
-                        <Text style={styles.text}>22 hours ago</Text>
+                        <Text style={[styles.text]}>{post.datePosted}</Text>
                     </View>
 
                     <View style={{ flexDirection: "column", marginStart: 12, gap: 2, marginBottom: 10 }}>
                         <TouchableOpacity onPress={() => navigation.navigate('Likes')}>
                             <Text style={[{ fontWeight: "500", color: 'black' }]}>{likes.toLocaleString()} likes</Text>
                         </TouchableOpacity>
-                        
-                        <ReadMore
-                            numberOfLines={2}
-                            renderTruncatedFooter={(handlePress: () => void) => <Text style={[styles.text, { fontWeight: '500' }]} onPress={handlePress}>... more</Text>}
-                            renderRevealedFooter={(handlePress: () => void) => <Text style={[styles.text, { fontWeight: '500' }]} onPress={handlePress}>... less</Text>}
-                            onReady={() => { }}>
-                            <Text style={[styles.text, { fontWeight: "900" }]}>This is a title</Text>
-                            <Text> </Text>
-                            <Text style={styles.text}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Maxime deleniti sequi, aliquid laborum aperiam mollitia non officia eos repellat velit voluptatem animi corporis asperiores rem labore perspiciatis expedita impedit delectus?</Text>
-                        </ReadMore>
+
+
+                        <View style={{ width: width, maxWidth: '95%' }}>
+                            <ReadMore numberOfLines={3} style={{ fontSize: 14, color: '#455A64', fontFamily: 'Roboto-Medium' }} seeLessStyle={{ color: 'black', fontWeight: '700' }} seeMoreStyle={{ color: 'black', fontWeight: '700' }}>
+                                {
+                                    <Text style={{}}>{post.postTitle}: {post.postBody}</Text>
+                                }
+                            </ReadMore>
+                        </View>
+
+
 
                         <TouchableOpacity onPress={() => setIsBottomSheetVisible(true)}>
                             <Text style={{ color: 'gray' }}>View all {comments} comments</Text>

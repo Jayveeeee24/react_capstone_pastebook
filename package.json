@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@fawazahmed/react-native-read-more": "^3.0.3",
     "@gorhom/bottom-sheet": "^4.6.0",
     "@nghinv/react-native-search-bar": "^0.2.0",
     "@react-native-camera-roll/camera-roll": "^7.4.0",

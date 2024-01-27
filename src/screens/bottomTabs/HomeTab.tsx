@@ -86,7 +86,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     const getPosts = async () => {
         try {
             const result = getNewsfeedPosts ? await getNewsfeedPosts() : undefined;
-            // console.log(result);
+            console.log(result);
             if (result) {
                 setPosts(result);
             }
@@ -120,85 +120,77 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-            <ScrollView
-                showsVerticalScrollIndicator={false}
+            <FlatList
+                data={posts}
                 onScroll={handleScroll}
-                refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-                }>
-                <TouchableWithoutFeedback onPress={() => commentBottomSheetRef.current && commentBottomSheetRef.current.close()}>
-                    <View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', borderBottomColor: 'lightgray', borderBottomWidth: 1 }}>
-                            <View style={{ marginStart: 15 }}>
-                                <UserAvatar item={{ id: userId, photo: { photoImageURL: profilePicture }, firstName: firstName }} navigation={navigation} route={route} />
-                            </View>
-                            <FlatList
-                                data={friends}
-                                renderItem={({ item }) => <UserAvatar item={item} navigation={navigation} route={route} />}
-                                keyExtractor={(item) => item.id}
-                                contentContainerStyle={[styles.friendsView]}
-                                horizontal
-                                showsHorizontalScrollIndicator={false}
-                            />
-
-                        </View>
-                        <View style={styles.postsContainer}>
-                            <IndividualPost post={{}} likes={1000} comments={100} onLikePress={() => { }} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={navigation} route={route} />
-                            
-                            <FlatList
-                                data={posts}
-                                renderItem={({ item }) => <IndividualPost post={item} comments={754} likes={31321} onLikePress={() => { } } setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={undefined} route={undefined} />}
-                                keyExtractor={(item) => item.id}
-                                contentContainerStyle={[{}]}
-                                horizontal
-                                showsHorizontalScrollIndicator={false} />
-                        </View>
-                    </View>
-                </TouchableWithoutFeedback>
-                <BottomSheet
-                    ref={commentBottomSheetRef}
-                    index={isCommentBottomSheetVisible ? 0 : -1}
-                    snapPoints={snapPoints}
-                    onChange={handleCommentSheetChanges}
-                    enablePanDownToClose
-                    style={{
-                        borderTopStartRadius: 20,
-                        borderTopEndRadius: 20,
-                        shadowRadius: 20,
-                        shadowColor: 'black',
-                        elevation: 20,
-                        zIndex: 1
-                    }}>
-                    <View style={{ flex: 1 }}>
-                        <View style={{ flex: 0, borderBottomColor: 'gray', borderBottomWidth: 0.2, paddingTop: 20, paddingBottom: 10 }} >
-                            <Text style={{ textAlign: "center", fontSize: 16, color: 'black', fontWeight: '500' }}>Comments</Text>
-                        </View>
-
-                        <View style={{ flex: 0, borderBottomColor: 'gray', borderBottomWidth: 0.2 }}>
-                            <View style={[{ flexDirection: 'row', borderBottomColor: '#ccc', marginHorizontal: 10, marginVertical: 5, gap: 10, alignItems: "center", }]}>
-                                <Image source={Images.sample_avatar} resizeMode="cover" style={{ aspectRatio: 1, width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: Colors.orange }} />
-
-                                <TextInput
-                                    placeholder="Add a comment for jayvee.artemis ..."
-                                    style={{ fontFamily: 'Roboto-Medium', color: 'black', fontSize: 15, flex: 1, backgroundColor: 'transparent' }}
-                                    value={''}
-                                    onChangeText={() => { }}
-                                    placeholderTextColor={'#666'} />
-
-                                <TouchableOpacity>
-                                    <MaterialCommunityIcons name="send" size={26} color={Colors.primaryBrand} />
-                                </TouchableOpacity>
+                renderItem={({ item }) => <IndividualPost post={item} comments={754} likes={31321} onLikePress={() => { }} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={undefined} route={undefined} />}
+                keyExtractor={(item) => item.id}
+                showsVerticalScrollIndicator={false}
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+                ListHeaderComponent={
+                    <TouchableWithoutFeedback onPress={() => commentBottomSheetRef.current && commentBottomSheetRef.current.close()}>
+                        <View>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', borderBottomColor: 'lightgray', borderBottomWidth: 1 }}>
+                                <View style={{ marginStart: 15 }}>
+                                    <UserAvatar item={{ id: userId, photo: { photoImageURL: profilePicture }, firstName: firstName }} navigation={navigation} route={route} />
+                                </View>
+                                <FlatList
+                                    data={friends}
+                                    scrollEnabled={friends.length > 4}
+                                    renderItem={({ item }) => <UserAvatar item={item} navigation={navigation} route={route} />}
+                                    keyExtractor={(item) => item.id}
+                                    contentContainerStyle={[styles.friendsView]}
+                                    horizontal
+                                    showsHorizontalScrollIndicator={false}
+                                />
                             </View>
                         </View>
-                        <View style={{ flex: 1, marginVertical: 20 }}>
-                            <ScrollView>
-                                <IndividualComment />
-                            </ScrollView>
+                    </TouchableWithoutFeedback>
+                }
+            />
+
+            <BottomSheet
+                ref={commentBottomSheetRef}
+                index={isCommentBottomSheetVisible ? 0 : -1}
+                snapPoints={snapPoints}
+                onChange={handleCommentSheetChanges}
+                enablePanDownToClose
+                style={{
+                    borderTopStartRadius: 20,
+                    borderTopEndRadius: 20,
+                    shadowRadius: 20,
+                    shadowColor: 'black',
+                    elevation: 20,
+                    zIndex: 1
+                }}>
+                <View style={{ flex: 1 }}>
+                    <View style={{ flex: 0, borderBottomColor: 'gray', borderBottomWidth: 0.2, paddingTop: 20, paddingBottom: 10 }} >
+                        <Text style={{ textAlign: "center", fontSize: 16, color: 'black', fontWeight: '500' }}>Comments</Text>
+                    </View>
+
+                    <View style={{ flex: 0, borderBottomColor: 'gray', borderBottomWidth: 0.2 }}>
+                        <View style={[{ flexDirection: 'row', borderBottomColor: '#ccc', marginHorizontal: 10, marginVertical: 5, gap: 10, alignItems: "center", }]}>
+                            <Image source={Images.sample_avatar} resizeMode="cover" style={{ aspectRatio: 1, width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: Colors.orange }} />
+
+                            <TextInput
+                                placeholder="Add a comment for jayvee.artemis ..."
+                                style={{ fontFamily: 'Roboto-Medium', color: 'black', fontSize: 15, flex: 1, backgroundColor: 'transparent' }}
+                                value={''}
+                                onChangeText={() => { }}
+                                placeholderTextColor={'#666'} />
+
+                            <TouchableOpacity>
+                                <MaterialCommunityIcons name="send" size={26} color={Colors.primaryBrand} />
+                            </TouchableOpacity>
                         </View>
                     </View>
-                </BottomSheet>
-            </ScrollView>
-
+                    <View style={{ flex: 1, marginVertical: 20 }}>
+                        <ScrollView>
+                            <IndividualComment />
+                        </ScrollView>
+                    </View>
+                </View>
+            </BottomSheet>
         </SafeAreaView>
     );
 }
