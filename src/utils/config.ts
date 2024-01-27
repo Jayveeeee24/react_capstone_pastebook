@@ -13,6 +13,7 @@ export const Colors = {
     success: '#22bb33',
     warning: '#FF8A65',
     danger: '#F56C6C',
+    orange: '#FF5722'
 
 }
 export const credentialTextTheme = { colors: { primary: Colors.primaryBrand } };

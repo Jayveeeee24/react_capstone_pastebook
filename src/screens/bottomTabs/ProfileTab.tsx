@@ -1,11 +1,11 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { Images } from "../../utils/Images";
 import { ProfileTabView } from "../tabViews/ProfileTabView";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Storage } from "../../utils/Config";
+import { Colors, Storage } from "../../utils/Config";
 import { useUser } from "../../context/UserContext";
 import { useFocusEffect } from "@react-navigation/native";
 import React from "react";
@@ -36,7 +36,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
     const [albumCount, setAlbumCount] = useState(0);
 
     useFocusEffect(
-        React.useCallback(() => {
+        useCallback(() => {
             const loadProfile = async () => {
                 const userId = Storage.getString('userId');
 
@@ -99,7 +99,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                 <View style={{ paddingHorizontal: 20, paddingVertical: 15 }}>
                     <View style={{ flexDirection: "row", gap: 20, }}>
                         <View style={{ flex: 1 }}>
-                            <Image source={profilePicture ? { uri: profilePicture } : Images.sample_avatar_neutral} resizeMode="contain" style={{ aspectRatio: 1, width: 80, height: 80 }} />
+                            <Image source={profilePicture ? { uri: profilePicture } : Images.sample_avatar_neutral} resizeMode="cover" style={{ aspectRatio: 1, width: 80, height: 80, borderRadius: 40, borderWidth: 3, borderColor: Colors.orange }} />
                         </View>
 
                         <View style={{ flex: 1, justifyContent: "center" }}>

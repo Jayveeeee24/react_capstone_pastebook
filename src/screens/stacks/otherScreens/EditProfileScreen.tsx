@@ -172,7 +172,7 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ navigation
                             {isLoading ? (
                                 <ActivityIndicator size="large" color={Colors.primaryBrand} style={{ width: 80, height: 80, }} />
                             ) : (
-                                <Image source={profilePicture ? { uri: profilePicture } : Images.sample_avatar_neutral} resizeMode="contain" style={{ aspectRatio: 1, width: 80, height: 80, borderRadius: 30 }} />
+                                <Image source={profilePicture ? { uri: profilePicture } : Images.sample_avatar_neutral} resizeMode="cover" style={{ aspectRatio: 1, width: 80, height: 80, borderRadius: 40, borderWidth: 3, borderColor: Colors.orange }} />
                             )}
                             <TouchableOpacity onPress={ImagePicker}>
                                 <Text style={{ color: Colors.primaryBrand, marginTop: 10, fontWeight: '500' }}>Edit profile picture</Text>

@@ -5,6 +5,9 @@ import { IndividualPost } from "../../components/IndividualPost";
 import { useCallback, useEffect, useState } from "react";
 import { useFriend } from "../../context/FriendContext";
 import { Storage } from "../../utils/Config";
+import { useFocusEffect } from "@react-navigation/native";
+import { useUser } from "../../context/UserContext";
+import { usePhoto } from "../../context/PhotoContext";
 
 interface HomeTabProps {
     navigation: any;
@@ -13,14 +16,40 @@ interface HomeTabProps {
 
 export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     const { getAllFriends } = useFriend();
+    const { getProfile } = useUser();
+    const { getPhotoById } = usePhoto();
 
     const [isScrollLoading, setIsScrollLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [friends, setFriends] = useState<any>([]);
 
+    const [firstName, setFirstName] = useState('');
+    const [profilePicture, setProfilePicture] = useState<any>();
+    const [userId, setUserId] = useState('');
+
+    useFocusEffect(() => {
+        loadProfile();
+    })
+
     useEffect(() => {
         getFriends();
     }, []);
+
+    const loadProfile = async () => {
+        setUserId(Storage.getString('userId')!);
+
+        if (userId != '') {
+            const result = getProfile ? await getProfile(userId) : undefined;
+            if (await result.id) {
+                setFirstName(result.firstName);
+                const pictureResult = getPhotoById ? await getPhotoById(result.photo.id) : undefined;
+
+                if (pictureResult) {
+                    setProfilePicture(pictureResult);
+                }
+            }
+        }
+    }
 
     //api functions
     const getFriends = async () => {
@@ -69,6 +98,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                     <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
                 }>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', borderBottomColor: 'lightgray', borderBottomWidth: 1 }}>
+                    <View style={{ marginStart: 15 }}>
+                        <UserAvatar item={{ id: userId, photo: { photoImageURL: profilePicture }, firstName: firstName }} navigation={navigation} route={route} />
+                    </View>
                     <FlatList
                         data={friends}
                         renderItem={({ item }) => <UserAvatar item={item} navigation={navigation} route={route} />}
