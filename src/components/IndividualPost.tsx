@@ -29,13 +29,18 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, onGetComme
                     <TouchableOpacity onPress={() => { }}>
                         <View style={styles.avatarContainer}>
                             <Card style={styles.avatarCard}>
-                                <Card.Cover resizeMode="cover" source={post.poster.photo.photoImageURL ? { uri: post.poster.photo.photoImageURL } : Images.sample_avatar_neutral} style={styles.avatarImage} />
+                                <Card.Cover resizeMode="cover" source={post.poster && post.poster.photo && post.poster.photo.photoImageURL ? { uri: post.poster.photo.photoImageURL } : Images.sample_avatar_neutral} style={styles.avatarImage} />
+
+                                {/* <Card.Cover resizeMode="cover" source={post.poster.photo.photoImageURL ? { uri: post.poster.photo.photoImageURL } : Images.sample_avatar_neutral} style={styles.avatarImage} /> */}
                             </Card>
                             <Text style={[styles.avatarText, styles.text]}>
-                                {`${post.poster.firstName.toLowerCase().replace(/\s/g, '')}.${post.poster.lastName.toLowerCase()}` +
+                                {post.poster && post.poster.firstName ? (
+                                    `${post.poster.firstName.toLowerCase().replace(/\s/g, '')}.${post.poster.lastName.toLowerCase()}` +
                                     (post.poster.id === post.timeline.userId
                                         ? ''
-                                        : ` @ ${post.timeline.user.firstName.toLowerCase().replace(/\s/g, '')}.${post.timeline.user.lastName.toLowerCase()}`)}
+                                        : ` @ ${post.timeline.user && post.timeline.user.firstName ? post.timeline.user.firstName.toLowerCase().replace(/\s/g, '') : ''}.${post.timeline.user && post.timeline.user.lastName ? post.timeline.user.lastName.toLowerCase() : ''}`)
+                                ) : ''}
+
                             </Text>
 
                         </View>
@@ -51,8 +56,12 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, onGetComme
                 </View>
 
                 <View style={styles.postImageContainer}>
-                    <Image source={{uri: post.photo.photoImageURL}} resizeMode="cover" style={[styles.postImage, { width: width, height: width }]} />
+                    <Image
+                        source={post && post.photo && post.photo.photoImageURL ? { uri: post.photo.photoImageURL } : Images.sample_avatar_neutral}
+                        resizeMode="cover"
+                        style={[styles.postImage, { width: width, height: width }]} />
                 </View>
+
 
                 <View style={{ flexDirection: "column" }}>
                     <View style={styles.footerButtonContainer}>
@@ -69,7 +78,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, onGetComme
                                 <MaterialCommunityIcons name="comment-outline" size={26} color="black" />
                             </TouchableOpacity>
                         </View>
-                        <Text style={[styles.text]}>{convertToRelativeTime(post.datePosted)}</Text>
+                        <Text style={[styles.text]}>{post.datePosted}</Text>
                     </View>
 
                     <View style={{ flexDirection: "column", marginStart: 12, gap: 2, marginBottom: 10 }}>

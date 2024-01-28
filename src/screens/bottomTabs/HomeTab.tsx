@@ -53,7 +53,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
         setIsLoading(true);
         getFriends();
         getPosts();
-        setIsLoading(false);
     }, []);
 
     const commentBottomSheetRef = useRef<BottomSheet>(null);
@@ -99,19 +98,22 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     const getPosts = async () => {
         try {
             const result = getNewsfeedPosts ? await getNewsfeedPosts() : undefined;
-            if (result) {
+            if (await result) {
                 setPosts(result);
+
+                setIsLoading(false);
             }
         } catch (error: any) {
             console.error("Error fetching photos:", error.response);
         }
+
     }
     const onGetComments = async (postId: string) => {
         try {
             const result = getComments ? await getComments(postId) : undefined;
 
             if (await result) {
-                console.log(result.length)
+                setComments(result);
             }
 
         } catch (error: any) {
@@ -166,7 +168,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                 <FlatList
                     data={posts}
                     onScroll={handleScroll}
-                    renderItem={({ item }) => <IndividualPost post={item} setSelectedPostId={setSelectedPostId} setSelectedPoster={setSelectedPoster} onGetComments={onGetComments} comments={754} likes={31321} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={undefined} route={undefined} />}
+                    renderItem={({ item }) => <IndividualPost key={item.id} post={item} setSelectedPostId={setSelectedPostId} setSelectedPoster={setSelectedPoster} onGetComments={onGetComments} comments={754} likes={31321} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={navigation} route={route} />}
                     keyExtractor={(item) => item.id}
                     showsVerticalScrollIndicator={false}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
@@ -174,7 +176,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                         <TouchableWithoutFeedback onPress={() => commentBottomSheetRef.current && commentBottomSheetRef.current.close()}>
                             <View>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', borderBottomColor: 'lightgray', borderBottomWidth: 1 }}>
-                                    <View style={{ marginStart: 15 }}>
+                                    <View style={{ marginStart: 5 }}>
                                         <UserAvatar item={{ id: userId, photo: { photoImageURL: profilePicture }, firstName: firstName }} navigation={navigation} route={route} />
                                     </View>
                                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.friendsView}>
@@ -202,8 +204,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                     shadowColor: 'black',
                     elevation: 20,
                     zIndex: 1,
-                }}
-            >
+                }}>
                 <View style={{ flex: 1 }}>
                     <View style={{ flex: 0, borderBottomColor: 'gray', borderBottomWidth: 0.2, paddingTop: 20, paddingBottom: 10 }}>
                         <Text style={{ textAlign: 'center', fontSize: 16, color: 'black', fontWeight: '500' }}>Comments</Text>
@@ -211,7 +212,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
 
                     <View style={{ flex: 0, borderBottomColor: 'gray', borderBottomWidth: 0.2 }}>
                         <View style={[{ flexDirection: 'row', borderBottomColor: '#ccc', marginHorizontal: 10, marginVertical: 5, gap: 10, alignItems: "center", }]}>
-                            <Image source={Images.sample_avatar} resizeMode="cover" style={{ aspectRatio: 1, width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: Colors.orange }} />
+                            <Image source={profilePicture ? { uri: profilePicture } : Images.sample_avatar_neutral} resizeMode="cover" style={{ aspectRatio: 1, width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: Colors.orange }} />
 
                             <TextInput
                                 placeholder={selectedPoster ? `Add a comment for ${selectedPoster.firstName.toLowerCase().replace(/\s/g, '')}.${selectedPoster.lastName.toLowerCase()} ...` : ``}
@@ -246,7 +247,6 @@ const styles = StyleSheet.create({
     },
 
     friendsView: {
-        paddingHorizontal: 15,
         gap: 15,
         height: 85,
         marginBottom: 10,
