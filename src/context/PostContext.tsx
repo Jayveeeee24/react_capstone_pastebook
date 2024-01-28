@@ -13,6 +13,7 @@ interface PostContextProps {
     getIsPostLiked?: (postId: string) => Promise<any>;
     likePost?: (postId: string, likerId: string) => Promise<any>;
     editPost?: (postId: string, postTitle: string, postBody: string, photoId: string) => Promise<any>;
+    getPostById?: (postId: string) => Promise<any>;
 }
 
 interface PostProviderProps {
@@ -43,8 +44,9 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
     const editPost = async (postId: string, postTitle: string, postBody: string, photoId: string) => {
         try {
             const response = await axios.put(`${BASE_URL}/api/post/update-post`, {
-                postId, postTitle, postBody, photoId,
+                id: postId, postTitle, postBody, photoId,
             });
+            
             return response.data;
         } catch (error: any) {
             return error.response;
@@ -56,6 +58,33 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
             const response = await axios.delete(`${BASE_URL}/api/post/delete-post/${postId}`);
             return response.data;
         } catch (error: any) {
+            return error.response;
+        }
+    }
+
+    const getPostById = async (postId: string) => {
+        try {
+            const result = await axios.get(`${BASE_URL}/api/post/get-post/${postId}`);
+
+            if (result.data) {
+                const photo = getPhotoById ? await getPhotoById(result.data.photo.id) : undefined;
+                if (photo) {
+                    return {
+                        ...result.data,
+                        photo: {
+                            ...result.data.photo,
+                            photoImageURL: await photo,
+                        },
+                    };
+                } else {
+                    console.error(`Error fetching photo for album with ID ${result.data.photo.id}: Photo not found`);
+                    return result.data;
+                }
+            }
+
+            return result.data;
+        } catch (error: any) {
+            console.log('get post by id error: ' + error);
             return error.response;
         }
     }
@@ -149,9 +178,9 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
         }
     }
 
-    
 
-    
+
+
 
 
 
@@ -164,6 +193,7 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
         getIsPostLiked,
         likePost,
         editPost,
+        getPostById
     }
 
     return (

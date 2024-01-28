@@ -57,6 +57,14 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
         getPosts();
     }, []);
 
+    useEffect(() => {
+        navigation.addListener('focus', () => {
+            if (route.params?.refresh) {
+                getPosts();
+            }
+        });
+    }, [route.params?.refresh])
+
     //Bottom sheets
     const commentBottomSheetRef = useRef<BottomSheet>(null);
     const [isCommentBottomSheetVisible, setIsCommentBottomSheetVisible] = useState(false);
@@ -211,9 +219,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                     renderItem={({ item }) => <IndividualPost key={item.id} post={item} getPosts={getPosts} setSelectedPostId={setSelectedPostId} setSelectedPoster={setSelectedPoster} onGetComments={onGetComments} setIsOptionsVisible={setIsOptionsVisible} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={navigation} route={route} />}
                     keyExtractor={(item) => item.id}
                     showsVerticalScrollIndicator={false}
-                    // maxToRenderPerBatch={1}
-                    // updateCellsBatchingPeriod={1000000}
-                    // initialNumToRender={1}
+                    maxToRenderPerBatch={2}
+                    updateCellsBatchingPeriod={100}
+                    initialNumToRender={2}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
                     ListHeaderComponent={
                         <TouchableWithoutFeedback onPress={() => commentBottomSheetRef.current && commentBottomSheetRef.current.close()}>
@@ -279,9 +287,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                                 keyExtractor={(item) => item.id}
                                 showsVerticalScrollIndicator={false} />
                         ) : (
-                            <View style={{ flex: 1, alignItems: "center", marginTop: 50}}>
-                                <Text style={{color: 'black', fontWeight: '700', fontSize: 22}}>No comments yet</Text>
-                                <Text style={{color: 'darkgray', fontWeight: '500', fontSize: 15}}>Start the conversation.</Text>
+                            <View style={{ flex: 1, alignItems: "center", marginTop: 50 }}>
+                                <Text style={{ color: 'black', fontWeight: '700', fontSize: 22 }}>No comments yet</Text>
+                                <Text style={{ color: 'darkgray', fontWeight: '500', fontSize: 15 }}>Start the conversation.</Text>
                             </View>
                         )}
                     </View>
@@ -312,7 +320,10 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                         optionsRef && optionsRef.current?.close();
 
                         navigation.navigate('CreatePostTab', {
-                            postId: selectedPostId,
+                            screen: 'CreatePost',
+                            params: {
+                                postId: selectedPostId,
+                            }
                         })
                     }}>
                         <View style={{ paddingHorizontal: 15, paddingVertical: 10, flexDirection: "row", alignItems: "center" }}>

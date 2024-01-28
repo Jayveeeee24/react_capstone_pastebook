@@ -22,50 +22,42 @@ interface CreatePostTabProps {
     navigation: any;
     route: any;
 }
-const width = Dimensions.get('window').width;
-const height = Dimensions.get('window').height;
 export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route }) => {
+    const width = Dimensions.get('window').width;
+    const height = Dimensions.get('window').height;
     const toast = useToast();
+
     const { getUploadsAlbumId } = useAlbum();
     const { addPhoto, getPhotoById } = usePhoto();
-    const { addPost } = usePost();
+    const { addPost, getPostById, editPost } = usePost();
     const { getAllFriends } = useFriend();
     const { getProfile } = useUser();
 
     const [currentView, setCurrentView] = useState('PhotoSelectView');
     const [isLoading, setIsLoading] = useState(false);
 
+    //gallery/camera roll
     const [images, setImages] = useState<any[]>([]);
     const [albums, setAlbums] = useState<any[]>([]); //gallery albums
-    const [friends, setFriends] = useState<any>([]);
-
-
     const [uploadsAlbumId, setUploadsAlbumId] = useState('');
-    const [pickedImage, setPickedImage] = useState<any>({});
     const [category, setCategory] = useState<string>('');
+    const [friends, setFriends] = useState<any>([]);
+    const [searchUserQuery, setSearchUserQuery] = useState('');
 
+
+    const getUserProfileExecuted = useRef(false);
+    const [currentFunction, setCurrentFunction] = useState('Add');
+    const [postId, setPostId] = useState('');
     const [postTitle, setPostTitle] = useState('');
     const [postBody, setPostBody] = useState('');
+    const [pickedImage, setPickedImage] = useState<any>({});
     const [postedUserId, setPostedUserId] = useState('');
     const [postedUserFirstName, setPostedUserFirstName] = useState('');
     const [postedUserLastName, setPostedUserLastName] = useState('');
 
 
-    const [searchUserQuery, setSearchUserQuery] = useState('');
-
-    //bottom sheet
-    const bottomSheetRef = useRef<BottomSheet>(null);
-    const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
-    const snapPoints = useMemo(() => ['50%', '90%'], []);
-    const handleSheetChanges = useCallback((index: number) => {
-        if (index === -1) {
-            setIsBottomSheetVisible(false);
-        }
-    }, []);
-
-
-
-    //Main functions
+    //Use Effects
+    
     useEffect(() => {
         hasPermission();
 
@@ -104,6 +96,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
 
         getUploadsAlbum();
         loadAlbums();
+
         if (route.params?.image) {
             setPickedImage(route.params?.image);
         }
@@ -115,8 +108,6 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
         };
 
     }, [route.params?.image, currentView, navigation]);
-    const getUserProfileExecuted = useRef(false);
-
     useEffect(() => {
         if (getUserProfileExecuted.current) {
             getUserProfile(postedUserId);
@@ -126,21 +117,38 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
             getUserProfileExecuted.current = true;
         }
     }, [postedUserId]);
-    const hasPermission = async () => {
-        const platformVersion = parseInt(String(Platform.Version), 10);
-        const permission =
-            platformVersion >= 33
-                ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
-                : PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+    useEffect(() => {
+        if (route.params?.postId) {
+            navigation.setOptions({
+                headerTitle: 'Edit Post'
+            });
 
-        const hasPermission = await PermissionsAndroid.check(permission);
-        if (hasPermission) {
-            return true;
+            setCurrentFunction('Edit');
+
+            const getPost = async () => {
+                const result = getPostById ? await getPostById(route.params?.postId) : undefined;
+                if (result) {
+                    setPostedUserId(result.poster.id);
+                    setPickedImage({
+                        node: {
+                            image: {
+                                uri: result.photo.photoImageURL
+                            }
+                        }
+                    });
+                    setPostId(route.params.postId);
+                    setPostTitle(result.postTitle);
+                    setPostBody(result.postBody);
+                }
+            }
+            getPost();
+        } else {
+            setCurrentFunction('Add');
         }
+    }, []);
 
-        const status = await PermissionsAndroid.request(permission);
-        return status === 'granted';
-    };
+
+
 
     //api functions
     const onAddPost = async () => {
@@ -167,7 +175,45 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
 
                     if (postResult) {
                         toast.show('Post success!', { type: 'success' });
-                        navigation.navigate('Home');
+                        navigation.navigate('Home', { refresh: true });
+                    } else {
+                        toast.show(postResult.result, { type: 'warning' });
+                    }
+                } else {
+                    toast.show(result, { type: 'warning' });
+                }
+
+            } catch (error: any) {
+                toast.show("An unexpected error occurred", { type: 'danger' });
+                console.log(error);
+            }
+        }
+        setIsLoading(false);
+    }
+    const onEditPost = async () => {
+        if (!postTitle.trim() || !postBody.trim()) {
+            toast.show('All fields are required', { type: 'danger' });
+        } else {
+            setIsLoading(true);
+            const file = pickedImage.node.image.uri;
+            const name = file.split('/').pop();
+
+            const formData = new FormData();
+            formData.append('albumId', uploadsAlbumId);
+            formData.append('file', {
+                uri: file,
+                name: name,
+                type: 'image/jpg'
+            });
+
+            try {
+                const result = addPhoto ? await addPhoto(formData) : undefined;
+                if (result) {
+                    const postResult = editPost ? await editPost(postId, postTitle, postBody, result) : undefined;
+                    console.log(postResult);
+                    if (postResult) {
+                        toast.show('Post updated!', { type: 'success' });
+                        navigation.navigate('Home', { refresh: true });
                     } else {
                         toast.show(postResult.result, { type: 'warning' });
                     }
@@ -220,7 +266,6 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
         }
     }
 
-
     //album retrieval
     const loadAlbums = async () => {
         if (Platform.OS === 'android' && !(await hasPermission())) {
@@ -252,7 +297,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
 
         CameraRoll.getPhotos(params).then((imgs) => {
             setImages(imgs.edges);
-            if (!route.params?.image) {
+            if (!route.params?.image && !route.params?.postId) {
                 setPickedImage(imgs.edges[0]);
             }
         });
@@ -265,6 +310,17 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
         });
     };
 
+    //bottom sheet
+    const bottomSheetRef = useRef<BottomSheet>(null);
+    const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
+    const snapPoints = useMemo(() => ['50%', '90%'], []);
+    const handleSheetChanges = useCallback((index: number) => {
+        if (index === -1) {
+            setIsBottomSheetVisible(false);
+        }
+    }, []);
+
+    //others
     const renderView = () => {
         switch (currentView) {
             case 'PhotoSelectView':
@@ -317,7 +373,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                                 right: 0,
                                 bottom: 0, backgroundColor: Colors.primaryBrand
                             }}
-                            onPress={() => navigation.replace("Camera")}
+                            onPress={() => navigation.replace("Camera", {postId: postId})}
                         />
                     </>
                 );
@@ -375,7 +431,14 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                             </View>
                         </ScrollView>
                         <TouchableOpacity
-                            onPress={onAddPost}
+                            onPress={() => {
+                                console.log(currentFunction);
+                                if (currentFunction == 'Edit') {
+                                    onEditPost();
+                                } else {
+                                    onAddPost();
+                                }
+                            }}
                             style={{
                                 flex: 0,
                                 backgroundColor: Colors.secondaryBrand,
@@ -387,7 +450,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                             {isLoading ? (
                                 <ActivityIndicator size="small" color="white" />
                             ) : (
-                                <Text style={{ color: 'white', fontSize: 20, textAlign: 'center', fontFamily: 'Roboto-Medium' }}>Post</Text>
+                                <Text style={{ color: 'white', fontSize: 20, textAlign: 'center', fontFamily: 'Roboto-Medium' }}>{currentFunction == 'Edit' ? 'Update Post' : "Post"}</Text>
                             )}
                         </TouchableOpacity>
 
@@ -427,6 +490,21 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                 );
         }
     }
+    const hasPermission = async () => {
+        const platformVersion = parseInt(String(Platform.Version), 10);
+        const permission =
+            platformVersion >= 33
+                ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
+                : PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+
+        const hasPermission = await PermissionsAndroid.check(permission);
+        if (hasPermission) {
+            return true;
+        }
+
+        const status = await PermissionsAndroid.request(permission);
+        return status === 'granted';
+    };
 
     return (
         <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
