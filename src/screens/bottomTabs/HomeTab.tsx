@@ -14,6 +14,8 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { IndividualComment } from "../../components/IndividualComment";
 import { useComment } from "../../context/CommentContext";
 import { useToast } from "react-native-toast-notifications";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { Modal } from "react-native-paper";
 
 interface HomeTabProps {
     navigation: any;
@@ -22,10 +24,10 @@ interface HomeTabProps {
 
 export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     const toast = useToast();
-    const { getAllFriends } = useFriend();
+    const { getAllFriends, getIsPosterFriend } = useFriend();
     const { getProfile } = useUser();
     const { getPhotoById } = usePhoto();
-    const { getNewsfeedPosts, getPostCommentsCount, getPostLikesCount } = usePost();
+    const { getNewsfeedPosts } = usePost();
     const { addComment, getComments } = useComment();
 
     const [isScrollLoading, setIsScrollLoading] = useState(false);
@@ -55,6 +57,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
         getPosts();
     }, []);
 
+    //Bottom sheets
     const commentBottomSheetRef = useRef<BottomSheet>(null);
     const [isCommentBottomSheetVisible, setIsCommentBottomSheetVisible] = useState(false);
     const snapPoints = useMemo(() => ['45%', '90%'], []);
@@ -64,6 +67,17 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
         }
     }, []);
 
+    const optionsRef = useRef<BottomSheet>(null);
+    const [isOptionsVisible, setIsOptionsVisible] = useState(false);
+    const snapPointsOptions = useMemo(() => ['30%', '35%'], []);
+    const handleOptionsSheetChanges = useCallback((index: number) => {
+        if (index === -1) {
+            setIsOptionsVisible(false);
+        }
+    }, []);
+
+
+    //api functions
     const loadProfile = async () => {
         setUserId(Storage.getString('userId')!);
 
@@ -79,8 +93,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
             }
         }
     }
-
-    //api functions
     const getFriends = async () => {
         try {
             const userId = Storage.getString('userId');
@@ -100,6 +112,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
             const result = getNewsfeedPosts ? await getNewsfeedPosts() : undefined;
             if (await result) {
                 setPosts(result);
+                console.log(result.friend);
+                // const friendResult = getIsPosterFriend ? await getIsPosterFriend(result[0].poster.id) : undefined;
+                // console.log(friendResult);
                 setIsLoading(false);
             }
         } catch (error: any) {
@@ -136,6 +151,12 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
         }
     }
 
+    //modal
+    const [visible, setVisible] = useState(false);
+    const showModal = () => setVisible(true);
+    const hideModal = () => setVisible(false);
+
+
 
     //scroll refresh
     const handleRefresh = useCallback(() => {
@@ -167,9 +188,12 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                 <FlatList
                     data={posts}
                     onScroll={handleScroll}
-                    renderItem={({ item }) => <IndividualPost key={item.id} post={item} getPosts={getPosts} setSelectedPostId={setSelectedPostId} setSelectedPoster={setSelectedPoster} onGetComments={onGetComments} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={navigation} route={route} />}
+                    renderItem={({ item }) => <IndividualPost key={item.id} post={item} getPosts={getPosts} setSelectedPostId={setSelectedPostId} setSelectedPoster={setSelectedPoster} onGetComments={onGetComments} setIsOptionsVisible={setIsOptionsVisible} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={navigation} route={route} />}
                     keyExtractor={(item) => item.id}
                     showsVerticalScrollIndicator={false}
+                    // maxToRenderPerBatch={1}
+                    // updateCellsBatchingPeriod={1000000}
+                    // initialNumToRender={1}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
                     ListHeaderComponent={
                         <TouchableWithoutFeedback onPress={() => commentBottomSheetRef.current && commentBottomSheetRef.current.close()}>
@@ -190,6 +214,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                 />
             )}
 
+            {/* Comment Bottom Sheet */}
             <BottomSheet
                 ref={commentBottomSheetRef}
                 index={isCommentBottomSheetVisible ? 0 : -1}
@@ -231,11 +256,87 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                             data={comments}
                             renderItem={({ item }) => <IndividualComment key={item.id} comment={item} navigation={navigation} route={route} />}
                             keyExtractor={(item) => item.id}
-                            showsVerticalScrollIndicator={false}
-                        />
+                            showsVerticalScrollIndicator={false} />
                     </View>
                 </View>
             </BottomSheet>
+
+            {/* Post Individual Bottom Sheet */}
+            <BottomSheet
+                ref={optionsRef}
+                index={isOptionsVisible ? 0 : -1}
+                snapPoints={snapPointsOptions}
+                onChange={handleOptionsSheetChanges}
+                enablePanDownToClose
+                style={{
+                    borderTopStartRadius: 20,
+                    borderTopEndRadius: 20,
+                    shadowRadius: 20,
+                    shadowColor: 'black',
+                    elevation: 20,
+                    zIndex: 1,
+                }}>
+                <View style={{ flex: 1 }}>
+                    <View style={{ flex: 0, borderBottomColor: 'gray', borderBottomWidth: 0.2, paddingTop: 20, paddingBottom: 10 }}>
+                        <Text style={{ textAlign: 'center', fontSize: 16, color: 'black', fontWeight: '500' }}>Post Options</Text>
+                    </View>
+
+                    <TouchableOpacity onPress={() => { }}>
+                        <View style={{ paddingHorizontal: 15, paddingVertical: 10, flexDirection: "row", alignItems: "center" }}>
+                            <MaterialCommunityIcons name="comment-edit-outline" size={36} color={'black'} style={{ flex: 0 }} />
+                            <View style={{ marginStart: 15, alignSelf: "center", flex: 1 }}>
+                                <Text style={{ fontSize: 20, color: 'black', fontFamily: 'Roboto-Medium' }}>Edit Post</Text>
+                            </View>
+                            <MaterialIcons name="arrow-forward-ios" size={24} color={'black'} style={{ flex: 0 }} />
+                        </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => {
+                        optionsRef && optionsRef.current?.close();
+                        showModal()
+                    }}>
+                        <View style={{ paddingHorizontal: 15, paddingVertical: 10, flexDirection: "row", alignItems: "center" }}>
+                            <MaterialCommunityIcons name="delete-outline" size={36} color={Colors.danger} style={{ flex: 0 }} />
+                            <View style={{ marginStart: 15, alignSelf: "center", flex: 1 }}>
+                                <Text style={{ fontSize: 20, color: Colors.danger, fontFamily: 'Roboto-Medium' }}>Delete Post</Text>
+                            </View>
+                            <MaterialIcons name="arrow-forward-ios" size={24} color={Colors.danger} style={{ flex: 0 }} />
+                        </View>
+                    </TouchableOpacity>
+
+
+                </View>
+            </BottomSheet>
+
+            <Modal
+                visible={visible}
+                onDismiss={hideModal}
+                contentContainerStyle={{
+                    flexDirection: "column",
+                    backgroundColor: 'white',
+                    borderRadius: 15,
+                    height: 300,
+                    width: 250,
+                    alignSelf: "center",
+                    alignItems: "flex-start",
+                }}>
+                <View style={{ marginBottom: 10, padding: 20 }}>
+                    <Text style={{ alignSelf: "center", fontSize: 18, textAlign: "center", fontWeight: '700', color: 'black', fontFamily: 'Roboto-Medium' }}>
+                        Are you sure you want to delete this post?
+                    </Text>
+                    <Text style={{ marginTop: 10, alignSelf: "center", textAlign: "center" }}>
+                        You're requesting to delete this post. You cannot revert this back, Confirm?
+                    </Text>
+                </View>
+                <View style={{ height: 1, backgroundColor: 'darkgray', width: '100%' }} />
+                <TouchableOpacity onPress={() => {}} style={{ width: '100%', alignSelf: "center", paddingVertical: 15 }}>
+                    <Text style={{ color: Colors.danger, fontWeight: '700', fontFamily: 'Roboto-Medium', fontSize: 16, alignSelf: "center" }}>Continue delete post</Text>
+                </TouchableOpacity>
+                <View style={{ height: 1, backgroundColor: 'darkgray', width: '100%', marginBottom: 10 }} />
+                <TouchableOpacity onPress={hideModal} style={{ width: '100%', alignSelf: "center", marginTop: 5, flex: 0 }}>
+                    <Text style={{ color: 'black', fontWeight: '700', fontFamily: 'Roboto-Medium', fontSize: 16, alignSelf: "center" }}>Cancel</Text>
+                </TouchableOpacity>
+            </Modal>
         </SafeAreaView>
     );
 }

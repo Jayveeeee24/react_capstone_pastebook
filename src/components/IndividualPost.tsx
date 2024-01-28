@@ -10,6 +10,7 @@ import { Colors, Storage, convertToRelativeTime } from "../utils/Config";
 interface IndividualPostProps {
     post: any;
     setIsBottomSheetVisible: (isTrue: boolean) => void,
+    setIsOptionsVisible: (isTrue: boolean) => void,
     setSelectedPostId: (postId: string) => void;
     setSelectedPoster: (post: {}) => void;
     onGetComments: (postId: string) => Promise<any>;
@@ -18,14 +19,17 @@ interface IndividualPostProps {
     route: any;
 }
 
-export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, onGetComments, setSelectedPostId, setSelectedPoster, setIsBottomSheetVisible, navigation, route }) => {
+export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, onGetComments, setSelectedPostId, setSelectedPoster, setIsBottomSheetVisible, setIsOptionsVisible, navigation, route }) => {
     const { getIsPostLiked, likePost } = usePost();
 
     const width = Dimensions.get('window').width;
     const [isLiked, setIsLiked] = useState(false);
+    const [userId, setUserId] = useState('');
 
     useEffect(() => {
         isPostLiked();
+        const id = Storage.getString('userId')
+        setUserId(id!);
     }, [post, isLiked]);
 
     const onLikePost = async () => {
@@ -74,10 +78,16 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
                         </View>
                     </TouchableOpacity>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                        {/*  display: post.friend.isFriend ? 'none' : 'flex', */}
                         <TouchableOpacity style={{ backgroundColor: 'lightgray', borderRadius: 5, paddingHorizontal: 14, paddingVertical: 5 }}>
                             <Text style={[styles.text, { fontWeight: '500' }]}>Follow</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => { }}>
+                        {/* display: post.poster.id == userId ? 'flex' : 'none' */}
+                        <TouchableOpacity style={{}} onPress={() => {
+                            setSelectedPoster(post.poster);
+                            setSelectedPostId(post.id);
+                            setIsOptionsVisible(true)
+                        }}>
                             <MaterialCommunityIcons name="dots-vertical" size={20} color="#666" />
                         </TouchableOpacity>
                     </View>
@@ -97,6 +107,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
                             <TouchableOpacity onPress={onLikePost}>
                                 <MaterialCommunityIcons name={isLiked ? "cards-heart" : "cards-heart-outline"} size={30} color={isLiked ? Colors.danger : "black"} />
                             </TouchableOpacity>
+
                             <TouchableOpacity onPress={() => {
                                 setSelectedPoster(post.poster);
                                 setSelectedPostId(post.id);
@@ -106,12 +117,12 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
                                 <MaterialCommunityIcons name="comment-outline" size={26} color="black" />
                             </TouchableOpacity>
                         </View>
-                        <Text style={[styles.text]}>{convertToRelativeTime(post.datePosted)}</Text>
+                        <Text style={[styles.text]}>{post.datePosted ? convertToRelativeTime(post.datePosted) : post.datePosted}</Text>
                     </View>
 
                     <View style={{ flexDirection: "column", marginStart: 12, gap: 2, marginBottom: 10 }}>
-                        <TouchableOpacity onPress={() => navigation.navigate('Likes')}>
-                            <Text style={[{ fontWeight: "500", color: 'black', display: post.likesCount > 0 ? 'flex' : 'none' }]}>{post.likesCount} likes</Text>
+                        <TouchableOpacity style={{ display: post.likesCount > 0 ? 'flex' : 'none' }} onPress={() => navigation.navigate('Likes')}>
+                            <Text style={[{ fontWeight: "500", color: 'black' }]}>{post.likesCount} likes</Text>
                         </TouchableOpacity>
 
                         <ReadMore

@@ -1,7 +1,8 @@
 import { ReactNode, createContext, useContext } from "react";
-import { BASE_URL } from "../utils/Config";
+import { BASE_URL, Storage } from "../utils/Config";
 import axios from "axios";
 import { usePhoto } from "./PhotoContext";
+import { useFriend } from "./FriendContext";
 
 interface PostContextProps {
     addPost?: (postTitle: string, postBody: string, datePosted: Date, userId: string, photoId?: string) => Promise<any>;
@@ -25,6 +26,7 @@ export const usePost = () => {
 
 export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
     const { getPhotoById } = usePhoto();
+    const { getIsPosterFriend } = useFriend();
 
     const addPost = async (postTitle: string, postBody: string, datePosted: Date, userId: string, photoId?: string) => {
         try {
@@ -49,11 +51,13 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
     const getNewsfeedPosts = async () => {
         try {
             const result = await axios.get(`${BASE_URL}/api/timeline/get-newsfeed-posts`);
+            const userId = Storage.getString('userId');
+
 
             if (result && Array.isArray(result.data)) {
                 const updatedPosts = await Promise.all(
                     result.data.map(async (post) => {
-                        const updatedPost = { ...post, commentsCount: 0, likesCount: 0 };
+                        const updatedPost = { ...post, commentsCount: 0, likesCount: 0, friend: {} };
 
                         if (updatedPost.photo && updatedPost.photoId) {
                             updatedPost.photo.photoImageURL = getPhotoById ? await getPhotoById(post.photoId) : undefined;
@@ -72,6 +76,14 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
 
                         const likesCount = getPostLikesCount ? await getPostLikesCount(post.id) : 0;
                         updatedPost.likesCount = likesCount;
+
+                        // console.log(post.poster.id);
+                        // console.log(userId);
+                        if (userId) {
+                            const friend = getIsPosterFriend ? await getIsPosterFriend(updatedPost.poster.id, userId) : {};
+                            updatedPost.friend = friend;
+                            console.log(friend);
+                        }
 
                         return updatedPost;
                     })
@@ -112,14 +124,14 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
             const result = await axios.get(`${BASE_URL}/api/post/is-post-liked/${postId}`);
             return result.data;
         } catch (error: any) {
-            console.log('get post likes error: ' + error);
+            console.log('get is post liked error: ' + error);
             return error.response;
         }
     }
 
-    const likePost = async (postId: string, likerId: string) =>{
+    const likePost = async (postId: string, likerId: string) => {
         try {
-            const response = await axios.post(`${BASE_URL}/api/post/like-post`, {postId, likerId});
+            const response = await axios.post(`${BASE_URL}/api/post/like-post`, { postId, likerId });
             return response.data;
         } catch (error: any) {
             return error.response;

@@ -129,7 +129,6 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
             toast.show("An unexpected error occurred", { type: 'danger' });
         }
     }
-
     const getPhotos = async (allbumId: string) => {
         setIsLoading(true);
         try {
@@ -263,6 +262,7 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
                             <Text style={{ color: 'black', fontWeight: '700', fontFamily: 'Roboto-Medium', fontSize: 16, alignSelf: "center" }}>Cancel</Text>
                         </TouchableOpacity>
                     </Modal>
+                    
                     <BottomSheet
                         ref={bottomSheetRef}
                         index={isBottomSheetVisible ? 0 : -1}

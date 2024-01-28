@@ -1,11 +1,12 @@
 import { ReactNode, createContext, useContext } from "react";
-import { BASE_URL } from "../utils/Config";
+import { BASE_URL, Storage } from "../utils/Config";
 import axios from "axios";
 import { usePhoto } from "./PhotoContext";
 
 
 interface FriendContextProps {
     getAllFriends?: (userId: string) => Promise<any>;
+    getIsPosterFriend?: (posterId: string, userId: string) => Promise<any>;
 }
 
 interface FriendProviderProps {
@@ -19,19 +20,19 @@ export const useFriend = () => {
 }
 
 export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
-    const {getPhotoById} = usePhoto();
+    const { getPhotoById } = usePhoto();
 
     const getAllFriends = async (userId: string) => {
         try {
             const result = await axios.get(`${BASE_URL}/api/friend/get-all-friends/${userId}`);
-    
+
             if (result && Array.isArray(result.data)) {
                 const updatedFriends = await Promise.all(
                     result.data.map(async (item: any) => {
                         try {
                             const photoId = item.photoId;
                             const photo = getPhotoById ? await getPhotoById(photoId) : undefined;
-    
+
                             if (photo) {
                                 return {
                                     ...item,
@@ -42,15 +43,15 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
                                 };
                             } else {
                                 console.error(`Error fetching photo for friend with ID ${item.id}: Photo not found`);
-                                return item; 
+                                return item;
                             }
                         } catch (error: any) {
                             console.error("Error fetching photo:", error);
-                            return item; 
+                            return item;
                         }
                     })
                 );
-    
+
                 return updatedFriends;
             } else {
                 console.error("Invalid data format:", result.data);
@@ -61,10 +62,21 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
             return [];
         }
     };
-    
+
+    const getIsPosterFriend = async (posterId: string, userId: string) => {
+        try {
+            const result = await axios.post(`${BASE_URL}/api/friend/get-friend-exist`, { receiverId: posterId, senderId: userId });
+            return result.data;
+        } catch (error: any) {
+            console.log('get poster friend error: ' + error);
+            return error.response;
+        }
+    }
+
 
     const contextValue: FriendContextProps = {
-        getAllFriends
+        getAllFriends,
+        getIsPosterFriend
     }
 
     return (
