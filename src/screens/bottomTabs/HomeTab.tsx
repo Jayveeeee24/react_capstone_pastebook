@@ -25,7 +25,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     const { getAllFriends } = useFriend();
     const { getProfile } = useUser();
     const { getPhotoById } = usePhoto();
-    const { getNewsfeedPosts } = usePost();
+    const { getNewsfeedPosts, getPostCommentsCount, getPostLikesCount } = usePost();
     const { addComment, getComments } = useComment();
 
     const [isScrollLoading, setIsScrollLoading] = useState(false);
@@ -100,7 +100,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
             const result = getNewsfeedPosts ? await getNewsfeedPosts() : undefined;
             if (await result) {
                 setPosts(result);
-
                 setIsLoading(false);
             }
         } catch (error: any) {
@@ -168,7 +167,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                 <FlatList
                     data={posts}
                     onScroll={handleScroll}
-                    renderItem={({ item }) => <IndividualPost key={item.id} post={item} setSelectedPostId={setSelectedPostId} setSelectedPoster={setSelectedPoster} onGetComments={onGetComments} comments={754} likes={31321} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={navigation} route={route} />}
+                    renderItem={({ item }) => <IndividualPost key={item.id} post={item} getPosts={getPosts} setSelectedPostId={setSelectedPostId} setSelectedPoster={setSelectedPoster} onGetComments={onGetComments} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={navigation} route={route} />}
                     keyExtractor={(item) => item.id}
                     showsVerticalScrollIndicator={false}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
@@ -230,7 +229,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                     <View style={{ flex: 1, marginVertical: 20 }}>
                         <FlatList
                             data={comments}
-                            renderItem={({ item }) => <IndividualComment comment={item} navigation={navigation} route={route} />}
+                            renderItem={({ item }) => <IndividualComment key={item.id} comment={item} navigation={navigation} route={route} />}
                             keyExtractor={(item) => item.id}
                             showsVerticalScrollIndicator={false}
                         />

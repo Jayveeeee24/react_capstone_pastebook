@@ -1,26 +1,56 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, ImageSourcePropType, Dimensions } from "react-native";
-import { Card, Menu, PaperProvider } from "react-native-paper";
+import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
+import { Card, } from "react-native-paper";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Images } from "../utils/Images";
-import { convertToRelativeTime } from "../utils/Config";
 import ReadMore from 'react-native-read-more-text';
+import { useEffect, useState } from "react";
+import { usePost } from "../context/PostContext";
+import { Colors, Storage, convertToRelativeTime } from "../utils/Config";
 
 interface IndividualPostProps {
     post: any;
-    likes: number,
-    comments: number,
     setIsBottomSheetVisible: (isTrue: boolean) => void,
     setSelectedPostId: (postId: string) => void;
     setSelectedPoster: (post: {}) => void;
     onGetComments: (postId: string) => Promise<any>;
+    getPosts: () => void;
     navigation: any;
     route: any;
 }
 
-export const IndividualPost: React.FC<IndividualPostProps> = ({ post, onGetComments, setSelectedPostId, setSelectedPoster, likes, comments, setIsBottomSheetVisible, navigation, route }) => {
-    const width = Dimensions.get('window').width;
+export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, onGetComments, setSelectedPostId, setSelectedPoster, setIsBottomSheetVisible, navigation, route }) => {
+    const { getIsPostLiked, likePost } = usePost();
 
+    const width = Dimensions.get('window').width;
+    const [isLiked, setIsLiked] = useState(false);
+
+    useEffect(() => {
+        isPostLiked();
+    }, [post, isLiked]);
+
+    const onLikePost = async () => {
+        const userId = Storage.getString('userId');
+        if (userId) {
+            try {
+                const result = likePost ? await likePost(post.id, userId) : undefined;
+                if (result) {
+                    isPostLiked();
+                    getPosts();
+                }
+            } catch (error: any) {
+                console.error("Error fetching like:", error.response);
+            }
+        }
+    }
+
+    const isPostLiked = async () => {
+        try {
+            const result = getIsPostLiked ? await getIsPostLiked(post.id) : undefined;
+            setIsLiked(result);
+        } catch (error: any) {
+            console.error("Error fetching like:", error.response);
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -30,8 +60,6 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, onGetComme
                         <View style={styles.avatarContainer}>
                             <Card style={styles.avatarCard}>
                                 <Card.Cover resizeMode="cover" source={post.poster && post.poster.photo && post.poster.photo.photoImageURL ? { uri: post.poster.photo.photoImageURL } : Images.sample_avatar_neutral} style={styles.avatarImage} />
-
-                                {/* <Card.Cover resizeMode="cover" source={post.poster.photo.photoImageURL ? { uri: post.poster.photo.photoImageURL } : Images.sample_avatar_neutral} style={styles.avatarImage} /> */}
                             </Card>
                             <Text style={[styles.avatarText, styles.text]}>
                                 {post.poster && post.poster.firstName ? (
@@ -66,8 +94,8 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, onGetComme
                 <View style={{ flexDirection: "column" }}>
                     <View style={styles.footerButtonContainer}>
                         <View style={{ flexDirection: "row", gap: 16, alignItems: "center" }}>
-                            <TouchableOpacity onPress={() => { }}>
-                                <MaterialCommunityIcons name="cards-heart-outline" size={30} color="black" />
+                            <TouchableOpacity onPress={onLikePost}>
+                                <MaterialCommunityIcons name={isLiked ? "cards-heart" : "cards-heart-outline"} size={30} color={isLiked ? Colors.danger : "black"} />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => {
                                 setSelectedPoster(post.poster);
@@ -78,12 +106,12 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, onGetComme
                                 <MaterialCommunityIcons name="comment-outline" size={26} color="black" />
                             </TouchableOpacity>
                         </View>
-                        <Text style={[styles.text]}>{post.datePosted}</Text>
+                        <Text style={[styles.text]}>{convertToRelativeTime(post.datePosted)}</Text>
                     </View>
 
                     <View style={{ flexDirection: "column", marginStart: 12, gap: 2, marginBottom: 10 }}>
                         <TouchableOpacity onPress={() => navigation.navigate('Likes')}>
-                            <Text style={[{ fontWeight: "500", color: 'black' }]}>{likes.toLocaleString()} likes</Text>
+                            <Text style={[{ fontWeight: "500", color: 'black', display: post.likesCount > 0 ? 'flex' : 'none' }]}>{post.likesCount} likes</Text>
                         </TouchableOpacity>
 
                         <ReadMore
@@ -103,7 +131,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, onGetComme
                             onGetComments(post.id);
                             setIsBottomSheetVisible(true);
                         }}>
-                            <Text style={{ color: 'gray' }}>View all {comments} comments</Text>
+                            <Text style={{ color: 'gray', display: post.commentsCount > 0 ? 'flex' : 'none' }}>View all {post.commentsCount} comments</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

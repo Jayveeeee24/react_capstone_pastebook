@@ -7,6 +7,10 @@ interface PostContextProps {
     addPost?: (postTitle: string, postBody: string, datePosted: Date, userId: string, photoId?: string) => Promise<any>;
     deletePost?: (postId: string) => Promise<any>;
     getNewsfeedPosts?: () => Promise<any>;
+    getPostCommentsCount?: (postId: string) => Promise<any>;
+    getPostLikesCount?: (postId: string) => Promise<any>;
+    getIsPostLiked?: (postId: string) => Promise<any>;
+    likePost?: (postId: string, likerId: string) => Promise<any>;
 }
 
 interface PostProviderProps {
@@ -49,7 +53,7 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
             if (result && Array.isArray(result.data)) {
                 const updatedPosts = await Promise.all(
                     result.data.map(async (post) => {
-                        const updatedPost = { ...post };
+                        const updatedPost = { ...post, commentsCount: 0, likesCount: 0 };
 
                         if (updatedPost.photo && updatedPost.photoId) {
                             updatedPost.photo.photoImageURL = getPhotoById ? await getPhotoById(post.photoId) : undefined;
@@ -62,6 +66,12 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
                         if (updatedPost.timeline && updatedPost.timeline.user && updatedPost.timeline.user.photo && updatedPost.timeline.user.photo.photoImageURL) {
                             updatedPost.timeline.user.photo.photoImageURL = getPhotoById ? await getPhotoById(updatedPost.timeline.user.photo.id) : undefined;
                         }
+
+                        const commentsCount = getPostCommentsCount ? await getPostCommentsCount(post.id) : 0;
+                        updatedPost.commentsCount = commentsCount;
+
+                        const likesCount = getPostLikesCount ? await getPostLikesCount(post.id) : 0;
+                        updatedPost.likesCount = likesCount;
 
                         return updatedPost;
                     })
@@ -77,12 +87,55 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
         }
     };
 
+    const getPostCommentsCount = async (postId: string) => {
+        try {
+            const result = await axios.get(`${BASE_URL}/api/comment/get-post-comments-count/${postId}`);
+            return result.data;
+        } catch (error: any) {
+            console.log('get post comment error: ' + error);
+            return error.response;
+        }
+    }
+
+    const getPostLikesCount = async (postId: string) => {
+        try {
+            const result = await axios.get(`${BASE_URL}/api/post/get-post-likes-count/${postId}`);
+            return result.data;
+        } catch (error: any) {
+            console.log('get post likes error: ' + error);
+            return error.response;
+        }
+    }
+
+    const getIsPostLiked = async (postId: string) => {
+        try {
+            const result = await axios.get(`${BASE_URL}/api/post/is-post-liked/${postId}`);
+            return result.data;
+        } catch (error: any) {
+            console.log('get post likes error: ' + error);
+            return error.response;
+        }
+    }
+
+    const likePost = async (postId: string, likerId: string) =>{
+        try {
+            const response = await axios.post(`${BASE_URL}/api/post/like-post`, {postId, likerId});
+            return response.data;
+        } catch (error: any) {
+            return error.response;
+        }
+    }
+
 
 
     const contextValue: PostContextProps = {
         addPost,
         deletePost,
-        getNewsfeedPosts
+        getNewsfeedPosts,
+        getPostCommentsCount,
+        getPostLikesCount,
+        getIsPostLiked,
+        likePost
     }
 
     return (

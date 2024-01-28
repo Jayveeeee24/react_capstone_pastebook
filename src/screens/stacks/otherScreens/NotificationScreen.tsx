@@ -49,7 +49,7 @@ export const NotificationScreen: React.FC<NotificationScreenProps> = ({ navigati
             const notifications = await loadNotification(); 
             
             if (notifications.length > 0) {
-                const contextResult = await axios.get(`${BASE_URL}/api/notification/get-notification-context/${notifications[0].id}`);
+                const contextResult = await axios.get(`${BASE_URL}/api/notification/get-notification-context/${notifications[1].id}`);
                 console.log('\n\nNOTIFICATION CONTEXT \n\n', contextResult.data);
             }
         }
