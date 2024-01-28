@@ -1,21 +1,38 @@
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Images } from "../utils/Images";
-import Entypo from 'react-native-vector-icons/Entypo'
+import { convertToRelativeTime } from "../utils/Config";
 
-export const IndividualNotification = () => {
+interface IndividualNotificationProps {
+    navigation: any;
+    notification: any;
+    route: any;
+}
+
+export const IndividualNotification: React.FC<IndividualNotificationProps> = ({ notification, navigation, route }) => {
     return (
         <View>
-            <TouchableOpacity style={{marginVertical: 5}}>
+            <TouchableOpacity style={{ marginVertical: 5 }} onPress={() => {
+
+            }}>
                 <View style={{ flexDirection: 'row', width: '100%', justifyContent: "space-between", paddingVertical: 8, paddingHorizontal: 12, alignItems: "center" }}>
                     <View style={{ flex: 0 }}>
-                        <Image source={Images.sample_avatar} resizeMode="cover" style={{ aspectRatio: 1, width: 50, height: 50 }} />
+                        {/* notification.notifier.photo.photoImageURL ? {uri: notification.notifier.photo.photoImageURL} :  */}
+                        <Image source={notification.notifier.photo.photoImageURL ? { uri: notification.notifier.photo.photoImageURL } : Images.sample_avatar_neutral} resizeMode="cover" style={{ aspectRatio: 1, width: 50, height: 50, borderRadius: 25 }} />
                     </View>
                     <View style={{ flex: 1, justifyContent: 'flex-start' }}>
                         <Text style={{ fontSize: 14, fontFamily: 'Roboto-Medium', color: 'gray', marginStart: 10 }}>
-                            <Text style={{ color: 'black', fontWeight: '700' }}>John Bernard Tinio</Text>
-                            <Text style={{ color: 'darkgray' }}> commented on your post.</Text>
-                            <Text> 1 d</Text>
-                            <Text style={{color: 'red', fontSize: 18}}> *</Text>
+                            {/* ${notification.notifier.firstName.toLowerCase().replace(/\s/g, '')}.${notification.notifier.lastName.toLowerCase()} */}
+                            <Text style={{ color: 'black', fontWeight: '700' }}>{(notification.notifier.firstName && notification.notifier.lastName) && `${notification.notifier.firstName.toLowerCase().replace(/\s/g, '')}.${notification.notifier.lastName.toLowerCase()}`}</Text>
+                            {/* notification.type == 'like' ? " has liked your post" : " has commented on your post." */}
+                            <Text style={{ color: 'darkgray' }}>
+                                {
+                                    notification.notificationType === 'like' ? ' has liked your post' :
+                                        notification.notificationType === 'comment' ? ' has commented on your post' :
+                                            notification.notificationType === 'accept-friend-request' ? ' has accepted your friend request' : ''
+                                }
+                            </Text>
+                            <Text> {convertToRelativeTime(notification.notifiedDate)}</Text>
+                            <Text style={{ color: 'red', fontSize: 18 }}>{!notification.isRead && ' *'}</Text>
                         </Text>
                     </View>
                 </View>

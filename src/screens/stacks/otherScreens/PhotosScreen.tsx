@@ -205,7 +205,7 @@ export const PhotosScreen: React.FC<PhotoScreenProps> = ({ navigation, route }) 
                                         <FlatList
                                             data={photos}
                                             renderItem={({ item, index }) => (
-                                                <IndividualPhoto index={index} item={item} navigation={navigation} route={route} />
+                                                <IndividualPhoto key={item.id} index={index} item={item} navigation={navigation} route={route} />
                                             )}
                                             keyExtractor={(item) => item.id}
                                             numColumns={3}

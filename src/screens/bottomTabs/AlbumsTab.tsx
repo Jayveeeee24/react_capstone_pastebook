@@ -60,7 +60,7 @@ export const AlbumsTab: React.FC<AlbumTabProps> = ({ navigation, route }) => {
                             <FlatList
                                 data={albums}
                                 renderItem={({ item, index }) => (
-                                    <IndividualAlbum index={index} item={item} navigation={navigation} route={route} />
+                                    <IndividualAlbum key={item.id} index={index} item={item} navigation={navigation} route={route} />
                                 )}
                                 keyExtractor={(item) => item.albumDTO.albumId}
                                 numColumns={3}
