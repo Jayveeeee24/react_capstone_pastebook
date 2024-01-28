@@ -13,11 +13,19 @@ export const CameraScreen = ({ navigation, route }: any) => {
     const [isCameraOkay, setIsCameraOkay] = useState(true);
     const [isFlashUp, setIsFlashUp] = useState(false);
 
+    const [postId, setPostId] = useState('');
+
     useEffect(() => {
         if (!hasPermission) {
             requestPermission();
         }
     }, [hasPermission]);
+
+    useEffect(() => {
+        if(route.params?.postId){
+            setPostId(route.params.postId);
+        }
+    })
 
     useFocusEffect(
         useCallback(() => {
@@ -61,7 +69,7 @@ export const CameraScreen = ({ navigation, route }: any) => {
             setIsCameraOkay(true);
             navigation.dispatch(CommonActions.navigate({
                 name: 'CreatePost',
-                params: { image: restructuredData },
+                params: { image: restructuredData, postId:  postId},
             }));
         }
     }

@@ -57,7 +57,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
 
 
     //Use Effects
-    
+
     useEffect(() => {
         hasPermission();
 
@@ -129,13 +129,15 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                 const result = getPostById ? await getPostById(route.params?.postId) : undefined;
                 if (result) {
                     setPostedUserId(result.poster.id);
-                    setPickedImage({
-                        node: {
-                            image: {
-                                uri: result.photo.photoImageURL
+                    if (!route.params?.image) {
+                        setPickedImage({
+                            node: {
+                                image: {
+                                    uri: result.photo.photoImageURL
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                     setPostId(route.params.postId);
                     setPostTitle(result.postTitle);
                     setPostBody(result.postBody);
@@ -373,7 +375,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                                 right: 0,
                                 bottom: 0, backgroundColor: Colors.primaryBrand
                             }}
-                            onPress={() => navigation.replace("Camera", {postId: postId})}
+                            onPress={() => navigation.replace("Camera", { postId: postId })}
                         />
                     </>
                 );
