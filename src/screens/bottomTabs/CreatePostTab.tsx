@@ -11,10 +11,12 @@ import { useAlbum } from "../../context/AlbumContext";
 import { usePhoto } from "../../context/PhotoContext";
 import { useToast } from "react-native-toast-notifications";
 import { usePost } from "../../context/PostContext";
-import { CommonActions } from "@react-navigation/native";
+import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import SearchBar from "react-native-dynamic-search-bar";
 import { IndividualSearch } from "../../components/IndividualSearch";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { useFriend } from "../../context/FriendContext";
+import { useUser } from "../../context/UserContext";
 
 interface CreatePostTabProps {
     navigation: any;
@@ -24,23 +26,30 @@ const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route }) => {
     const toast = useToast();
-    const [isLoading, setIsLoading] = useState(false);
+    const { getUploadsAlbumId } = useAlbum();
+    const { addPhoto, getPhotoById } = usePhoto();
+    const { addPost } = usePost();
+    const { getAllFriends } = useFriend();
+    const { getProfile } = useUser();
 
     const [currentView, setCurrentView] = useState('PhotoSelectView');
+    const [isLoading, setIsLoading] = useState(false);
+
     const [images, setImages] = useState<any[]>([]);
     const [albums, setAlbums] = useState<any[]>([]); //gallery albums
+    const [friends, setFriends] = useState<any>([]);
+
+
+    const [uploadsAlbumId, setUploadsAlbumId] = useState('');
     const [pickedImage, setPickedImage] = useState<any>({});
     const [category, setCategory] = useState<string>('');
 
     const [postTitle, setPostTitle] = useState('');
     const [postBody, setPostBody] = useState('');
     const [postedUserId, setPostedUserId] = useState('');
+    const [postedUserFirstName, setPostedUserFirstName] = useState('');
+    const [postedUserLastName, setPostedUserLastName] = useState('');
 
-    const [uploadsAlbumId, setUploadsAlbumId] = useState('');
-
-    const { getUploadsAlbumId } = useAlbum();
-    const { addPhoto } = usePhoto();
-    const { addPost } = usePost();
 
     const [searchUserQuery, setSearchUserQuery] = useState('');
 
@@ -53,6 +62,8 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
             setIsBottomSheetVisible(false);
         }
     }, []);
+
+
 
     //Main functions
     useEffect(() => {
@@ -91,19 +102,10 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
             ),
         });
 
-
         getUploadsAlbum();
-
         loadAlbums();
         if (route.params?.image) {
             setPickedImage(route.params?.image);
-        }
-
-        const userId = Storage.getString('userId');
-        if (route.params?.postedUserId) {
-            setPostedUserId(route.params?.postedUserId)
-        } else {
-            setPostedUserId(userId!);
         }
 
         return () => {
@@ -112,9 +114,18 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
             });
         };
 
-
-
     }, [route.params?.image, currentView, navigation]);
+    const getUserProfileExecuted = useRef(false);
+
+    useEffect(() => {
+        if (getUserProfileExecuted.current) {
+            getUserProfile(postedUserId);
+        } else {
+            const userId = Storage.getString('userId');
+            setPostedUserId(userId!);
+            getUserProfileExecuted.current = true;
+        }
+    }, [postedUserId]);
     const hasPermission = async () => {
         const platformVersion = parseInt(String(Platform.Version), 10);
         const permission =
@@ -171,6 +182,44 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
         }
         setIsLoading(false);
     }
+    const getFriends = async () => {
+        try {
+            const userId = Storage.getString('userId');
+
+            if (userId) {
+                const result = getAllFriends ? await getAllFriends(userId) : undefined;
+                if (result) {
+                    const profileResult = getProfile ? await getProfile(userId) : undefined;
+                    if (await profileResult.id) {
+                        const pictureResult = getPhotoById ? await getPhotoById(profileResult.photo.id) : undefined;
+
+                        if (pictureResult) {
+                            const newItem = {
+                                photo: {
+                                    photoImageURL: pictureResult,
+                                },
+                                firstName: profileResult.firstName,
+                                lastName: profileResult.lastName + ' (You)',
+                                id: profileResult.id,
+                            }
+                            setFriends((friends: any) => [newItem, ...result]);
+                        }
+                    }
+
+                }
+            }
+        } catch (error: any) {
+            console.error("Error fetching photos:", error.response);
+        }
+    }
+    const getUserProfile = async (userId: string) => {
+        const result = getProfile ? await getProfile(userId) : undefined;
+        if (await result.id) {
+            setPostedUserFirstName(result.firstName);
+            setPostedUserLastName(result.lastName);
+        }
+    }
+
 
     //album retrieval
     const loadAlbums = async () => {
@@ -301,11 +350,14 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                                     multiline
                                     placeholderTextColor={'#666'} />
 
-                                <TouchableNativeFeedback onPress={() => setIsBottomSheetVisible(true)}>
+                                <TouchableNativeFeedback onPress={() => {
+                                    setIsBottomSheetVisible(true);
+                                    getFriends();
+                                }}>
                                     <View style={{ paddingHorizontal: 10, paddingVertical: 15, flexDirection: "row", alignItems: "center" }}>
                                         <MaterialCommunityIcons name="account-outline" size={28} color={'#37474F'} style={{ flex: 0 }} />
                                         <View style={{ marginStart: 10, alignSelf: "center", flex: 1 }}>
-                                            <Text style={{ fontSize: 18, color: '#37474F', fontFamily: 'Roboto-Medium' }}>Post in: johnbernard.tinio</Text>
+                                            <Text style={{ fontSize: 18, color: '#37474F', fontFamily: 'Roboto-Medium' }}>Post in: {`${postedUserFirstName.toLowerCase().replace(/\s/g, '')}.${postedUserLastName.toLowerCase()}`}</Text>
                                         </View>
                                         <MaterialIcons name="arrow-forward-ios" size={20} color={'#37474F'} style={{ flex: 0 }} />
                                     </View>
@@ -362,7 +414,12 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                                     onPress={() => { setSearchUserQuery('') }}
                                     onChangeText={setSearchUserQuery}
                                     style={{ backgroundColor: '#ECEFF1', width: '100%', marginBottom: 10 }} />
-                                {/* <IndividualSearch /> */}
+
+                                <FlatList
+                                    data={friends}
+                                    renderItem={({ item }) => <IndividualSearch key={item.id} item={item} setPostedUserId={setPostedUserId} bottomSheetRef={bottomSheetRef} navigation={navigation} route={route} />}
+                                    keyExtractor={(item) => item.id}
+                                    showsVerticalScrollIndicator={false} />
 
                             </View>
                         </BottomSheet>

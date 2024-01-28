@@ -5,13 +5,14 @@ import { usePhoto } from "./PhotoContext";
 import { useFriend } from "./FriendContext";
 
 interface PostContextProps {
-    addPost?: (postTitle: string, postBody: string, datePosted: Date, userId: string, photoId?: string) => Promise<any>;
+    addPost?: (postTitle: string, postBody: string, datePosted: Date, userId: string, photoId: string) => Promise<any>;
     deletePost?: (postId: string) => Promise<any>;
     getNewsfeedPosts?: () => Promise<any>;
     getPostCommentsCount?: (postId: string) => Promise<any>;
     getPostLikesCount?: (postId: string) => Promise<any>;
     getIsPostLiked?: (postId: string) => Promise<any>;
     likePost?: (postId: string, likerId: string) => Promise<any>;
+    editPost?: (postId: string, postTitle: string, postBody: string, photoId: string) => Promise<any>;
 }
 
 interface PostProviderProps {
@@ -28,10 +29,21 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
     const { getPhotoById } = usePhoto();
     const { getIsPosterFriend } = useFriend();
 
-    const addPost = async (postTitle: string, postBody: string, datePosted: Date, userId: string, photoId?: string) => {
+    const addPost = async (postTitle: string, postBody: string, datePosted: Date, userId: string, photoId: string) => {
         try {
             const response = await axios.post(`${BASE_URL}/api/post/add-post`, {
                 postTitle, postBody, datePosted, photoId, userId,
+            });
+            return response.data;
+        } catch (error: any) {
+            return error.response;
+        }
+    }
+
+    const editPost = async (postId: string, postTitle: string, postBody: string, photoId: string) => {
+        try {
+            const response = await axios.put(`${BASE_URL}/api/post/update-post`, {
+                postId, postTitle, postBody, photoId,
             });
             return response.data;
         } catch (error: any) {
@@ -81,8 +93,7 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
                         // console.log(userId);
                         if (userId) {
                             const friend = getIsPosterFriend ? await getIsPosterFriend(updatedPost.poster.id, userId) : {};
-                            updatedPost.friend = friend;
-                            console.log(friend);
+                            updatedPost.friend = await friend;
                         }
 
                         return updatedPost;
@@ -138,6 +149,10 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
         }
     }
 
+    
+
+    
+
 
 
     const contextValue: PostContextProps = {
@@ -147,7 +162,8 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
         getPostCommentsCount,
         getPostLikesCount,
         getIsPostLiked,
-        likePost
+        likePost,
+        editPost,
     }
 
     return (

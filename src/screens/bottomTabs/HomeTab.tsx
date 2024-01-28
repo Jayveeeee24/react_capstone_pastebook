@@ -27,7 +27,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     const { getAllFriends, getIsPosterFriend } = useFriend();
     const { getProfile } = useUser();
     const { getPhotoById } = usePhoto();
-    const { getNewsfeedPosts } = usePost();
+    const { getNewsfeedPosts, deletePost } = usePost();
     const { addComment, getComments } = useComment();
 
     const [isScrollLoading, setIsScrollLoading] = useState(false);
@@ -60,7 +60,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     //Bottom sheets
     const commentBottomSheetRef = useRef<BottomSheet>(null);
     const [isCommentBottomSheetVisible, setIsCommentBottomSheetVisible] = useState(false);
-    const snapPoints = useMemo(() => ['45%', '90%'], []);
+    const snapPoints = useMemo(() => ['45%', '95%'], []);
     const handleCommentSheetChanges = useCallback((index: number) => {
         if (index === -1) {
             setIsCommentBottomSheetVisible(false);
@@ -112,7 +112,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
             const result = getNewsfeedPosts ? await getNewsfeedPosts() : undefined;
             if (await result) {
                 setPosts(result);
-                console.log(result.friend);
+                // console.log(result);
                 // const friendResult = getIsPosterFriend ? await getIsPosterFriend(result[0].poster.id) : undefined;
                 // console.log(friendResult);
                 setIsLoading(false);
@@ -121,6 +121,25 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
             console.error("Error fetching photos:", error.response);
         }
 
+    }
+    const onDeletePost = async () => {
+        try {
+            const result = deletePost ? await deletePost(selectedPostId) : undefined;
+            if (result) {
+                toast.show('Post Deleted!', {
+                    type: "success",
+                });
+                hideModal();
+                getPosts();
+            } else {
+                toast.show(result, {
+                    type: "warning",
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            toast.show("An unexpected error occurred", { type: 'danger' });
+        }
     }
     const onGetComments = async (postId: string) => {
         try {
@@ -142,6 +161,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                 const result = addComment ? await addComment(commentContent, selectedPostId) : undefined;
                 if (result) {
                     onGetComments(selectedPostId);
+                    getPosts();
                 }
                 setCommentContent('');
             } catch (error: any) {
@@ -252,11 +272,18 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                     </View>
 
                     <View style={{ flex: 1, marginVertical: 20 }}>
-                        <FlatList
-                            data={comments}
-                            renderItem={({ item }) => <IndividualComment key={item.id} comment={item} navigation={navigation} route={route} />}
-                            keyExtractor={(item) => item.id}
-                            showsVerticalScrollIndicator={false} />
+                        {comments.length > 0 ? (
+                            <FlatList
+                                data={comments}
+                                renderItem={({ item }) => <IndividualComment key={item.id} comment={item} navigation={navigation} route={route} />}
+                                keyExtractor={(item) => item.id}
+                                showsVerticalScrollIndicator={false} />
+                        ) : (
+                            <View style={{ flex: 1, alignItems: "center", marginTop: 50}}>
+                                <Text style={{color: 'black', fontWeight: '700', fontSize: 22}}>No comments yet</Text>
+                                <Text style={{color: 'darkgray', fontWeight: '500', fontSize: 15}}>Start the conversation.</Text>
+                            </View>
+                        )}
                     </View>
                 </View>
             </BottomSheet>
@@ -281,7 +308,13 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                         <Text style={{ textAlign: 'center', fontSize: 16, color: 'black', fontWeight: '500' }}>Post Options</Text>
                     </View>
 
-                    <TouchableOpacity onPress={() => { }}>
+                    <TouchableOpacity onPress={() => {
+                        optionsRef && optionsRef.current?.close();
+
+                        navigation.navigate('CreatePostTab', {
+                            postId: selectedPostId,
+                        })
+                    }}>
                         <View style={{ paddingHorizontal: 15, paddingVertical: 10, flexDirection: "row", alignItems: "center" }}>
                             <MaterialCommunityIcons name="comment-edit-outline" size={36} color={'black'} style={{ flex: 0 }} />
                             <View style={{ marginStart: 15, alignSelf: "center", flex: 1 }}>
@@ -329,7 +362,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                     </Text>
                 </View>
                 <View style={{ height: 1, backgroundColor: 'darkgray', width: '100%' }} />
-                <TouchableOpacity onPress={() => {}} style={{ width: '100%', alignSelf: "center", paddingVertical: 15 }}>
+                <TouchableOpacity onPress={onDeletePost} style={{ width: '100%', alignSelf: "center", paddingVertical: 15 }}>
                     <Text style={{ color: Colors.danger, fontWeight: '700', fontFamily: 'Roboto-Medium', fontSize: 16, alignSelf: "center" }}>Continue delete post</Text>
                 </TouchableOpacity>
                 <View style={{ height: 1, backgroundColor: 'darkgray', width: '100%', marginBottom: 10 }} />

@@ -82,8 +82,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
                         <TouchableOpacity style={{ backgroundColor: 'lightgray', borderRadius: 5, paddingHorizontal: 14, paddingVertical: 5 }}>
                             <Text style={[styles.text, { fontWeight: '500' }]}>Follow</Text>
                         </TouchableOpacity>
-                        {/* display: post.poster.id == userId ? 'flex' : 'none' */}
-                        <TouchableOpacity style={{}} onPress={() => {
+                        <TouchableOpacity style={{ display: post.poster.id == userId ? 'flex' : 'none' }} onPress={() => {
                             setSelectedPoster(post.poster);
                             setSelectedPostId(post.id);
                             setIsOptionsVisible(true)
