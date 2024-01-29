@@ -32,7 +32,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
           setUserId(id);
         }
         
-        isPostLiked();
+        isPostLiked(post.id);
     }, [post, isLiked]);
 
     const onLikePost = async () => {
@@ -41,7 +41,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
             try {
                 const result = likePost ? await likePost(post.id, userId) : undefined;
                 if (result) {
-                    isPostLiked();
+                    isPostLiked(post.id);
                     getPosts();
                 }
             } catch (error: any) {
@@ -50,9 +50,9 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
         }
     }
 
-    const isPostLiked = async () => {
+    const isPostLiked = async (postId: string) => {
         try {
-            const result = getIsPostLiked ? await getIsPostLiked(post.id) : undefined;
+            const result = getIsPostLiked ? await getIsPostLiked(postId) : undefined;
             setIsLiked(result);
         } catch (error: any) {
             console.error("Error fetching like:", error.response);
@@ -82,9 +82,9 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
                     </TouchableOpacity>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                         {/*  display: post.friend.isFriend ? 'none' : 'flex', */}
-                        <TouchableOpacity style={{ backgroundColor: 'lightgray', borderRadius: 5, paddingHorizontal: 14, paddingVertical: 5 }}>
+                        {/* <TouchableOpacity style={{ backgroundColor: 'lightgray', borderRadius: 5, paddingHorizontal: 14, paddingVertical: 5 }}>
                             <Text style={[styles.text, { fontWeight: '500' }]}>Follow</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <TouchableOpacity style={{ display: post.poster?.id == userId ? 'flex' : 'none' }} onPress={() => {
                             setSelectedPoster(post.poster);
                             setSelectedPostId(post.id);

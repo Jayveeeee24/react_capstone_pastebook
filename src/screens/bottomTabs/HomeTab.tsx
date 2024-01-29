@@ -46,64 +46,12 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     const [posts, setPosts] = useState<any>([]);
     const [comments, setComments] = useState<any>([]);
 
-
     const [selectedPostId, setSelectedPostId] = useState('');
     const [selectedPoster, setSelectedPoster] = useState<any>();
     const [commentContent, setCommentContent] = useState('');
 
     const [notificationCount, setNotificationCount] = useState(0);
     const [friendRequestCount, setFriendRequestCount] = useState(0);
-    const getUserProfileExecuted = useRef(false);
-
-
-    useFocusEffect(() => {
-        getFriends();
-        loadProfile();
-
-    });
-    useEffect(() => {
-        if (getUserProfileExecuted.current) {
-            navigation.setOptions({
-                headerRight: () => (
-                    <View style={{ flexDirection: 'row', marginRight: 10, alignItems: "center" }}>
-                        <NotificationIconWithBadge
-                            onPress={() => {
-                                navigation.navigate('Notifications');
-                            }}
-                            badgeCount={friendRequestCount} />
-
-                        <FriendRequestWithBadge
-                            onPress={async () => {
-                                navigation.navigate('FriendRequest');
-                            }}
-                            badgeCount={notificationCount} />
-
-                    </View>
-                ),
-            });
-        } else {
-            getNotificationCount();
-            getFriendRequestCount();
-            getUserProfileExecuted.current = true;
-        }
-    }, [friendRequestCount, notificationCount]);
-    useEffect(() => {
-        // console.log("friend: " + friendRequestCount)
-        // console.log("notif: " + notificationCount)
-
-    }, [navigation, friendRequestCount, notificationCount])
-    useEffect(() => {
-        setIsLoading(true);
-        getPosts();
-    }, [navigation]);
-    useEffect(() => {
-        navigation.addListener('focus', () => {
-
-            if (route.params?.refresh) {
-                getPosts();
-            }
-        });
-    }, [route.params?.refresh]);
 
     //Bottom sheets
     const commentBottomSheetRef = useRef<BottomSheet>(null);
@@ -125,22 +73,78 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     }, []);
 
 
+    //useEffects
+    useFocusEffect(
+        useCallback(() => {
+            const loadInitial = async () => {
+                getFriends();
+                loadProfile();
+                getNotificationCount();
+                getFriendRequestCount();
+            }
+            loadInitial();
+
+        }, [navigation, friendRequestCount, notificationCount])
+    );
+    useEffect(() => {
+        setIsLoading(true);
+        getPosts();
+    }, [navigation, getPhotoById, getProfile])
+    useEffect(() => {
+        const loadSecond = async () => {
+            navigation.setOptions({
+                headerRight: () => (
+                    <View style={{ flexDirection: 'row', marginRight: 10, alignItems: "center" }}>
+                        <NotificationIconWithBadge
+                            onPress={() => {
+                                navigation.navigate('Notifications');
+                            }}
+                            badgeCount={notificationCount} />
+
+                        <FriendRequestWithBadge
+                            onPress={async () => {
+                                navigation.navigate('FriendRequest');
+                            }}
+                            badgeCount={friendRequestCount} />
+
+                    </View>
+                ),
+            });
+        }
+
+        loadSecond();
+    }, [friendRequestCount, notificationCount]);
+    useEffect(() => {
+        navigation.addListener('focus', () => {
+
+            if (route.params?.refresh) {
+                getPosts();
+            }
+        });
+    }, [route.params?.refresh]);
+
     //api functions
     const loadProfile = async () => {
         setUserId(Storage.getString('userId')!);
 
-        if (userId != '') {
-            const result = getProfile ? await getProfile(userId) : undefined;
-            if (await result.id) {
-                setFirstName(result.firstName);
-                const pictureResult = getPhotoById ? await getPhotoById(result.photo.id) : undefined;
+        if (userId !== '') {
+            try {
+                const result = getProfile ? await getProfile(userId) : undefined;
 
-                if (pictureResult) {
-                    setProfilePicture(pictureResult);
+                if (await result.id) {
+                    setFirstName(result.firstName);
+                    const pictureResult = getPhotoById ? await getPhotoById(result.photo.id) : undefined;
+
+                    if (pictureResult) {
+                        setProfilePicture(pictureResult);
+                    }
                 }
+            } catch (error) {
+                console.error("Error loading profile:", error);
             }
         }
-    }
+    };
+
     const getFriends = async () => {
         try {
             const userId = Storage.getString('userId');
@@ -160,9 +164,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
             const result = getNewsfeedPosts ? await getNewsfeedPosts() : undefined;
             if (await result) {
                 setPosts(result);
-                // console.log(result);
-                // const friendResult = getIsPosterFriend ? await getIsPosterFriend(result[0].poster.id) : undefined;
-                // console.log(friendResult);
                 setIsLoading(false);
             }
         } catch (error: any) {
@@ -232,7 +233,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     const getFriendRequestCount = async () => {
         try {
             const result = getFriendRequestsCount ? await getFriendRequestsCount() : undefined;
-            console.log(result);
+            // console.log(result);
             if (result) {
                 setFriendRequestCount(result);
                 // return result;
@@ -254,6 +255,10 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     //scroll refresh
     const handleRefresh = useCallback(() => {
         setRefreshing(true);
+        loadProfile();
+        getFriends();
+        getNotificationCount();
+        getFriendRequestCount();
         getPosts();
         setRefreshing(false);
     }, []);
@@ -277,11 +282,11 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                     <ActivityIndicator size="large" color={Colors.primaryBrand} />
                 </View>
-            ) : (
+            ) : posts.length > 0 ? (
                 <FlatList
                     data={posts}
                     onScroll={handleScroll}
-                    renderItem={({ item }) => <IndividualPost key={item.id} post={item} getPosts={getPosts} setSelectedPostId={setSelectedPostId} setSelectedPoster={setSelectedPoster} onGetComments={onGetComments} setIsOptionsVisible={setIsOptionsVisible} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={navigation} route={route} />}
+                    renderItem={({ item }) => <IndividualPost post={item} getPosts={getPosts} setSelectedPostId={setSelectedPostId} setSelectedPoster={setSelectedPoster} onGetComments={onGetComments} setIsOptionsVisible={setIsOptionsVisible} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={navigation} route={route} />}
                     keyExtractor={(item) => item.id}
                     showsVerticalScrollIndicator={false}
                     maxToRenderPerBatch={2}
@@ -297,7 +302,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                                     </View>
                                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.friendsView}>
                                         {friends.map((item: any) => (
-                                            <UserAvatar key={item.id} item={item} navigation={navigation} route={route} />
+                                            <UserAvatar item={item} navigation={navigation} route={route} />
                                         ))}
                                     </ScrollView>
                                 </View>
@@ -305,6 +310,21 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                         </TouchableWithoutFeedback>
                     }
                 />
+            ) : (
+                <TouchableWithoutFeedback onPress={() => commentBottomSheetRef.current && commentBottomSheetRef.current.close()}>
+                    <View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', borderBottomColor: 'lightgray', borderBottomWidth: 1 }}>
+                            <View style={{ marginStart: 5 }}>
+                                <UserAvatar item={{ id: userId, photo: { photoImageURL: profilePicture }, firstName: firstName }} navigation={navigation} route={route} />
+                            </View>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.friendsView}>
+                                {friends.map((item: any) => (
+                                    <UserAvatar item={item} navigation={navigation} route={route} />
+                                ))}
+                            </ScrollView>
+                        </View>
+                    </View>
+                </TouchableWithoutFeedback>
             )}
 
             {/* Comment Bottom Sheet */}
@@ -348,7 +368,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                         {comments.length > 0 ? (
                             <FlatList
                                 data={comments}
-                                renderItem={({ item }) => <IndividualComment key={item.id} comment={item} navigation={navigation} route={route} />}
+                                renderItem={({ item }) => <IndividualComment comment={item} navigation={navigation} route={route} />}
                                 keyExtractor={(item) => item.id}
                                 showsVerticalScrollIndicator={false} />
                         ) : (

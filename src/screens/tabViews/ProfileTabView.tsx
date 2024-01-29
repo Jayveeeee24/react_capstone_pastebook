@@ -1,10 +1,14 @@
 import * as React from 'react';
-import { View, useWindowDimensions, StyleSheet, TouchableOpacity, Text, ScrollView } from 'react-native';
+import { View, useWindowDimensions, StyleSheet, TouchableOpacity, Text, ScrollView, FlatList } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { IndividualPost } from '../../components/IndividualPost';
 import { Images } from '../../utils/Images';
-import { Colors } from '../../utils/Config';
+import { Colors, Storage } from '../../utils/Config';
+import { useEffect, useState } from 'react';
+import { usePost } from '../../context/PostContext';
+
+
 
 const FirstRoute = () => (
     <ScrollView showsVerticalScrollIndicator={false}>
@@ -12,6 +16,11 @@ const FirstRoute = () => (
             {/* <IndividualPost name='jayvee.artemis' avatarUrl={Images.sample_avatar} postImageUrl={Images.sample_post_image} postTitle="This is a post" postCaption="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Necessitatibus voluptates et quas numquam, ducimus autem asperiores itaque non provident, quam doloribus rerum, ullam fugit iste magni! Laboriosam iste modi possimus." comments={910} likes={1654432} onLikePress={() => { }} /> */}
         </View>
     </ScrollView>
+    // <FlatList
+    //     data={comments}
+    //     renderItem={({ item }) => <IndividualComment key={item.id} comment={item} navigation={navigation} route={route} />}
+    //     keyExtractor={(item) => item.id}
+    //     showsVerticalScrollIndicator={false} />
 );
 
 const SecondRoute = () => (
@@ -45,11 +54,52 @@ const renderTabBar = (props: { navigationState: { routes: any[]; index: any; }; 
 export const ProfileTabView = () => {
     const layout = useWindowDimensions();
 
+    //useEffect
+    useEffect(() => {
+        getOwnPost();
+        // getOthersPost();
+    }, [])
+
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
         { key: 'first', title: 'First' },
         { key: 'second', title: 'Second' },
     ]);
+
+    const { getMyOwnPosts, getOthersPosts } = usePost();
+
+
+    const [ownPosts, setOwnPosts] = useState<any>([]);
+    const [othersPosts, setOthersPosts] = useState<any>([]);
+
+
+    const getOwnPost = async () => {
+        const userId = Storage.getString('userId');
+        if(userId){
+            try {
+                const result = getMyOwnPosts ? await getMyOwnPosts(userId) : undefined;
+                if (await result) {
+                    console.log(result);
+                }
+            } catch (error: any) {
+                console.error("Error fetching photos:", error.response);
+            }
+        }
+    }
+
+    const getOthersPost = async () => {
+        const userId = Storage.getString('userId');
+        if(userId){
+            try {
+                const result = getOthersPosts ? await getOthersPosts(userId) : undefined;
+                if (await result) {
+                    console.log(result);
+                }
+            } catch (error: any) {
+                console.error("Error fetching photos:", error.response);
+            }
+        }
+    }
 
     return (
         <TabView

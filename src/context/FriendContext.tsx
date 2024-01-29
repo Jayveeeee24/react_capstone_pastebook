@@ -218,7 +218,7 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
 
             return result.data;
         } catch (error: any) {
-            console.log('get context error: ' + error);
+            console.log('get friend count error: ' + error);
             return error.response;
         }
     }
