@@ -53,36 +53,45 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
 
     const [notificationCount, setNotificationCount] = useState(0);
     const [friendRequestCount, setFriendRequestCount] = useState(0);
+    const getUserProfileExecuted = useRef(false);
 
 
     useFocusEffect(() => {
         getFriends();
         loadProfile();
-        getNotificationCount();
-        getFriendRequestCount();
+
     });
     useEffect(() => {
-        console.log("friend: " + friendRequestCount)
-        console.log("notif: " + notificationCount)
-        navigation.setOptions({
-            headerRight: () => (
-                <View style={{ flexDirection: 'row', marginRight: 10, alignItems: "center" }}>
-                    <NotificationIconWithBadge
-                        onPress={() => {
-                            navigation.navigate('Notifications');
-                        }}
-                        badgeCount={notificationCount} />
+        if (getUserProfileExecuted.current) {
+            navigation.setOptions({
+                headerRight: () => (
+                    <View style={{ flexDirection: 'row', marginRight: 10, alignItems: "center" }}>
+                        <NotificationIconWithBadge
+                            onPress={() => {
+                                navigation.navigate('Notifications');
+                            }}
+                            badgeCount={friendRequestCount} />
 
-                    <FriendRequestWithBadge
-                        onPress={async () => {
-                            navigation.navigate('FriendRequest');
-                        }}
-                        badgeCount={friendRequestCount} />
+                        <FriendRequestWithBadge
+                            onPress={async () => {
+                                navigation.navigate('FriendRequest');
+                            }}
+                            badgeCount={notificationCount} />
 
-                </View>
-            ),
-        });
-    }, [notificationCount, friendRequestCount])
+                    </View>
+                ),
+            });
+        } else {
+            getNotificationCount();
+            getFriendRequestCount();
+            getUserProfileExecuted.current = true;
+        }
+    }, [friendRequestCount, notificationCount]);
+    useEffect(() => {
+        // console.log("friend: " + friendRequestCount)
+        // console.log("notif: " + notificationCount)
+
+    }, [navigation, friendRequestCount, notificationCount])
     useEffect(() => {
         setIsLoading(true);
         getPosts();
@@ -212,20 +221,25 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
         try {
             const result = getNotificationsCount ? await getNotificationsCount() : undefined;
             if (result) {
+                // return result;
                 setNotificationCount(result);
             }
         } catch (error: any) {
             console.error("Error fetching notifs count:", error.response);
+            // return 0;
         }
     }
     const getFriendRequestCount = async () => {
         try {
             const result = getFriendRequestsCount ? await getFriendRequestsCount() : undefined;
-            if (await result) {
+            console.log(result);
+            if (result) {
                 setFriendRequestCount(result);
+                // return result;
             }
         } catch (error: any) {
             console.error("Error fetching friend request count:", error.response);
+            // return 0;
         }
     }
 

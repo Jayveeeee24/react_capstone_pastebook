@@ -421,15 +421,6 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                                     </View>
                                 </TouchableNativeFeedback>
 
-                                <TouchableNativeFeedback>
-                                    <View style={{ paddingHorizontal: 10, paddingVertical: 15, flexDirection: "row", alignItems: "center" }}>
-                                        <MaterialCommunityIcons name="account-outline" size={28} color={'#37474F'} style={{ flex: 0 }} />
-                                        <View style={{ marginStart: 10, alignSelf: "center", flex: 1 }}>
-                                            <Text style={{ fontSize: 18, color: '#37474F', fontFamily: 'Roboto-Medium' }}>Album: Greens</Text>
-                                        </View>
-                                        <MaterialIcons name="arrow-forward-ios" size={20} color={'#37474F'} style={{ flex: 0 }} />
-                                    </View>
-                                </TouchableNativeFeedback>
                             </View>
                         </ScrollView>
                         <TouchableOpacity
