@@ -8,6 +8,7 @@ interface FriendContextProps {
     getAllFriends?: (userId: string) => Promise<any>;
     getIsPosterFriend?: (posterId: string, userId: string) => Promise<any>;
     getAllFriendsByUserId?: (userId: string) => Promise<any>;
+    getAllSearchUsers?: (name: string) => Promise<any>;
 }
 
 interface FriendProviderProps {
@@ -86,7 +87,7 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
                             const photoId = friend.photo.id;
 
                             const photo = getPhotoById ? await getPhotoById(friend.photo.id) : undefined;
-                            if(photo){
+                            if (photo) {
                                 return {
                                     ...friend,
                                     photo: {
@@ -94,7 +95,7 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
                                         photoImageURL: await photo,
                                     },
                                 };
-                            }else {
+                            } else {
                                 console.error(`Error fetching photo for album with ID ${photoId}: Photo not found`);
                                 return friend;
                             }
@@ -115,11 +116,52 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
         }
     }
 
+    const getAllSearchUsers = async (name: string) => {
+        try {
+            const result = await axios.get(`${BASE_URL}/api/profile/search-users/${name}`);
+
+            // return result.data;
+            if (result && Array.isArray(result.data)) {
+                const updatedSearch = await Promise.all(
+                    result.data.map(async (search) => {
+                        try {
+                            const photoId = search.photo.id;
+
+                            const photo = getPhotoById ? await getPhotoById(search.photo.id) : undefined;
+                            if (photo) {
+                                return {
+                                    ...search,
+                                    photo: {
+                                        ...search.photo,
+                                        photoImageURL: await photo,
+                                    },
+                                };
+                            } else {
+                                console.error(`Error fetching photo for album with ID ${photoId}: Photo not found`);
+                                return search;
+                            }
+                        } catch (error: any) {
+                            console.error("Error fetching photo:", error);
+                            return search;
+                        }
+                    })
+                );
+
+                return updatedSearch;
+            } else {
+                console.error("Invalid data format:", result.data);
+                return [];
+            }
+        } catch (error: any) {
+            return error.response;
+        }
+    }
 
     const contextValue: FriendContextProps = {
         getAllFriends,
         getIsPosterFriend,
-        getAllFriendsByUserId
+        getAllFriendsByUserId,
+        getAllSearchUsers
     }
 
     return (
