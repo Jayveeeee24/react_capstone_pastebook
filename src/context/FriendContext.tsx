@@ -7,6 +7,7 @@ import { usePhoto } from "./PhotoContext";
 interface FriendContextProps {
     getAllFriends?: (userId: string) => Promise<any>;
     getIsPosterFriend?: (posterId: string, userId: string) => Promise<any>;
+    getAllFriendsByUserId?: (userId: string) => Promise<any>;
 }
 
 interface FriendProviderProps {
@@ -73,10 +74,52 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
         }
     }
 
+    const getAllFriendsByUserId = async (userId: string) => {
+        try {
+            const result = await axios.get(`${BASE_URL}/api/friend/get-all-friends/${userId}`);
+
+
+            if (result && Array.isArray(result.data)) {
+                const updatedFriends = await Promise.all(
+                    result.data.map(async (friend) => {
+                        try {
+                            const photoId = friend.photo.id;
+
+                            const photo = getPhotoById ? await getPhotoById(friend.photo.id) : undefined;
+                            if(photo){
+                                return {
+                                    ...friend,
+                                    photo: {
+                                        ...friend.photo,
+                                        photoImageURL: await photo,
+                                    },
+                                };
+                            }else {
+                                console.error(`Error fetching photo for album with ID ${photoId}: Photo not found`);
+                                return friend;
+                            }
+                        } catch (error: any) {
+                            console.error("Error fetching photo:", error);
+                            return friend;
+                        }
+                    })
+                );
+
+                return updatedFriends;
+            } else {
+                console.error("Invalid data format:", result.data);
+                return [];
+            }
+        } catch (error: any) {
+            return error.response || "An unexpected error occurred";
+        }
+    }
+
 
     const contextValue: FriendContextProps = {
         getAllFriends,
-        getIsPosterFriend
+        getIsPosterFriend,
+        getAllFriendsByUserId
     }
 
     return (

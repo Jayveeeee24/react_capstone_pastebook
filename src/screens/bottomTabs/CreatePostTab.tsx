@@ -13,7 +13,7 @@ import { useToast } from "react-native-toast-notifications";
 import { usePost } from "../../context/PostContext";
 import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import SearchBar from "react-native-dynamic-search-bar";
-import { IndividualSearch } from "../../components/IndividualSearch";
+import { IndividualUserSelect } from "../../components/IndividualUserSelect";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useFriend } from "../../context/FriendContext";
 import { useUser } from "../../context/UserContext";
@@ -482,7 +482,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
 
                                 <FlatList
                                     data={friends}
-                                    renderItem={({ item }) => <IndividualSearch key={item.id} item={item} setPostedUserId={setPostedUserId} bottomSheetRef={bottomSheetRef} navigation={navigation} route={route} />}
+                                    renderItem={({ item }) => <IndividualUserSelect key={item.id} item={item} setPostedUserId={setPostedUserId} bottomSheetRef={bottomSheetRef} navigation={navigation} route={route} />}
                                     keyExtractor={(item) => item.id}
                                     showsVerticalScrollIndicator={false} />
 

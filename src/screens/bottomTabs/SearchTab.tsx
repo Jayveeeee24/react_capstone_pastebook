@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Alert, Keyboard, SafeAreaView, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Alert, FlatList, Keyboard, SafeAreaView, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { Searchbar, TextInput } from "react-native-paper";
 import SearchBar from "react-native-dynamic-search-bar";
+import { useFriend } from "../../context/FriendContext";
+import { Storage } from "../../utils/Config";
 import { IndividualSearch } from "../../components/IndividualSearch";
 
 interface SearchTabProps {
@@ -10,8 +12,14 @@ interface SearchTabProps {
 }
 
 export const SearchTab: React.FC<SearchTabProps> = ({ navigation, route }) => {
+    const { getAllFriendsByUserId } = useFriend();
+
+    const [users, setUsers] = useState<any>([]);
+
     const [searchQuery, setSearchQuery] = useState('');
 
+
+    //useEffect
     useEffect(() => {
         navigation.setOptions({
             headerLeft: () => (
@@ -32,23 +40,36 @@ export const SearchTab: React.FC<SearchTabProps> = ({ navigation, route }) => {
         });
     }, [navigation, searchQuery]);
 
+    useEffect(() => {
+        getFriendsByUserId();
+    }, [])
+
+    //api functions
+    const getFriendsByUserId = async () => {
+        const userId = Storage.getString('userId');
+        if (userId) {
+            try {
+                const result = getAllFriendsByUserId ? await getAllFriendsByUserId(userId) : undefined;
+                if (await result) {
+                    console.log(result)
+                    setUsers(result);
+                }
+            } catch (error: any) {
+                console.error("Error fetching photos:", error.response);
+            }
+        }
+    }
+
     return (
         <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
             <ScrollView>
                 <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
                     <View style={{ flex: 1, flexDirection: "column", marginTop: 10 }}>
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
+                        <FlatList
+                            data={users}
+                            renderItem={({ item }) => <IndividualSearch key={item.id} item={item} navigation={navigation} route={route} />}
+                            keyExtractor={(item) => item.id}
+                            showsVerticalScrollIndicator={false} />
                     </View>
                 </TouchableWithoutFeedback>
             </ScrollView>
