@@ -74,18 +74,24 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
 
 
     //useEffects
-    useFocusEffect(
-        useCallback(() => {
-            const loadInitial = async () => {
-                getFriends();
-                loadProfile();
-                getNotificationCount();
-                getFriendRequestCount();
-            }
-            loadInitial();
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         const loadInitial = async () => {
+    //             getFriends();
+    //             loadProfile();
+    //             getNotificationCount();
+    //             getFriendRequestCount();
+    //         }
+    //         loadInitial();
 
-        }, [navigation, friendRequestCount, notificationCount])
-    );
+    //     }, [navigation, friendRequestCount, notificationCount])
+    // );
+    useFocusEffect(() => {
+        getFriends();
+        loadProfile();
+        getNotificationCount();
+        getFriendRequestCount();
+    })
     useEffect(() => {
         setIsLoading(true);
         getPosts();

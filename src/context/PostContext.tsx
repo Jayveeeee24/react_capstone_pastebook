@@ -233,45 +233,45 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
         try {
             const result = await axios.get(`${BASE_URL}/api/timeline/get-others-posts/${userId}`);
 
-            // if (result && Array.isArray(result.data)) {
-            //     const updatedPosts = await Promise.all(
-            //         result.data.map(async (post) => {
-            //             const updatedPost = { ...post, commentsCount: 0, likesCount: 0, friend: {} };
+            if (result && Array.isArray(result.data)) {
+                const updatedPosts = await Promise.all(
+                    result.data.map(async (post) => {
+                        const updatedPost = { ...post, commentsCount: 0, likesCount: 0, friend: {} };
 
-            //             if (updatedPost.photo && updatedPost.photoId) {
-            //                 updatedPost.photo.photoImageURL = getPhotoById ? await getPhotoById(post.photoId) : undefined;
-            //             }
+                        if (updatedPost.photo && updatedPost.photoId) {
+                            updatedPost.photo.photoImageURL = getPhotoById ? await getPhotoById(post.photoId) : undefined;
+                        }
 
-            //             if (updatedPost.poster && updatedPost.poster.photo && updatedPost.poster.photo.photoImageURL) {
-            //                 updatedPost.poster.photo.photoImageURL = getPhotoById ? await getPhotoById(updatedPost.poster.photo.id) : undefined;
-            //             }
+                        if (updatedPost.poster && updatedPost.poster.photo && updatedPost.poster.photo.photoImageURL) {
+                            updatedPost.poster.photo.photoImageURL = getPhotoById ? await getPhotoById(updatedPost.poster.photo.id) : undefined;
+                        }
 
-            //             if (updatedPost.timeline && updatedPost.timeline.user && updatedPost.timeline.user.photo && updatedPost.timeline.user.photo.photoImageURL) {
-            //                 updatedPost.timeline.user.photo.photoImageURL = getPhotoById ? await getPhotoById(updatedPost.timeline.user.photo.id) : undefined;
-            //             }
+                        if (updatedPost.timeline && updatedPost.timeline.user && updatedPost.timeline.user.photo && updatedPost.timeline.user.photo.photoImageURL) {
+                            updatedPost.timeline.user.photo.photoImageURL = getPhotoById ? await getPhotoById(updatedPost.timeline.user.photo.id) : undefined;
+                        }
 
-            //             const commentsCount = getPostCommentsCount ? await getPostCommentsCount(post.id) : 0;
-            //             updatedPost.commentsCount = commentsCount;
+                        const commentsCount = getPostCommentsCount ? await getPostCommentsCount(post.id) : 0;
+                        updatedPost.commentsCount = commentsCount;
 
-            //             const likesCount = getPostLikesCount ? await getPostLikesCount(post.id) : 0;
-            //             updatedPost.likesCount = likesCount;
+                        const likesCount = getPostLikesCount ? await getPostLikesCount(post.id) : 0;
+                        updatedPost.likesCount = likesCount;
 
-            //             // console.log(post.poster.id);
-            //             // console.log(userId);
-            //             if (userId) {
-            //                 const friend = getIsPosterFriend ? await getIsPosterFriend(updatedPost.poster.id, userId) : {};
-            //                 updatedPost.friend = await friend;
-            //             }
+                        // console.log(post.poster.id);
+                        // console.log(userId);
+                        if (userId) {
+                            const friend = getIsPosterFriend ? await getIsPosterFriend(updatedPost.poster.id, userId) : {};
+                            updatedPost.friend = await friend;
+                        }
 
-            //             return updatedPost;
-            //         })
-            //     );
+                        return updatedPost;
+                    })
+                );
 
-            //     return updatedPosts;
-            // } else {
-            //     console.error("Invalid data format received from the server");
-            //     return result.data;
-            // }
+                return updatedPosts;
+            } else {
+                console.error("Invalid data format received from the server");
+                return result.data;
+            }
 
             return result.data;
         } catch (error: any) {

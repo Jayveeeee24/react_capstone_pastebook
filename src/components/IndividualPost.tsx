@@ -29,9 +29,9 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
     useEffect(() => {
         const id = Storage.getString('userId');
         if (id) {
-          setUserId(id);
+            setUserId(id);
         }
-        
+
         isPostLiked(post.id);
     }, [post, isLiked]);
 
@@ -63,7 +63,17 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
         <View style={styles.container}>
             <View style={{ flex: 1 }}>
                 <View style={styles.headerContainer}>
-                    <TouchableOpacity onPress={() => { }}>
+                    <TouchableOpacity onPress={() => {
+                        const userId = Storage.getString('userId');
+                        if (userId) {
+                            console.log(userId);
+                            if (userId == post.poster.id) {
+                                navigation.navigate('ProfileTab');
+                            } else {
+                                navigation.navigate('OthersProfile', { userId: post.poster.id })
+                            }
+                        }
+                    }}>
                         <View style={styles.avatarContainer}>
                             <Card style={styles.avatarCard}>
                                 <Card.Cover resizeMode="cover" source={post.poster && post.poster.photo && post.poster.photo.photoImageURL ? { uri: post.poster.photo.photoImageURL } : Images.sample_avatar_neutral} style={styles.avatarImage} />

@@ -34,11 +34,15 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
     const [postCount, setPostCount] = useState(0);
     const [friendCount, setFriendCount] = useState(0);
     const [albumCount, setAlbumCount] = useState(0);
+    const [userId, setUserId] = useState('')
 
     useFocusEffect(
         useCallback(() => {
             const loadProfile = async () => {
                 const userId = Storage.getString('userId');
+                if(userId){
+                    setUserId(userId);
+                }
 
                 if (userId) {
                     const result = getProfile ? await getProfile(userId) : undefined;
@@ -151,7 +155,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                     </TouchableOpacity>
                 </View>
                 <View style={{ flex: 1 }}>
-                    <ProfileTabView navigation={navigation} route={route} />
+                    <ProfileTabView navigation={navigation} route={route} userId={userId} />
                 </View>
             </View>
         </SafeAreaView>

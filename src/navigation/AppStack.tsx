@@ -27,6 +27,7 @@ import { EditEmailScreen } from "../screens/stacks/otherScreens/EditEmailScreen"
 import { EditPasswordScreen } from "../screens/stacks/otherScreens/EditPasswordScreen";
 import { CameraScreen } from "../screens/stacks/otherScreens/CameraScreen";
 import { LikesScreen } from "../screens/stacks/otherScreens/LikesScreen";
+import { OthersProfileScreen } from "../screens/stacks/otherScreens/OthersProfileScreen";
 
 
 
@@ -112,6 +113,8 @@ export const AppStack = () => {
         <Stack.Screen name="Likes" component={LikesScreen} options={{
           headerTitle: 'Likes',
         }} />
+        <Stack.Screen name="OthersProfile" component={OthersProfileScreen} />
+
       </Stack.Navigator>
     );
   }

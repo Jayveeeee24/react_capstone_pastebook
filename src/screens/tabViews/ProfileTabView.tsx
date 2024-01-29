@@ -19,10 +19,11 @@ import { useFocusEffect } from '@react-navigation/native';
 interface ProfileTabViewProps {
     navigation: any;
     route: any;
+    userId: string;
 }
 
 
-export const ProfileTabView: React.FC<ProfileTabViewProps> = ({ navigation, route }) => {
+export const ProfileTabView: React.FC<ProfileTabViewProps> = ({ navigation, route, userId }) => {
     const layout = useWindowDimensions();
     const toast = useToast();
 
@@ -30,16 +31,12 @@ export const ProfileTabView: React.FC<ProfileTabViewProps> = ({ navigation, rout
     //context
     const { getMyOwnPosts, getOthersPosts } = usePost();
     const { addComment, getComments } = useComment();
-    const { getNewsfeedPosts, deletePost } = usePost();
-
-
-
+    const { deletePost } = usePost();
 
     const [ownPosts, setOwnPosts] = useState<any>([]);
     const [othersPosts, setOthersPosts] = useState<any>([]);
     const [profilePicture, setProfilePicture] = useState<any>();
     const [comments, setComments] = useState<any>([]);
-    const [posts, setPosts] = useState<any>([]);
 
 
     const [selectedPostId, setSelectedPostId] = useState('');
@@ -73,10 +70,10 @@ export const ProfileTabView: React.FC<ProfileTabViewProps> = ({ navigation, rout
 
 
     //useEffect
-    useEffect(() => {
-        getOwnPost();
-        getOthersPost();
-    }, [])
+    // useEffect(() => {
+    //     getOwnPost();
+    //     getOthersPost();
+    // }, [])
     useFocusEffect(
         useCallback(() => {
             const loadProfile = async () => {
@@ -86,18 +83,17 @@ export const ProfileTabView: React.FC<ProfileTabViewProps> = ({ navigation, rout
 
             loadProfile();
 
-        }, [navigation])
+        }, [navigation, userId])
     );
 
 
     //api functions
     const getOwnPost = async () => {
-        const userId = Storage.getString('userId');
         if (userId) {
             try {
                 const result = getMyOwnPosts ? await getMyOwnPosts(userId) : undefined;
                 if (await result) {
-                    console.log(result);
+                    // console.log(result);
                     setOwnPosts(result);
                 }
             } catch (error: any) {
@@ -107,12 +103,11 @@ export const ProfileTabView: React.FC<ProfileTabViewProps> = ({ navigation, rout
     }
 
     const getOthersPost = async () => {
-        const userId = Storage.getString('userId');
         if (userId) {
             try {
                 const result = getOthersPosts ? await getOthersPosts(userId) : undefined;
                 if (await result) {
-                    console.log(result);
+                    // console.log(result);
                     setOthersPosts(result);
                 }
             } catch (error: any) {

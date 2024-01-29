@@ -13,6 +13,7 @@ interface FriendContextProps {
     acceptFriendRequest?: (requestId: string) => Promise<any>; 
     rejectFriendRequest?: (requestId: string) => Promise<any>;
     getFriendRequestsCount?: () => Promise<any>;
+    getFriendExist?: (receiverId: string, senderId: string) => Promise<any>;
 }
 
 interface FriendProviderProps {
@@ -223,6 +224,16 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
         }
     }
 
+    const getFriendExist = async (receiverId: string, senderId: string) => {
+        try {
+            const result = await axios.post(`${BASE_URL}/api/friend/get-friend-exist`, {receiverId, senderId});
+            return result.data;
+        } catch (error: any) {
+            console.log('get friend exist error: ' + error);
+            return error.response;
+        }
+    }
+
 
     const contextValue: FriendContextProps = {
         getAllFriends,
@@ -232,7 +243,8 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
         getAllFriendRequest,
         acceptFriendRequest,
         rejectFriendRequest,
-        getFriendRequestsCount
+        getFriendRequestsCount,
+        getFriendExist
     }
 
     return (
