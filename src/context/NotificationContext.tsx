@@ -8,6 +8,7 @@ interface NotificationContextProps {
     getNotificationContext?: (notificationId: string) => Promise<any>;
     clearAllNotifications?: () => Promise<any>;
     updateReadNotification?: (notificationId: string) => Promise<any>;
+    getNotificationsCount?: () => Promise<any>;
 }
 
 interface NotificationProviderProps {
@@ -80,7 +81,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
                 return [];
             }
         } catch (error: any) {
-            return error.response || "An unexpected error occurred";
+            console.log(error)
+            return error || "An unexpected error occurred";
         }
     }
 
@@ -115,12 +117,23 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
         }
     }
 
+    const getNotificationsCount = async () => {
+        try {
+            const result = await axios.get(`${BASE_URL}/api/notification/get-notifications-count`);
+            return result.data;
+        } catch (error: any) {
+            console.log('get notification count error: ' + error);
+            return error.response;
+        }
+    }
+
 
     const contextValue: NotificationContextProps = {
         getAllNotifications,
         getNotificationContext,
         clearAllNotifications,
-        updateReadNotification
+        updateReadNotification,
+        getNotificationsCount
     }
 
     return (

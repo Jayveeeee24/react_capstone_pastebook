@@ -85,24 +85,6 @@ export const AppStack = () => {
         })}>
         <Stack.Screen name="Home" component={HomeTab} options={{
           title: '',
-          headerRight: () => (
-            <View style={{ flexDirection: 'row', marginRight: 10, alignItems: "center" }}>
-              <NotificationIconWithBadge
-                onPress={() => {
-                  navigation.navigate('Notifications');
-                }}
-                badgeCount={3} />
-
-              <TouchableOpacity
-                onPress={async () => {
-                  navigation.navigate('FriendRequest');
-                }}
-              >
-                <MaterialCommunityIcons name="account-plus-outline" size={30} color="black" />
-              </TouchableOpacity>
-
-            </View>
-          ),
           headerLeft: () => (
             <View style={{ flexDirection: 'row', marginLeft: 10 }}>
               <Image

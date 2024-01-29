@@ -23,13 +23,13 @@ export const convertToRelativeTime = (timestamp: string) => {
     const date = new Date(timestamp);
     const relativeTime = formatDistanceToNow(date, { addSuffix: false });
 
-    // Extract number and unit using regex
+
     const match = relativeTime.match(/(\d+) (\w+)/);
     if (match) {
         const [_, number, unit] = match;
-        const modifiedUnit = Number(number) < 0 ? unit.replace(/s$/, '') : unit; // Remove 's' from the end of the unit if number is greater than 1
-        return `${number} ${modifiedUnit} ago`; // Using only the first character of the unit
+        const modifiedUnit = Number(number) < 0 ? unit.replace(/s$/, '') : unit; 
+        return `${number} ${modifiedUnit} ago`; 
     }
 
-    return relativeTime; // Return the original relative time if no match
+    return relativeTime + ' ago'; 
 };

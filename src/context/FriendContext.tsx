@@ -12,6 +12,7 @@ interface FriendContextProps {
     getAllFriendRequest?: () => Promise<any>;
     acceptFriendRequest?: (requestId: string) => Promise<any>; 
     rejectFriendRequest?: (requestId: string) => Promise<any>;
+    getFriendRequestsCount?: () => Promise<any>;
 }
 
 interface FriendProviderProps {
@@ -211,6 +212,17 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
         }
     }
 
+    const getFriendRequestsCount = async () => {
+        try {
+            const result = await axios.get(`${BASE_URL}/api/friend/get-all-friend-request-count`);
+
+            return result.data;
+        } catch (error: any) {
+            console.log('get context error: ' + error);
+            return error.response;
+        }
+    }
+
 
     const contextValue: FriendContextProps = {
         getAllFriends,
@@ -219,7 +231,8 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
         getAllSearchUsers,
         getAllFriendRequest,
         acceptFriendRequest,
-        rejectFriendRequest
+        rejectFriendRequest,
+        getFriendRequestsCount
     }
 
     return (

@@ -30,6 +30,7 @@ export const NotificationScreen: React.FC<NotificationScreenProps> = ({ navigati
     const getNotifications = async () => {
         try {
             const result = getAllNotifications ? await getAllNotifications() : undefined;
+
             if (result && Array.isArray(result)) {
                 // for (let i = 0; i < result.length; i++) {
                 //     console.log(result[i].notifier);

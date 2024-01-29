@@ -16,6 +16,9 @@ import { useComment } from "../../context/CommentContext";
 import { useToast } from "react-native-toast-notifications";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { Modal } from "react-native-paper";
+import { NotificationIconWithBadge } from "../../components/customComponents/NotificationWithBadge";
+import { FriendRequestWithBadge } from "../../components/customComponents/FriendRequestWithBadge";
+import { useNotification } from "../../context/NotificationContext";
 
 interface HomeTabProps {
     navigation: any;
@@ -24,9 +27,10 @@ interface HomeTabProps {
 
 export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     const toast = useToast();
-    const { getAllFriends, getIsPosterFriend } = useFriend();
+    const { getAllFriends, getIsPosterFriend, getFriendRequestsCount } = useFriend();
     const { getProfile } = useUser();
     const { getPhotoById } = usePhoto();
+    const { getNotificationsCount } = useNotification();
     const { getNewsfeedPosts, deletePost } = usePost();
     const { addComment, getComments } = useComment();
 
@@ -47,23 +51,50 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     const [selectedPoster, setSelectedPoster] = useState<any>();
     const [commentContent, setCommentContent] = useState('');
 
+    const [notificationCount, setNotificationCount] = useState(0);
+    const [friendRequestCount, setFriendRequestCount] = useState(0);
+
+
     useFocusEffect(() => {
-        loadProfile();
-    })
-    useFocusEffect(() =>{
         getFriends();
-    })
+        loadProfile();
+        getNotificationCount();
+        getFriendRequestCount();
+    });
+    useEffect(() => {
+        console.log("friend: " + friendRequestCount)
+        console.log("notif: " + notificationCount)
+        navigation.setOptions({
+            headerRight: () => (
+                <View style={{ flexDirection: 'row', marginRight: 10, alignItems: "center" }}>
+                    <NotificationIconWithBadge
+                        onPress={() => {
+                            navigation.navigate('Notifications');
+                        }}
+                        badgeCount={notificationCount} />
+
+                    <FriendRequestWithBadge
+                        onPress={async () => {
+                            navigation.navigate('FriendRequest');
+                        }}
+                        badgeCount={friendRequestCount} />
+
+                </View>
+            ),
+        });
+    }, [notificationCount, friendRequestCount])
     useEffect(() => {
         setIsLoading(true);
         getPosts();
-    }, []);
+    }, [navigation]);
     useEffect(() => {
         navigation.addListener('focus', () => {
+
             if (route.params?.refresh) {
                 getPosts();
             }
         });
-    }, [route.params?.refresh])
+    }, [route.params?.refresh]);
 
     //Bottom sheets
     const commentBottomSheetRef = useRef<BottomSheet>(null);
@@ -128,7 +159,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
         } catch (error: any) {
             console.error("Error fetching photos:", error.response);
         }
-
     }
     const onDeletePost = async () => {
         try {
@@ -178,6 +208,27 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
             }
         }
     }
+    const getNotificationCount = async () => {
+        try {
+            const result = getNotificationsCount ? await getNotificationsCount() : undefined;
+            if (result) {
+                setNotificationCount(result);
+            }
+        } catch (error: any) {
+            console.error("Error fetching notifs count:", error.response);
+        }
+    }
+    const getFriendRequestCount = async () => {
+        try {
+            const result = getFriendRequestsCount ? await getFriendRequestsCount() : undefined;
+            if (await result) {
+                setFriendRequestCount(result);
+            }
+        } catch (error: any) {
+            console.error("Error fetching friend request count:", error.response);
+        }
+    }
+
 
     //modal
     const [visible, setVisible] = useState(false);

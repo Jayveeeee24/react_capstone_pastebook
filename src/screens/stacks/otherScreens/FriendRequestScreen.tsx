@@ -57,13 +57,20 @@ export const FriendRequestScreen: React.FC<FriendRequestScreenProps> = ({ naviga
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-            <FlatList
+            {friendRequests.length > 0 ? (
+                <FlatList
                 data={friendRequests}
                 onScroll={handleScroll}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
                 renderItem={({ item }) => <IndividualFriendRequest key={item.id} friendRequest={item} getFriendRequests={getFriendRequests} navigation={navigation} route={route} />}
                 keyExtractor={(item) => item.id}
                 showsVerticalScrollIndicator={false} />
+            ) : (
+                <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                    <Text style={{ color: 'black', fontWeight: '700', fontSize: 22 }}>No Friend Requests yet</Text>
+                    <Text style={{ color: '#263238', fontWeight: '500', fontSize: 15 }}>Add some!</Text>
+                </View>
+            )}
         </SafeAreaView>
     );
 }
