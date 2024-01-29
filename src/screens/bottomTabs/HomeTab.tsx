@@ -278,7 +278,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-            {isLoading ? (
+            {isLoading || refreshing ? (
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                     <ActivityIndicator size="large" color={Colors.primaryBrand} />
                 </View>

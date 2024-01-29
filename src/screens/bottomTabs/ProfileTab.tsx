@@ -151,7 +151,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                     </TouchableOpacity>
                 </View>
                 <View style={{ flex: 1 }}>
-                    <ProfileTabView />
+                    <ProfileTabView navigation={navigation} route={route} />
                 </View>
             </View>
         </SafeAreaView>
