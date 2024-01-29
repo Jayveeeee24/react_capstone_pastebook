@@ -13,7 +13,7 @@ interface NotificationScreenProps {
 }
 
 export const NotificationScreen: React.FC<NotificationScreenProps> = ({ navigation, route }) => {
-    const { getAllNotifications } = useNotification();
+    const { getAllNotifications, clearAllNotifications } = useNotification();
 
     const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -34,7 +34,7 @@ export const NotificationScreen: React.FC<NotificationScreenProps> = ({ navigati
                 // for (let i = 0; i < result.length; i++) {
                 //     console.log(result[i].notifier);
                 // }
-                    console.log(result[0].notifiedDate);
+                // console.log(result[0].notifiedDate);
 
 
                 setNotifications(result);
@@ -43,6 +43,18 @@ export const NotificationScreen: React.FC<NotificationScreenProps> = ({ navigati
             console.error("Error fetching notifications:", error);
         }
     }
+    const onClearNotification = async () => {
+        try {
+            const result = clearAllNotifications ? await clearAllNotifications() : undefined;
+            if (result) {
+                getNotifications();
+            }
+        } catch (error) {
+            console.error("Error clearing notifications:", error);
+        }
+    }
+    
+
     //scrollviews
     const handleRefresh = useCallback(() => {
         setRefreshing(true);
@@ -64,34 +76,43 @@ export const NotificationScreen: React.FC<NotificationScreenProps> = ({ navigati
         }
     };
 
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-            <FlatList
-                data={notifications}
-                renderItem={({ item }) => (
-                    <IndividualNotification key={item.id} notification={item} navigation={navigation} route={route} />
-                )}
-                keyExtractor={(item) => item.id}
-                // numColumns={3}
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
-                showsVerticalScrollIndicator={false}
-                // maxToRenderPerBatch={10}
-                // updateCellsBatchingPeriod={100}
-                // initialNumToRender={10}
-                ListHeaderComponent={() => (
-                    <View>
-                        <TouchableOpacity style={{ flexDirection: "row", marginHorizontal: 20, justifyContent: "flex-end", alignItems: "center" }}>
-                            <MaterialCommunityIcons name="notification-clear-all" size={25} color={'black'} />
-                            <Text style={{ color: 'black', marginStart: 5 }}>Clear all</Text>
-                        </TouchableOpacity>
-                        {/* <Text style={{ marginHorizontal: 10, marginVertical: 13, fontSize: 18, color: 'black', fontFamily: 'Roboto-Medium' }}>Yesterday</Text>
+            {notifications.length > 0 ? (
+                <FlatList
+                    data={notifications}
+                    renderItem={({ item }) => (
+                        <IndividualNotification key={item.id} notification={item} getNotifications={getNotifications} navigation={navigation} route={route} />
+                    )}
+                    keyExtractor={(item) => item.id}
+                    // numColumns={3}
+                    onScroll={handleScroll}
+                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+                    showsVerticalScrollIndicator={false}
+                    // maxToRenderPerBatch={10}
+                    // updateCellsBatchingPeriod={100}
+                    // initialNumToRender={10}
+                    ListHeaderComponent={() => (
+                        <View>
+                            <TouchableOpacity onPress={onClearNotification} style={{ display: notifications.length > 0 ? 'flex' : 'none', flexDirection: "row", marginHorizontal: 20, justifyContent: "flex-end", alignItems: "center" }}>
+                                <MaterialCommunityIcons name="notification-clear-all" size={25} color={'black'} />
+                                <Text style={{ color: 'black', marginStart: 5 }}>Clear all</Text>
+                            </TouchableOpacity>
+                            {/* <Text style={{ marginHorizontal: 10, marginVertical: 13, fontSize: 18, color: 'black', fontFamily: 'Roboto-Medium' }}>Yesterday</Text>
                     <IndividualNotification />
                     <Text style={{ marginHorizontal: 10, marginVertical: 13, fontSize: 18, color: 'black', fontFamily: 'Roboto-Medium' }}>Last 7 days</Text>
                     <IndividualNotification />
                     */}
-                    </View>
-                )}
-            />
+                        </View>
+                    )}
+                />
+            ) : (
+                <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                    <Text style={{ color: 'black', fontWeight: '700', fontSize: 22 }}>No Notifications yet</Text>
+                    <Text style={{ color: '#263238', fontWeight: '500', fontSize: 15 }}>Interact with others.</Text>
+                </View>
+            )}
 
         </SafeAreaView>
     );

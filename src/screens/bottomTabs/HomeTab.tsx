@@ -289,7 +289,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                         ) : (
                             <View style={{ flex: 1, alignItems: "center", marginTop: 50 }}>
                                 <Text style={{ color: 'black', fontWeight: '700', fontSize: 22 }}>No comments yet</Text>
-                                <Text style={{ color: 'darkgray', fontWeight: '500', fontSize: 15 }}>Start the conversation.</Text>
+                                <Text style={{ color: '#263238', fontWeight: '500', fontSize: 15 }}>Start the conversation.</Text>
                             </View>
                         )}
                     </View>

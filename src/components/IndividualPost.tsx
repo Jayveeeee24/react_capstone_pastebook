@@ -27,11 +27,12 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
     const [userId, setUserId] = useState('');
 
     useEffect(() => {
-        isPostLiked();
         const id = Storage.getString('userId');
         if (id) {
           setUserId(id);
         }
+        
+        isPostLiked();
     }, [post, isLiked]);
 
     const onLikePost = async () => {

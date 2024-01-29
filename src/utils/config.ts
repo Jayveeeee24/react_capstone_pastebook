@@ -27,7 +27,7 @@ export const convertToRelativeTime = (timestamp: string) => {
     const match = relativeTime.match(/(\d+) (\w+)/);
     if (match) {
         const [_, number, unit] = match;
-        const modifiedUnit = Number(number) < 1 ? unit.replace(/s$/, '') : unit; // Remove 's' from the end of the unit if number is greater than 1
+        const modifiedUnit = Number(number) < 0 ? unit.replace(/s$/, '') : unit; // Remove 's' from the end of the unit if number is greater than 1
         return `${number} ${modifiedUnit} ago`; // Using only the first character of the unit
     }
 

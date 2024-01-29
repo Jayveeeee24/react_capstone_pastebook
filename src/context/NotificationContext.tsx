@@ -6,6 +6,8 @@ import { usePhoto } from "./PhotoContext";
 interface NotificationContextProps {
     getAllNotifications?: () => Promise<any>;
     getNotificationContext?: (notificationId: string) => Promise<any>;
+    clearAllNotifications?: () => Promise<any>;
+    updateReadNotification?: (notificationId: string) => Promise<any>;
 }
 
 interface NotificationProviderProps {
@@ -65,19 +67,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
                                 updatedNotification.notifier.photo.photoImageURL = receiverPhoto;
                             }
                         }
-                        // console.log(context.id);
-
-                        // if(updatedNotification.notificationType == "like"){
-                        //     updatedNotification.notifier = updatedNotification.context.liker;
-
-                        //     const likerPhoto = getPhotoById ? await getPhotoById(updatedNotification.context.liker.photo) : undefined;
-                        //     updatedNotification.notifier.photo.photoImageURL = likerPhoto;
-                        // }else{
-                        //     updatedNotification.notifier = updatedNotification.context.commenter;
-
-                        //     const commenterPhoto = getPhotoById ? await getPhotoById(updatedNotification.context.commenter.photo) : undefined;
-                        //     updatedNotification.notifier.photo.photoImageURL = commenterPhoto;
-                        // }
 
                         return updatedNotification;
                     })
@@ -106,10 +95,32 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
         }
     }
 
+    const clearAllNotifications = async () => {
+        try {
+            const result = await axios.delete(`${BASE_URL}/api/notification/clear-notification`);
+            return result.data;
+        } catch (error: any) {
+            console.log('clear notifs error: ' + error);
+            return error.response;
+        }
+    }
+
+    const updateReadNotification = async (notificationId: string) => {
+        try {
+            const result = await axios.put(`${BASE_URL}/api/notification/update-notification-read/${notificationId}`);
+            return result.data;
+        } catch (error: any) {
+            console.log('read notif error: ' + error);
+            return error.response;
+        }
+    }
+
 
     const contextValue: NotificationContextProps = {
         getAllNotifications,
-        getNotificationContext
+        getNotificationContext,
+        clearAllNotifications,
+        updateReadNotification
     }
 
     return (
