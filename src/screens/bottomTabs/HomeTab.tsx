@@ -19,6 +19,7 @@ import { Modal } from "react-native-paper";
 import { NotificationIconWithBadge } from "../../components/customComponents/NotificationWithBadge";
 import { FriendRequestWithBadge } from "../../components/customComponents/FriendRequestWithBadge";
 import { useNotification } from "../../context/NotificationContext";
+import { Item } from "react-native-paper/lib/typescript/components/Drawer/Drawer";
 
 interface HomeTabProps {
     navigation: any;
@@ -86,14 +87,46 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
 
     //     }, [navigation, friendRequestCount, notificationCount])
     // );
-    useFocusEffect(() => {
-        getFriends();
+    // useFocusEffect(() => {
+    //     getFriends();
+    //     loadProfile();
+    //     getNotificationCount();
+    //     getFriendRequestCount();
+    // })
+    const [isImageLoading, setIsImageLoading] = useState(true);
+
+    useEffect(() => {
+        const loadProfile = async () => {
+            setUserId(Storage.getString('userId')!);
+
+            if (userId !== '') {
+                try {
+                    const result = getProfile ? await getProfile(userId) : undefined;
+
+                    if (await result.id) {
+                        setFirstName(result.firstName);
+                        const pictureResult = getPhotoById ? await getPhotoById(result.photo.id) : undefined;
+
+                        if (pictureResult) {
+                            setProfilePicture(pictureResult);
+                            setIsImageLoading(false);  // Set loading to false when image is loaded
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error loading profile:", error);
+                }
+            }
+        };
+
         loadProfile();
-        getNotificationCount();
-        getFriendRequestCount();
-    })
+    }, [getProfile, getPhotoById, userId]);
+
     useEffect(() => {
         setIsLoading(true);
+
+        getFriends();
+        getNotificationCount();
+        getFriendRequestCount();
         getPosts();
     }, [navigation, getPhotoById, getProfile])
     useEffect(() => {
@@ -303,12 +336,17 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                         <TouchableWithoutFeedback onPress={() => commentBottomSheetRef.current && commentBottomSheetRef.current.close()}>
                             <View>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', borderBottomColor: 'lightgray', borderBottomWidth: 1 }}>
-                                    <View style={{ marginStart: 5 }}>
-                                        <UserAvatar item={{ id: userId, photo: { photoImageURL: profilePicture }, firstName: firstName }} navigation={navigation} route={route} />
-                                    </View>
+                                    {profilePicture &&
+                                        <View style={{ marginStart: 5 }}>
+                                            {isImageLoading ? (
+                                                <ActivityIndicator size="small" color={Colors.primaryBrand} />
+                                            ) : (
+                                                <UserAvatar key={userId} item={{ id: userId, photo: { photoImageURL: profilePicture }, firstName: firstName }} navigation={navigation} route={route} />
+                                            )}
+                                        </View>}
                                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.friendsView}>
                                         {friends.map((item: any) => (
-                                            <UserAvatar item={item} navigation={navigation} route={route} />
+                                            <UserAvatar key={item.id} item={item} navigation={navigation} route={route} />
                                         ))}
                                     </ScrollView>
                                 </View>

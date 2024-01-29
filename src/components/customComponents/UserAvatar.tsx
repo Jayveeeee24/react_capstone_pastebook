@@ -15,7 +15,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({ item, navigation, route 
     const userId = Storage.getString('userId');
 
     return (
-        <View style={{marginHorizontal: 5}}>
+        <View style={{marginHorizontal: 5}} key={item}>
             <TouchableOpacity>
                 <Card style={styles.avatarContainer}>
                     <Card.Cover resizeMode="cover" source={item.photo.photoImageURL ? { uri: item.photo.photoImageURL } : Images.sample_avatar_neutral} style={styles.avatarImage} />

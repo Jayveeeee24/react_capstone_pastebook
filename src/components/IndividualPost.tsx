@@ -60,13 +60,12 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
     }
 
     return (
-        <View style={styles.container}>
+        <View style={styles.container} key={post.id}>
             <View style={{ flex: 1 }}>
                 <View style={styles.headerContainer}>
                     <TouchableOpacity onPress={() => {
                         const userId = Storage.getString('userId');
                         if (userId) {
-                            console.log(userId);
                             if (userId == post.poster.id) {
                                 navigation.navigate('ProfileTab');
                             } else {

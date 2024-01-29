@@ -10,6 +10,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { ProfileTabView } from "../../tabViews/ProfileTabView";
 import { Images } from "../../../utils/Images";
 import { useFriend } from "../../../context/FriendContext";
+import axios from "axios";
 
 interface OthersProfileScreenProps {
     navigation: any;
@@ -52,6 +53,9 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
 
                     setUserId(route.params.userId);
 
+                    // console.log("receiverId " + id);
+                    // console.log("senderId " + route.params.userId);
+
                     const result = getProfile ? await getProfile(route.params.userId) : undefined;
                     if (await result.id) {
                         setFirstName(result.firstName);
@@ -82,11 +86,10 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
     );
 
     useEffect(() => {
-        
         loadIsFriend();
-    })
+    }, [])
 
-    
+
 
     useEffect(() => {
         navigation.setOptions({
@@ -120,11 +123,15 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
 
 
     const loadIsFriend = async () => {
-        console.log("userId " + userId);
-        console.log("viewerId " + viewerId);
+        console.log("userId [" + userId + "]");
+        console.log("viewerId [" + viewerId + "]");
         try {
             const result = getFriendExist ? await getFriendExist(userId, viewerId) : undefined;
-            if (await result) {
+            axios.interceptors.request.use(request => {
+              console.log('Starting Request', request);
+              return request;
+            });
+            if (result) {
                 // console.log(result);
             }
         } catch (error: any) {

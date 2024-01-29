@@ -225,8 +225,11 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
     }
 
     const getFriendExist = async (receiverId: string, senderId: string) => {
+        console.log("receiverId " + receiverId);
+        console.log("senderId " + senderId);
+        // console.log(axios.defaults.headers.common["Authorization"]);
         try {
-            const result = await axios.post(`${BASE_URL}/api/friend/get-friend-exist`, {receiverId, senderId});
+            const result = await axios.post(`${BASE_URL}/api/friend/get-friend-exist`, { receiverId, senderId });
             return result.data;
         } catch (error: any) {
             console.log('get friend exist error: ' + error);
