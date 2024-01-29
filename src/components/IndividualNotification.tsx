@@ -32,14 +32,11 @@ export const IndividualNotification: React.FC<IndividualNotificationProps> = ({ 
             <TouchableOpacity style={{ marginVertical: 5 }} onPress={() => readNotification()}>
                 <View style={{ flexDirection: 'row', width: '100%', justifyContent: "space-between", paddingVertical: 8, paddingHorizontal: 12, alignItems: "center" }}>
                     <View style={{ flex: 0 }}>
-                        {/* notification.notifier.photo.photoImageURL ? {uri: notification.notifier.photo.photoImageURL} :  */}
                         <Image source={notification.notifier.photo.photoImageURL ? { uri: notification.notifier.photo.photoImageURL } : Images.sample_avatar_neutral} resizeMode="cover" style={{ aspectRatio: 1, width: 50, height: 50, borderRadius: 25 }} />
                     </View>
                     <View style={{ flex: 1, justifyContent: 'flex-start' }}>
                         <Text style={{ fontSize: 14, fontFamily: 'Roboto-Medium', color: 'gray', marginStart: 10 }}>
-                            {/* ${notification.notifier.firstName.toLowerCase().replace(/\s/g, '')}.${notification.notifier.lastName.toLowerCase()} */}
                             <Text style={{ color: 'black', fontWeight: '700' }}>{(notification.notifier.firstName && notification.notifier.lastName) && `${notification.notifier.firstName.toLowerCase().replace(/\s/g, '')}.${notification.notifier.lastName.toLowerCase()}`}</Text>
-                            {/* notification.type == 'like' ? " has liked your post" : " has commented on your post." */}
                             <Text style={{ color: '#263238' }}>
                                 {
                                     notification.notificationType === 'like' ? ' has liked your post' :

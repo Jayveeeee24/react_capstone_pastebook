@@ -9,6 +9,9 @@ interface FriendContextProps {
     getIsPosterFriend?: (posterId: string, userId: string) => Promise<any>;
     getAllFriendsByUserId?: (userId: string) => Promise<any>;
     getAllSearchUsers?: (name: string) => Promise<any>;
+    getAllFriendRequest?: () => Promise<any>;
+    acceptFriendRequest?: (requestId: string) => Promise<any>; 
+    rejectFriendRequest?: (requestId: string) => Promise<any>;
 }
 
 interface FriendProviderProps {
@@ -157,11 +160,66 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
         }
     }
 
+    const getAllFriendRequest = async () => {
+        try {
+            const result = await axios.get(`${BASE_URL}/api/friend/get-all-friend-request`);
+
+            if (result && Array.isArray(result.data)) {
+                const updatedFriendRequests = await Promise.all(
+                    result.data.map(async (friendRequest) => {
+                        const updatedFriendRequest = { ...friendRequest, commentsCount: 0, likesCount: 0, friend: {} };
+
+                        // if (updatedFriendRequest.receiver.photo && updatedFriendRequest.receiver.photo.id) {
+                        //     updatedFriendRequest.receiver.photo.photoImageURL = getPhotoById ? await getPhotoById(updatedFriendRequest.receiver.photo.id) : undefined;
+                        // }
+
+                        if (updatedFriendRequest.sender.photo && updatedFriendRequest.sender.photo.id) {
+                            updatedFriendRequest.sender.photo.photoImageURL = getPhotoById ? await getPhotoById(updatedFriendRequest.sender.photo.id) : undefined;
+                        }
+
+
+                        return updatedFriendRequest;
+                    })
+                );
+
+                return updatedFriendRequests;
+            } else {
+                console.error("Invalid data format received from the server");
+                return result.data;
+            }
+        } catch (error: any) {
+            console.log('get friend requests error: ' + error);
+            return error.response;
+        }
+    }
+
+    const acceptFriendRequest = async (requestId: string) => {
+        try {
+            const response = await axios.post(`${BASE_URL}/api/friend/accept-friend/${requestId}`);
+            return response.data;
+        } catch (error: any) {
+            return error.response;
+        }
+    }
+
+    const rejectFriendRequest = async (requestId: string) => {
+        try {
+            const response = await axios.delete(`${BASE_URL}/api/friend/reject-friend/${requestId}`);
+            return response.data;
+        } catch (error: any) {
+            return error.response;
+        }
+    }
+
+
     const contextValue: FriendContextProps = {
         getAllFriends,
         getIsPosterFriend,
         getAllFriendsByUserId,
-        getAllSearchUsers
+        getAllSearchUsers,
+        getAllFriendRequest,
+        acceptFriendRequest,
+        rejectFriendRequest
     }
 
     return (

@@ -77,10 +77,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
                 return updatedNotifications;
             } else {
                 console.error("Invalid data format received from the server");
-                return result.data;
+                return [];
             }
         } catch (error: any) {
-            return error.response?.data?.result || "An unexpected error occurred";
+            return error.response || "An unexpected error occurred";
         }
     }
 

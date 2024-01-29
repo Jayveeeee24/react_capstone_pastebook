@@ -30,18 +30,17 @@ export const NotificationScreen: React.FC<NotificationScreenProps> = ({ navigati
     const getNotifications = async () => {
         try {
             const result = getAllNotifications ? await getAllNotifications() : undefined;
-            if (result) {
+            if (result && Array.isArray(result)) {
                 // for (let i = 0; i < result.length; i++) {
                 //     console.log(result[i].notifier);
                 // }
                 // console.log(result[0].notifiedDate);
-
-
                 setNotifications(result);
             }
         } catch (error) {
             console.error("Error fetching notifications:", error);
         }
+        setRefreshing(false);
     }
     const onClearNotification = async () => {
         try {
@@ -59,9 +58,7 @@ export const NotificationScreen: React.FC<NotificationScreenProps> = ({ navigati
     const handleRefresh = useCallback(() => {
         setRefreshing(true);
 
-        setTimeout(() => {
-            setRefreshing(false);
-        }, 1000);
+        getNotifications();
     }, []);
     const handleScroll = (event: { nativeEvent: { layoutMeasurement: any; contentOffset: any; contentSize: any; }; }) => {
         const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;

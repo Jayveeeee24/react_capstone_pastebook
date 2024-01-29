@@ -50,13 +50,13 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     useFocusEffect(() => {
         loadProfile();
     })
-
+    useFocusEffect(() =>{
+        getFriends();
+    })
     useEffect(() => {
         setIsLoading(true);
-        getFriends();
         getPosts();
     }, []);
-
     useEffect(() => {
         navigation.addListener('focus', () => {
             if (route.params?.refresh) {
