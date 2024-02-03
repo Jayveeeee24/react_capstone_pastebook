@@ -1,15 +1,13 @@
-import { ActivityIndicator, Button, Image, Keyboard, LayoutAnimation, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Image, Keyboard, LayoutAnimation, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { Images } from "../../../utils/Images";
-import { useContext, useState } from "react";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Card, ProgressBar, TextInput } from "react-native-paper";
-import { AuthContext, useAuth } from "../../../context/AuthContext";
+import { useState } from "react";
+import { ActivityIndicator, ProgressBar } from "react-native-paper";
+import { useAuth } from "../../../context/AuthContext";
 import { GenderDropdown } from "../../../components/customComponents/GenderDropdown";
 import { DatePickerComponent } from "../../../components/customComponents/DatePickerComponent";
 import { useToast } from "react-native-toast-notifications";
 import { EmailComponent } from "../../../components/customComponents/TextInputs/EmailComponent";
-import { Colors, credentialTextTheme } from "../../../utils/GlobalStyles";
+import { Colors, globalStyles } from "../../../utils/GlobalStyles";
 import { PasswordComponent } from "../../../components/customComponents/TextInputs/PasswordComponent";
 import { NameComponent } from "../../../components/customComponents/TextInputs/NameComponent";
 import { PhoneComponent } from "../../../components/customComponents/TextInputs/PhoneComponent";
@@ -118,6 +116,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
         if (currentView === 'EmailView') {
             try {
+                setIsLoading(true);
                 const result = verifyEmailNewUser ? await verifyEmailNewUser(email) : undefined;
                 if (result == "Email sent successfully!") {
                     setCurrentView('VerifyCodeView');
@@ -131,8 +130,10 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                 console.error('Error:', error);
                 toast.show("An unexpected error occurred", { type: 'danger' });
             }
+            setIsLoading(false);
         } else if (currentView === 'VerifyCodeView') {
             try {
+                setIsLoading(true);
                 const result = verifyCode ? await verifyCode(email, verificationCode) : undefined;
                 if (result === true) {
                     setCurrentView('OtherDetailsView');
@@ -147,6 +148,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                 console.error('Error:', error);
                 toast.show("An unexpected error occurred", { type: 'danger' });
             }
+            setIsLoading(false);
         }
         else if (currentView === 'OtherDetailsView') {
             setCurrentView('PasswordView');
@@ -158,7 +160,6 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
                 if (result == "User Registered Successfully") {
                     toast.show(result, { type: 'success' });
-                    setIsLoading(false);
                     navigation.navigate('Login');
                 } else {
                     toast.show(result, { type: 'warning' });
@@ -166,7 +167,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
             } catch (error: any) {
                 toast.show("An unexpected error occurred", { type: 'danger' });
             }
-
+            setIsLoading(false);
         }
     };
     const getButtonText = () => {
@@ -184,46 +185,70 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         }
     };
     const renderView = () => {
-        
-
         switch (currentView) {
             case 'EmailView':
                 return (
-                    <EmailComponent email={email} setEmail={setEmail} isValidEmail={isValidEmail} isEmailAvailable={isEmailAvailable} />  
+                    <EmailComponent
+                        email={email}
+                        setEmail={setEmail}
+                        isValidEmail={isValidEmail}
+                        isEmailAvailable={isEmailAvailable} />
                 );
             case 'VerifyCodeView':
                 return (
                     <>
-                        <VerificationComponent verificationCode={verificationCode} setVerificationCode={setVerificationCode} isVerificationCodeValid={isVerificationCodeValid} />
+                        <VerificationComponent
+                            verificationCode={verificationCode}
+                            setVerificationCode={setVerificationCode}
+                            isVerificationCodeValid={isVerificationCodeValid} />
                     </>
                 )
             case 'OtherDetailsView':
                 return (
                     <>
                         <ScrollView>
-                            <NameComponent name={firstName} setName={setFirstName} isNameValid={isFirstNameValid} placeholderText="First Name" warningText="Please enter a valid first name" />
-                            <NameComponent name={lastName} setName={setLastName} isNameValid={isLastNameValid} placeholderText="Last Name" warningText="Please enter a valid last name" />
-
-                            <PhoneComponent phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} />
-
-                            <View style={{ marginHorizontal: 30 }}>
-                                <GenderDropdown data={genders} value={genders.find(item => item.label === gender)?.value || ''} onValueChange={(value) => setGender(genders.find(item => item.value === value)?.label || '')} isGenderValid={isGenderValid} placeholder={"Gender"} />
-                            </View>
-
-                            <View style={{ marginHorizontal: 30 }}>
-                                <DatePickerComponent
-                                    dateOfBirth={dateOfBirth}
-                                    setDateOfBirth={setDateOfBirth}
-                                    isDateOfBirthValid={isDateOfBirthValid} />
-                            </View>
+                            <NameComponent
+                                name={firstName}
+                                setName={setFirstName}
+                                isNameValid={isFirstNameValid}
+                                placeholderText="First Name"
+                                warningText="Please enter a valid first name" />
+                            <NameComponent
+                                name={lastName}
+                                setName={setLastName}
+                                isNameValid={isLastNameValid}
+                                placeholderText="Last Name"
+                                warningText="Please enter a valid last name" />
+                            <PhoneComponent
+                                phoneNumber={phoneNumber}
+                                setPhoneNumber={setPhoneNumber} />
+                            <GenderDropdown
+                                data={genders}
+                                value={genders.find(item => item.label === gender)?.value || ''}
+                                onValueChange={(value) => setGender(genders.find(item => item.value === value)?.label || '')}
+                                isGenderValid={isGenderValid} />
+                            <DatePickerComponent
+                                dateOfBirth={dateOfBirth}
+                                setDateOfBirth={setDateOfBirth}
+                                isDateOfBirthValid={isDateOfBirthValid} />
                         </ScrollView>
                     </>
                 );
             case 'PasswordView':
                 return (
                     <>
-                        <PasswordComponent password={password} setPassword={setPassword} isPasswordValid={isPasswordValid} warningText="Please enter a valid password (min 8 chars)" placeholderText="Password"/>
-                        <PasswordComponent password={confirmPassword} setPassword={setConfirmPassword} isPasswordValid={isConfirmPasswordValid} warningText="Passwords do not match" placeholderText="Confirm Password" />
+                        <PasswordComponent
+                            password={password}
+                            setPassword={setPassword}
+                            isPasswordValid={isPasswordValid}
+                            warningText="Please enter a valid password (min 8 chars)"
+                            placeholderText="Password" />
+                        <PasswordComponent
+                            password={confirmPassword}
+                            setPassword={setConfirmPassword}
+                            isPasswordValid={isConfirmPasswordValid}
+                            warningText="Passwords do not match"
+                            placeholderText="Confirm Password" />
                     </>
                 );
             default:
@@ -248,11 +273,11 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                             style={{ width: 320, height: 210 }}
                         />
                         <Text
-                            style={[styles.subHeaderTitle, styles.text]}>
+                            style={[styles.subHeaderTitle, globalStyles.textDefaults]}>
                             Socialize. Connect. Paste It!
                         </Text>
                         <Text
-                            style={[styles.text, styles.headerTitle]}>
+                            style={[globalStyles.textDefaults, styles.headerTitle]}>
                             Register an Account
                         </Text>
                     </View>
@@ -267,23 +292,25 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
                     <TouchableOpacity
                         onPress={() => {
-                            if (currentView == 'EmailView') {
-                                validateEmail();
-                            } else if (currentView == 'VerifyCodeView') {
-                                validateVerificationCode();
-                            }
-                            else if (currentView == 'OtherDetailsView') {
-                                validateDetails();
-                            }
-                            else {
-                                validatePassword();
+                            if (!isLoading) {
+                                if (currentView == 'EmailView') {
+                                    validateEmail();
+                                } else if (currentView == 'VerifyCodeView') {
+                                    validateVerificationCode();
+                                }
+                                else if (currentView == 'OtherDetailsView') {
+                                    validateDetails();
+                                }
+                                else {
+                                    validatePassword();
+                                }
                             }
                         }}
-                        style={[styles.buttonContainer, { marginTop: 30, backgroundColor: Colors.primaryBrand }]}>
+                        style={[styles.buttonContainer, { marginTop: 10, backgroundColor: Colors.primaryBrand }]}>
                         {isLoading ? (
                             <ActivityIndicator size="small" color="white" />
                         ) : (
-                            <Text style={[styles.buttonText, styles.text]}>{getButtonText()}</Text>
+                            <Text style={[styles.buttonText, { fontFamily: 'Roboto-Medium' }]}>{getButtonText()}</Text>
                         )}
                     </TouchableOpacity>
                 </View>
@@ -298,9 +325,6 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
 
 const styles = StyleSheet.create({
-    text: {
-        fontFamily: 'Roboto-Medium'
-    },
     headerTitle: {
         fontSize: 26,
         color: '#333',
@@ -312,15 +336,6 @@ const styles = StyleSheet.create({
         marginTop: 20,
         color: '#333',
         fontWeight: '700',
-    },
-    credentialContainer: {
-        flexDirection: 'row',
-        borderBottomColor: '#ccc',
-        marginHorizontal: 30,
-        alignItems: "center"
-    },
-    credentialText: {
-        color: 'black', fontSize: 18, flex: 1, backgroundColor: 'transparent'
     },
     buttonContainer: {
         padding: 15,
@@ -336,13 +351,6 @@ const styles = StyleSheet.create({
         height: 8,
         borderRadius: 5
     },
-    textValidation: {
-        color: 'red', marginStart: 30
-    }
-
-
-
-
 });
 
 

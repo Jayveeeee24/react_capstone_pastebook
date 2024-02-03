@@ -22,7 +22,7 @@ export const PasswordComponent: React.FC<PasswordComponentProps> = ({ isPassword
     return (
         <>
             <View style={[styles.container, { marginBottom: isPasswordValid ? 10 : 0 }]}>
-                <MaterialIcons name="lock-outline" size={20} color="#666" style={{ marginHorizontal: 5 }} />
+                <MaterialIcons name="lock-outline" size={20} color={Colors.placeholderColor} style={{ marginHorizontal: 5 }} />
                 <TextInput
                     placeholder={placeholderText}
                     theme={credentialTextTheme}
@@ -31,7 +31,7 @@ export const PasswordComponent: React.FC<PasswordComponentProps> = ({ isPassword
                         onPress={togglePasswordVisibility} />}
                     secureTextEntry={!showPassword}
                     style={[globalStyles.textDefaults, styles.textInput]}
-                    placeholderTextColor={'#666'}
+                    placeholderTextColor={Colors.placeholderColor}
                     value={password}
                     onChangeText={setPassword} />
             </View>

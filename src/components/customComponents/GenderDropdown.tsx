@@ -3,16 +3,16 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Dropdown } from "react-native-element-dropdown";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Colors } from '../../utils/GlobalStyles';
 
 interface GenderDropdown {
   data: { label: string; value: string; }[];
   value: string;
   onValueChange: (value: string) => void;
   isGenderValid: boolean;
-  placeholder: string;
 }
 
-export const GenderDropdown: React.FC<GenderDropdown> = ({ data, value, onValueChange, isGenderValid, placeholder }) => {
+export const GenderDropdown: React.FC<GenderDropdown> = ({ data, value, onValueChange, isGenderValid }) => {
   const renderItem = (item: any) => {
     return (
       <View style={styles.item}>
@@ -40,7 +40,7 @@ export const GenderDropdown: React.FC<GenderDropdown> = ({ data, value, onValueC
         maxHeight={300}
         labelField="label"
         valueField="value"
-        placeholder={placeholder}
+        placeholder={'Gender'}
         value={value}
         onChange={(item) => {
           onValueChange(item.value);
@@ -51,7 +51,7 @@ export const GenderDropdown: React.FC<GenderDropdown> = ({ data, value, onValueC
         renderItem={renderItem}
       />
       {!isGenderValid && (
-        <Text style={[styles.textValidation, { marginTop: 5 }]}>Please choose a valid {placeholder.toLowerCase()}</Text>
+        <Text style={[styles.textValidation, { marginTop: 5 }]}>Please choose a valid gender</Text>
       )}
     </>
   );
@@ -59,7 +59,8 @@ export const GenderDropdown: React.FC<GenderDropdown> = ({ data, value, onValueC
 
 const styles = StyleSheet.create({
   textValidation: {
-    color: 'red', marginStart: 30
+    color: Colors.danger, 
+    marginStart: 30
   },
   icon: {
     marginRight: 5,
@@ -79,6 +80,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   dropdown: {
+    marginHorizontal: 30,
     marginTop: 10,
     height: 50,
     backgroundColor: 'white',

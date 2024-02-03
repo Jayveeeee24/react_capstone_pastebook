@@ -11,9 +11,9 @@ export const Colors = {
     secondaryBrand: '#eab676',
     success: '#22bb33',
     warning: '#FF8A65',
-    danger: '#F56C6C',
+    danger: '#EF5350',
     orange: '#FF5722',
-    placeholderTextColor: "#666",
+    placeholderColor: "#666",
     borderBottomColor: "#ccc"
 }
 

@@ -14,14 +14,18 @@ export const EmailComponent: React.FC<EmailComponentProps> = ({ email, setEmail,
     return (
         <>
             <View style={[styles.container, { marginBottom: isValidEmail ? 10 : 0 }]}>
-                <MaterialIcons name="alternate-email" size={20} color={Colors.placeholderTextColor} style={{ marginHorizontal: 5 }} />
+                <MaterialIcons
+                    name="alternate-email"
+                    size={20}
+                    color={Colors.placeholderColor}
+                    style={{ marginHorizontal: 5 }} />
                 <TextInput
                     placeholder="Email Address"
                     style={[globalStyles.textDefaults, styles.emailTextInput]}
                     value={email}
                     onChangeText={setEmail}
                     theme={credentialTextTheme}
-                    placeholderTextColor={Colors.placeholderTextColor} />
+                    placeholderTextColor={Colors.placeholderColor} />
             </View>
             {!isValidEmail && (
                 <Text style={styles.warningText}>Please enter a valid email address.</Text>

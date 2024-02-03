@@ -13,12 +13,16 @@ export const VerificationComponent: React.FC<VerificationComponentProps> = ({ ve
     return (
         <>
             <View style={[styles.container, { marginBottom: isVerificationCodeValid ? 10 : 0 }]}>
-                <MaterialCommunityIcons name="email-check-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
+                <MaterialCommunityIcons
+                    name="email-check-outline"
+                    size={30} 
+                    color={Colors.placeholderColor}
+                    style={{ marginHorizontal: 5 }} />
                 <TextInput
                     placeholder="Verification Code"
                     theme={credentialTextTheme}
                     style={[globalStyles.textDefaults, styles.verificationTextInput]}
-                    placeholderTextColor={Colors.placeholderTextColor}
+                    placeholderTextColor={Colors.placeholderColor}
                     value={verificationCode}
                     onChangeText={setVerificationCode} />
             </View>

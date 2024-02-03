@@ -12,13 +12,17 @@ interface PhoneComponentProps {
 export const PhoneComponent: React.FC<PhoneComponentProps> = ({ phoneNumber, setPhoneNumber }) => {
     return (
         <>
-            <View style={[styles.container, {}]}>
-                <MaterialCommunityIcons name="phone-outline" size={30} color={Colors.placeholderTextColor} style={{ marginHorizontal: 5 }} />
+            <View style={[styles.container]}>
+                <MaterialCommunityIcons
+                    name="phone-outline"
+                    size={30}
+                    color={Colors.placeholderColor}
+                    style={{ marginHorizontal: 5 }} />
                 <TextInput
                     placeholder="Phone Number"
                     theme={credentialTextTheme}
                     style={[globalStyles.textDefaults, styles.textInput]}
-                    placeholderTextColor={Colors.placeholderTextColor}
+                    placeholderTextColor={Colors.placeholderColor}
                     keyboardType="phone-pad"
                     value={phoneNumber}
                     onChangeText={setPhoneNumber} />
