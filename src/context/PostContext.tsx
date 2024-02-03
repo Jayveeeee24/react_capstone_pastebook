@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useContext } from "react";
-import { BASE_URL, Storage } from "../utils/Config";
+import { BASE_URL, MmkvStorage } from "../utils/GlobalConfig";
 import axios from "axios";
 import { usePhoto } from "./PhotoContext";
 import { useFriend } from "./FriendContext";
@@ -94,7 +94,7 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
     const getNewsfeedPosts = async () => {
         try {
             const result = await axios.get(`${BASE_URL}/api/timeline/get-newsfeed-posts`);
-            const userId = Storage.getString('userId');
+            const userId = MmkvStorage.getString('userId');
 
 
             if (result && Array.isArray(result.data) && result.data.length > 0) {

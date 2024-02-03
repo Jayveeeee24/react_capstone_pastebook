@@ -14,7 +14,6 @@ import { NotificationIconWithBadge } from "../components/customComponents/Notifi
 import { Images } from "../utils/Images";
 import { NotificationScreen } from "../screens/stacks/otherScreens/NotificationScreen";
 import { FriendRequestScreen } from "../screens/stacks/otherScreens/FriendRequestScreen";
-import { Colors } from "../utils/Config";
 import { LoginScreen } from "../screens/stacks/authentication/LoginScreen";
 import { RegisterScreen } from "../screens/stacks/authentication/RegisterScreen";
 import { useAuth } from "../context/AuthContext";
@@ -28,6 +27,7 @@ import { EditPasswordScreen } from "../screens/stacks/otherScreens/EditPasswordS
 import { CameraScreen } from "../screens/stacks/otherScreens/CameraScreen";
 import { LikesScreen } from "../screens/stacks/otherScreens/LikesScreen";
 import { OthersProfileScreen } from "../screens/stacks/otherScreens/OthersProfileScreen";
+import { Colors } from "../utils/GlobalStyles";
 
 
 

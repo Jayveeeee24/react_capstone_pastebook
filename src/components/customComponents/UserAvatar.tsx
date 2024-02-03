@@ -2,7 +2,8 @@ import { ImageSourcePropType, StyleSheet, View } from "react-native";
 import { Card, Title } from "react-native-paper";
 import { Images } from "../../utils/Images";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { Colors, Storage } from "../../utils/Config";
+import { MmkvStorage } from "../../utils/GlobalConfig";
+import { Colors } from "../../utils/GlobalStyles";
 
 interface UserAvatarProps {
     item: any;
@@ -12,7 +13,7 @@ interface UserAvatarProps {
 
 
 export const UserAvatar: React.FC<UserAvatarProps> = ({ item, navigation, route }) => {
-    const userId = Storage.getString('userId');
+    const userId = MmkvStorage.getString('userId');
 
     return (
         <View style={{marginHorizontal: 5}} key={item}>

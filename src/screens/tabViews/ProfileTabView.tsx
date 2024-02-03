@@ -4,7 +4,7 @@ import { TabView, SceneMap } from 'react-native-tab-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { IndividualPost } from '../../components/IndividualPost';
 import { Images } from '../../utils/Images';
-import { Colors, Storage } from '../../utils/Config';
+import { MmkvStorage } from '../../utils/GlobalConfig';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { usePost } from '../../context/PostContext';
 import BottomSheet from '@gorhom/bottom-sheet';
@@ -14,6 +14,7 @@ import { IndividualComment } from '../../components/IndividualComment';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Modal } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
+import { Colors } from '../../utils/GlobalStyles';
 
 
 interface ProfileTabViewProps {

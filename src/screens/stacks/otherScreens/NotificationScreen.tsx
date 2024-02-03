@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import axios from "axios";
-import { BASE_URL } from "../../../utils/Config";
+import { BASE_URL } from "../../../utils/GlobalConfig";
 import { useNotification } from "../../../context/NotificationContext";
 
 interface NotificationScreenProps {

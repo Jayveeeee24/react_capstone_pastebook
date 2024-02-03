@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { usePhoto } from "../../../context/PhotoContext";
 import { useUser } from "../../../context/UserContext";
 import { CommonActions, useFocusEffect } from "@react-navigation/native";
-import { Colors, Storage } from "../../../utils/Config";
+import { MmkvStorage } from "../../../utils/GlobalConfig";
 import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
@@ -11,6 +11,7 @@ import { ProfileTabView } from "../../tabViews/ProfileTabView";
 import { Images } from "../../../utils/Images";
 import { useFriend } from "../../../context/FriendContext";
 import axios from "axios";
+import { Colors } from "../../../utils/GlobalStyles";
 
 interface OthersProfileScreenProps {
     navigation: any;
@@ -45,7 +46,7 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
         useCallback(() => {
 
             const loadProfile = async () => {
-                const id = Storage.getString('userId');
+                const id = MmkvStorage.getString('userId');
                 if (id) {
                     setViewerId(id);
                 }

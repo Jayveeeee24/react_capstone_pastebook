@@ -5,11 +5,12 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { Images } from "../../utils/Images";
 import { ProfileTabView } from "../tabViews/ProfileTabView";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Colors, Storage } from "../../utils/Config";
+import { MmkvStorage } from "../../utils/GlobalConfig";
 import { useUser } from "../../context/UserContext";
 import { useFocusEffect } from "@react-navigation/native";
 import React from "react";
 import { usePhoto } from "../../context/PhotoContext";
+import { Colors } from "../../utils/GlobalStyles";
 
 interface ProfileTabProps {
     navigation: any;
@@ -39,7 +40,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
     useFocusEffect(
         useCallback(() => {
             const loadProfile = async () => {
-                const userId = Storage.getString('userId');
+                const userId = MmkvStorage.getString('userId');
                 if(userId){
                     setUserId(userId);
                 }

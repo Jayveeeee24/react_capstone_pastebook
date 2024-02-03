@@ -4,7 +4,7 @@ import { Images } from "../../utils/Images";
 import { IndividualPost } from "../../components/IndividualPost";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFriend } from "../../context/FriendContext";
-import { Colors, Storage } from "../../utils/Config";
+import { MmkvStorage } from "../../utils/GlobalConfig";
 import { useFocusEffect } from "@react-navigation/native";
 import { useUser } from "../../context/UserContext";
 import { usePhoto } from "../../context/PhotoContext";
@@ -20,6 +20,7 @@ import { NotificationIconWithBadge } from "../../components/customComponents/Not
 import { FriendRequestWithBadge } from "../../components/customComponents/FriendRequestWithBadge";
 import { useNotification } from "../../context/NotificationContext";
 import { Item } from "react-native-paper/lib/typescript/components/Drawer/Drawer";
+import { Colors } from "../../utils/GlobalStyles";
 
 interface HomeTabProps {
     navigation: any;
@@ -97,7 +98,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
 
     useEffect(() => {
         const loadProfile = async () => {
-            setUserId(Storage.getString('userId')!);
+            setUserId(MmkvStorage.getString('userId')!);
 
             if (userId !== '') {
                 try {
@@ -119,6 +120,10 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
         };
 
         loadProfile();
+        
+        getFriends();
+        getNotificationCount();
+        getFriendRequestCount();
     }, [getProfile, getPhotoById, userId]);
 
     useEffect(() => {
@@ -164,7 +169,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
 
     //api functions
     const loadProfile = async () => {
-        setUserId(Storage.getString('userId')!);
+        setUserId(MmkvStorage.getString('userId')!);
 
         if (userId !== '') {
             try {
@@ -186,7 +191,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
 
     const getFriends = async () => {
         try {
-            const userId = Storage.getString('userId');
+            const userId = MmkvStorage.getString('userId');
 
             if (userId) {
                 const result = getAllFriends ? await getAllFriends(userId) : undefined;

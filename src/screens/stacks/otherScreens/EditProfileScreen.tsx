@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Image, Keyboard, SafeAreaView, ScrollView, Text, TouchableOpacity, TextInput as TextArea, TouchableWithoutFeedback, View, StyleSheet, ActivityIndicator } from "react-native";
 import { Images } from "../../../utils/Images";
-import { Colors, Storage, credentialTextTheme } from "../../../utils/Config";
 import { GenderDropdown } from "../../../components/customComponents/GenderDropdown";
 import { DatePickerComponent } from "../../../components/customComponents/DatePickerComponent";
 import { TextInput } from "react-native-paper";
@@ -10,6 +9,8 @@ import { useUser } from "../../../context/UserContext";
 import { usePhoto } from "../../../context/PhotoContext";
 import { MediaType, launchImageLibrary } from "react-native-image-picker";
 import { useAlbum } from "../../../context/AlbumContext";
+import { MmkvStorage } from "../../../utils/GlobalConfig";
+import { Colors, credentialTextTheme } from "../../../utils/GlobalStyles";
 
 interface EditProfileScreenProps {
     navigation: any;
@@ -50,7 +51,7 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({ navigation
 
     }, []);
     const loadProfile = async () => {
-        const userId = Storage.getString('userId');
+        const userId = MmkvStorage.getString('userId');
         const albumIdResult = getUploadsAlbumId ? await getUploadsAlbumId() : undefined;
         if (albumIdResult) {
             setAlbumId(albumIdResult);

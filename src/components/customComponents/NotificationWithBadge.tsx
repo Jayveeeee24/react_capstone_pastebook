@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { Colors } from "../../utils/Config";
+import { Colors } from "../../utils/GlobalStyles";
 
 export const NotificationIconWithBadge = ({ onPress, badgeCount }: any) => {
     return (
@@ -13,7 +13,7 @@ export const NotificationIconWithBadge = ({ onPress, badgeCount }: any) => {
                         position: 'absolute',
                         top: 0,
                         right: 0,
-                        backgroundColor: '#1565C0',
+                        backgroundColor: Colors.primaryBrand,
                         borderRadius: 8,
                         width: 16,
                         height: 16,

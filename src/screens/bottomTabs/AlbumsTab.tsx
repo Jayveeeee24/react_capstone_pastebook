@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, Keyboard, LogBox, SafeAreaView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { FAB, TextInput } from "react-native-paper";
-import { Colors, credentialTextTheme } from "../../utils/Config";
 import { IndividualAlbum } from "../../components/IndividualAlbum";
 import { useAlbum } from "../../context/AlbumContext";
 import BottomSheet from "@gorhom/bottom-sheet";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useToast } from "react-native-toast-notifications";
+import { Colors, credentialTextTheme } from "../../utils/GlobalStyles";
 
 interface AlbumTabProps {
     navigation: any;

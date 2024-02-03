@@ -5,8 +5,8 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import React, { useContext, useState } from "react";
 import { AuthContext, useAuth } from "../../../context/AuthContext";
 import { TextInput } from "react-native-paper";
-import { Colors } from "../../../utils/Config";
 import { useToast } from "react-native-toast-notifications";
+import { Colors } from "../../../utils/GlobalStyles";
 
 
 interface LoginScreenProps {

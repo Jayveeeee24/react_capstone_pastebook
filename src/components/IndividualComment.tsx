@@ -1,6 +1,7 @@
 import { Image, Text, View, TouchableOpacity } from "react-native";
 import { Images } from "../utils/Images";
-import { Colors, convertToRelativeTime } from "../utils/Config";
+import { convertToRelativeTime } from "../utils/HelperFunctions";
+import { Colors } from "../utils/GlobalStyles";
 
 interface IndividualCommentProps {
     comment: any;

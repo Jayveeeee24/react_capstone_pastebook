@@ -1,6 +1,6 @@
 import axios from "axios";
 import { ReactNode, createContext, useContext } from "react";
-import { BASE_URL, Storage } from "../utils/Config";
+import { BASE_URL, MmkvStorage } from "../utils/GlobalConfig";
 import { usePhoto } from "./PhotoContext";
 
 interface NotificationContextProps {
@@ -25,7 +25,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     const { getPhotoById } = usePhoto();
 
     const getAllNotifications = async () => {
-        const userId = Storage.getString('userId');
+        const userId = MmkvStorage.getString('userId');
 
         try {
             const result = await axios.get(`${BASE_URL}/api/notification/get-notifications`);

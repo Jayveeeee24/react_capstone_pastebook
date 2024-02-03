@@ -1,8 +1,9 @@
 import axios from 'axios';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { BASE_URL, Colors, Storage } from '../utils/Config';
+import { BASE_URL, MmkvStorage } from '../utils/GlobalConfig';
 import { ActivityIndicator } from 'react-native-paper';
 import { View } from 'react-native';
+import { Colors } from '../utils/GlobalStyles';
 
 interface AuthContextProps {
   authState?: boolean;
@@ -35,7 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const loadToken = async () => {
       setLoading(true);
-      const token = Storage.getString('userToken');
+      const token = MmkvStorage.getString('userToken');
 
       if (token) {
         // axios.interceptors.request.use(request => {
@@ -50,7 +51,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               setAuthState(true);
             }
           }).catch((e) => {
-            Storage.clearAll();
+            MmkvStorage.clearAll();
             setAuthState(false);
             axios.defaults.headers.common['Authorization'] = '';
           }).finally(() => {
@@ -99,8 +100,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setAuthState(true);
 
         axios.defaults.headers.common['Authorization'] = result.data.token;
-        Storage.set('userToken', result.data.token);
-        Storage.set('userId', result.data.userId);
+        MmkvStorage.set('userToken', result.data.token);
+        MmkvStorage.set('userId', result.data.userId);
       }
 
       return result.data;
@@ -111,7 +112,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      Storage.clearAll();
+      MmkvStorage.clearAll();
       setAuthState(false);
 
       await axios.post(`${BASE_URL}/api/authentication/logout`, {});

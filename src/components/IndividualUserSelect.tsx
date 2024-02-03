@@ -1,7 +1,7 @@
 import { Image, Text, TouchableNativeFeedback, View } from "react-native";
 import { Images } from "../utils/Images";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { Storage } from "../utils/Config";
+import { MmkvStorage } from "../utils/GlobalConfig";
 import { useEffect, useState } from "react";
 import BottomSheet from "@gorhom/bottom-sheet";
 

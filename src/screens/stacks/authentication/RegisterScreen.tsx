@@ -7,8 +7,13 @@ import { Card, ProgressBar, TextInput } from "react-native-paper";
 import { AuthContext, useAuth } from "../../../context/AuthContext";
 import { GenderDropdown } from "../../../components/customComponents/GenderDropdown";
 import { DatePickerComponent } from "../../../components/customComponents/DatePickerComponent";
-import { Colors, credentialTextTheme } from "../../../utils/Config";
 import { useToast } from "react-native-toast-notifications";
+import { EmailComponent } from "../../../components/customComponents/TextInputs/EmailComponent";
+import { Colors, credentialTextTheme } from "../../../utils/GlobalStyles";
+import { PasswordComponent } from "../../../components/customComponents/TextInputs/PasswordComponent";
+import { NameComponent } from "../../../components/customComponents/TextInputs/NameComponent";
+import { PhoneComponent } from "../../../components/customComponents/TextInputs/PhoneComponent";
+import { VerificationComponent } from "../../../components/customComponents/TextInputs/VerificationComponent";
 
 interface RegisterScreenProps {
     navigation: any;
@@ -154,9 +159,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                 if (result == "User Registered Successfully") {
                     toast.show(result, { type: 'success' });
                     setIsLoading(false);
-                    setTimeout(() => {
-                        navigation.navigate('Login');
-                    }, 1000);
+                    navigation.navigate('Login');
                 } else {
                     toast.show(result, { type: 'warning' });
                 }
@@ -181,75 +184,27 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         }
     };
     const renderView = () => {
-        const [showPassword, setShowPassword] = useState(false);
-        const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-        const togglePasswordVisibility = () => {
-            setShowPassword(!showPassword);
-        };
-        const toggleConfirmPasswordVisibility = () => {
-            setShowConfirmPassword(!showConfirmPassword);
-        };
+        
 
         switch (currentView) {
             case 'EmailView':
                 return (
-                    <>
-                        <View style={[styles.credentialContainer, { marginBottom: isValidEmail ? 10 : 0 }]}>
-                            <MaterialIcons name="alternate-email" size={20} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput
-                                placeholder="Email Address"
-                                style={[styles.text, styles.credentialText]}
-                                value={email}
-                                onChangeText={setEmail}
-                                theme={credentialTextTheme}
-                                placeholderTextColor={'#666'}
-                            />
-
-                        </View>
-                        {!isValidEmail && (
-                            <Text style={styles.textValidation}>Please enter a valid email address.</Text>
-                        )}
-                        {!isEmailAvailable && (
-                            <Text style={styles.textValidation}>This email is already in use. Please use a different email address.</Text>
-                        )}
-                    </>
+                    <EmailComponent email={email} setEmail={setEmail} isValidEmail={isValidEmail} isEmailAvailable={isEmailAvailable} />  
                 );
             case 'VerifyCodeView':
                 return (
                     <>
-                        <View style={[styles.credentialContainer, { marginBottom: isVerificationCodeValid ? 10 : 0 }]}>
-                            <MaterialCommunityIcons name="email-check-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput placeholder="Verification Code" theme={credentialTextTheme} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={verificationCode} onChangeText={setVerificationCode} />
-                        </View>
-                        {!isVerificationCodeValid && (
-                            <Text style={styles.textValidation}>Please enter the verification code sent in the email</Text>
-                        )}
+                        <VerificationComponent verificationCode={verificationCode} setVerificationCode={setVerificationCode} isVerificationCodeValid={isVerificationCodeValid} />
                     </>
                 )
             case 'OtherDetailsView':
                 return (
                     <>
                         <ScrollView>
-                            <View style={[styles.credentialContainer, { marginBottom: isFirstNameValid ? 10 : 0 }]}>
-                                <MaterialCommunityIcons name="account-box-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
-                                <TextInput placeholder="First Name" theme={credentialTextTheme} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={firstName} onChangeText={setFirstName} />
-                            </View>
-                            {!isFirstNameValid && (
-                                <Text style={styles.textValidation}>Please enter a valid first name</Text>
-                            )}
-                            <View style={[styles.credentialContainer, { marginBottom: isLastNameValid ? 10 : 0 }]}>
-                                <MaterialCommunityIcons name="account-box-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
-                                <TextInput placeholder="Last Name" theme={credentialTextTheme} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={lastName} onChangeText={setLastName} />
-                            </View>
-                            {!isLastNameValid && (
-                                <Text style={styles.textValidation}>Please enter a valid last name</Text>
-                            )}
-                            <View style={[styles.credentialContainer, {}]}>
-                                <MaterialCommunityIcons name="phone-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
-                                <TextInput placeholder="Phone Number" theme={credentialTextTheme}
-                                    style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} keyboardType="phone-pad" value={phoneNumber} onChangeText={setPhoneNumber} />
-                            </View>
+                            <NameComponent name={firstName} setName={setFirstName} isNameValid={isFirstNameValid} placeholderText="First Name" warningText="Please enter a valid first name" />
+                            <NameComponent name={lastName} setName={setLastName} isNameValid={isLastNameValid} placeholderText="Last Name" warningText="Please enter a valid last name" />
+
+                            <PhoneComponent phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} />
 
                             <View style={{ marginHorizontal: 30 }}>
                                 <GenderDropdown data={genders} value={genders.find(item => item.label === gender)?.value || ''} onValueChange={(value) => setGender(genders.find(item => item.value === value)?.label || '')} isGenderValid={isGenderValid} placeholder={"Gender"} />
@@ -267,20 +222,8 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
             case 'PasswordView':
                 return (
                     <>
-                        <View style={[styles.credentialContainer, { marginBottom: isPasswordValid ? 10 : 0 }]}>
-                            <MaterialIcons name="lock-outline" size={20} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput placeholder="Password" theme={credentialTextTheme} right={<TextInput.Icon icon={showPassword ? 'eye-off' : 'eye'} onPress={togglePasswordVisibility} />} secureTextEntry={!showPassword} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={password} onChangeText={setPassword} />
-                        </View>
-                        {!isPasswordValid && (
-                            <Text style={styles.textValidation}>Please enter a valid password (min 8 chars)</Text>
-                        )}
-                        <View style={[styles.credentialContainer, {}]}>
-                            <MaterialIcons name="lock-outline" size={20} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput placeholder="Confirm Password" theme={credentialTextTheme} right={<TextInput.Icon icon={showConfirmPassword ? 'eye-off' : 'eye'} onPress={toggleConfirmPasswordVisibility} />} secureTextEntry={!showConfirmPassword} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={confirmPassword} onChangeText={setConfirmPassword} />
-                        </View>
-                        {!isConfirmPasswordValid && (
-                            <Text style={styles.textValidation}>Passwords do not match</Text>
-                        )}
+                        <PasswordComponent password={password} setPassword={setPassword} isPasswordValid={isPasswordValid} warningText="Please enter a valid password (min 8 chars)" placeholderText="Password"/>
+                        <PasswordComponent password={confirmPassword} setPassword={setConfirmPassword} isPasswordValid={isConfirmPasswordValid} warningText="Passwords do not match" placeholderText="Confirm Password" />
                     </>
                 );
             default:
@@ -336,7 +279,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
                                 validatePassword();
                             }
                         }}
-                        style={[styles.buttonContainer, { marginTop: 20, backgroundColor: Colors.primaryBrand }]}>
+                        style={[styles.buttonContainer, { marginTop: 30, backgroundColor: Colors.primaryBrand }]}>
                         {isLoading ? (
                             <ActivityIndicator size="small" color="white" />
                         ) : (

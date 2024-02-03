@@ -3,7 +3,7 @@ import { Alert, FlatList, Keyboard, SafeAreaView, ScrollView, Text, TouchableOpa
 import { Searchbar, TextInput } from "react-native-paper";
 import SearchBar from "react-native-dynamic-search-bar";
 import { useFriend } from "../../context/FriendContext";
-import { Storage } from "../../utils/Config";
+import { MmkvStorage } from "../../utils/GlobalConfig";
 import { IndividualSearch } from "../../components/IndividualSearch";
 
 interface SearchTabProps {
@@ -53,7 +53,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({ navigation, route }) => {
 
     //api functions
     const getFriendsByUserId = async () => {
-        const userId = Storage.getString('userId');
+        const userId = MmkvStorage.getString('userId');
         if (userId) {
             try {
                 const result = getAllFriendsByUserId ? await getAllFriendsByUserId(userId) : undefined;

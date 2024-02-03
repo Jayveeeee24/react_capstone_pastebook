@@ -6,8 +6,8 @@ import { useAuth } from "../../../context/AuthContext";
 import { useToast } from "react-native-toast-notifications";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Images } from "../../../utils/Images";
-import { Colors, credentialTextTheme } from "../../../utils/Config";
 import { useUser } from "../../../context/UserContext";
+import { Colors, credentialTextTheme } from "../../../utils/GlobalStyles";
 
 interface EditEmailScreenProps {
     navigation: any;

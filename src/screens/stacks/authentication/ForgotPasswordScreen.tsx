@@ -5,8 +5,8 @@ import { useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Colors, credentialTextTheme } from "../../../utils/Config";
 import { useToast } from "react-native-toast-notifications";
+import { Colors, credentialTextTheme } from "../../../utils/GlobalStyles";
 
 interface ForgotPasswordScreenProps {
     navigation: any;

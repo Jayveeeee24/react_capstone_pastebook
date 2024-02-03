@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useContext } from "react";
-import { BASE_URL, Storage } from "../utils/Config";
+import { BASE_URL, MmkvStorage } from "../utils/GlobalConfig";
 import axios from "axios";
 import { usePhoto } from "./PhotoContext";
 

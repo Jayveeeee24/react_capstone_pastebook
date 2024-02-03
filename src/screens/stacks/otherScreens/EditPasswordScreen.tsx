@@ -3,9 +3,9 @@ import { Image, Keyboard, LayoutAnimation, SafeAreaView, StyleSheet, Text, Touch
 import { Images } from "../../../utils/Images"
 import { ProgressBar, TextInput } from "react-native-paper"
 import { useToast } from "react-native-toast-notifications"
-import { Colors, credentialTextTheme } from "../../../utils/Config"
 import MaterialIcons from "react-native-vector-icons/MaterialIcons"
 import { UserContext, useUser } from "../../../context/UserContext"
+import { Colors, credentialTextTheme } from "../../../utils/GlobalStyles"
 
 interface EditPasswordScreenProps {
     navigation: any;

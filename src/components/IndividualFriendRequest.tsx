@@ -1,10 +1,11 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Images } from "../utils/Images";
-import { BASE_URL, Colors, convertToRelativeTime } from "../utils/Config";
+import { BASE_URL } from "../utils/GlobalConfig";
 import Entypo from "react-native-vector-icons/Entypo";
 import axios from "axios";
 import { useFriend } from "../context/FriendContext";
 import { useToast } from "react-native-toast-notifications";
+import { Colors } from "../utils/GlobalStyles";
 
 interface IndividualFriendRequestProps {
     friendRequest: any;

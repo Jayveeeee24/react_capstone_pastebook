@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Dimensions, FlatList, Image, PermissionsAndroid, Platform, SafeAreaView, ScrollView, TextInput as TextArea, Text, TouchableOpacity, View, TouchableNativeFeedback, ActivityIndicator, Animated, Pressable } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Colors, Storage, credentialTextTheme } from "../../utils/Config";
 import { CameraRoll, GetAlbumsParams } from "@react-native-camera-roll/camera-roll";
 import { Picker } from "@react-native-picker/picker";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
@@ -17,6 +16,8 @@ import { IndividualUserSelect } from "../../components/IndividualUserSelect";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useFriend } from "../../context/FriendContext";
 import { useUser } from "../../context/UserContext";
+import { MmkvStorage } from "../../utils/GlobalConfig";
+import { Colors, credentialTextTheme } from "../../utils/GlobalStyles";
 
 interface CreatePostTabProps {
     navigation: any;
@@ -112,7 +113,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
         if (getUserProfileExecuted.current) {
             getUserProfile(postedUserId);
         } else {
-            const userId = Storage.getString('userId');
+            const userId = MmkvStorage.getString('userId');
             setPostedUserId(userId!);
             getUserProfileExecuted.current = true;
         }
@@ -232,7 +233,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
     }
     const getFriends = async () => {
         try {
-            const userId = Storage.getString('userId');
+            const userId = MmkvStorage.getString('userId');
 
             if (userId) {
                 const result = getAllFriends ? await getAllFriends(userId) : undefined;

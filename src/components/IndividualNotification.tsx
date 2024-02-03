@@ -1,7 +1,7 @@
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Images } from "../utils/Images";
-import { convertToRelativeTime } from "../utils/Config";
 import { useNotification } from "../context/NotificationContext";
+import { convertToRelativeTime } from "../utils/HelperFunctions";
 
 interface IndividualNotificationProps {
     navigation: any;

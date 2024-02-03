@@ -1,6 +1,6 @@
 import axios from "axios";
 import { ReactNode, createContext, useContext } from "react";
-import { BASE_URL } from "../utils/Config";
+import { BASE_URL } from "../utils/GlobalConfig";
 import { usePhoto } from "./PhotoContext";
 
 

@@ -5,7 +5,9 @@ import { Images } from "../utils/Images";
 import ReadMore from 'react-native-read-more-text';
 import { useEffect, useState } from "react";
 import { usePost } from "../context/PostContext";
-import { Colors, Storage, convertToRelativeTime } from "../utils/Config";
+import { MmkvStorage } from "../utils/GlobalConfig";
+import { Colors, globalStyles } from "../utils/GlobalStyles";
+import { convertToRelativeTime } from "../utils/HelperFunctions";
 
 interface IndividualPostProps {
     post: any;
@@ -27,7 +29,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
     const [userId, setUserId] = useState('');
 
     useEffect(() => {
-        const id = Storage.getString('userId');
+        const id = MmkvStorage.getString('userId');
         if (id) {
             setUserId(id);
         }
@@ -36,7 +38,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
     }, [post, isLiked]);
 
     const onLikePost = async () => {
-        const userId = Storage.getString('userId');
+        const userId = MmkvStorage.getString('userId');
         if (userId) {
             try {
                 const result = likePost ? await likePost(post.id, userId) : undefined;
@@ -64,7 +66,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
             <View style={{ flex: 1 }}>
                 <View style={styles.headerContainer}>
                     <TouchableOpacity onPress={() => {
-                        const userId = Storage.getString('userId');
+                        const userId = MmkvStorage.getString('userId');
                         if (userId) {
                             if (userId == post.poster.id) {
                                 navigation.navigate('ProfileTab');
@@ -133,7 +135,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
 
                     <View style={{ flexDirection: "column", marginStart: 12, gap: 2, marginBottom: 10 }}>
                         <TouchableOpacity style={{ display: post.likesCount > 0 ? 'flex' : 'none' }} onPress={() => navigation.navigate('Likes')}>
-                            <Text style={[{ fontWeight: "500", color: 'black' }]}>{post.likesCount} likes</Text>
+                            <Text style={[{ fontWeight: "500" }, globalStyles.textDefaults]}>{post.likesCount} likes</Text>
                         </TouchableOpacity>
 
                         <ReadMore
