@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Alert, Keyboard, SafeAreaView, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Alert, FlatList, Keyboard, SafeAreaView, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { Searchbar, TextInput } from "react-native-paper";
 import SearchBar from "react-native-dynamic-search-bar";
+import { useFriend } from "../../context/FriendContext";
+import { MmkvStorage } from "../../utils/GlobalConfig";
 import { IndividualSearch } from "../../components/IndividualSearch";
 
 interface SearchTabProps {
@@ -10,8 +12,14 @@ interface SearchTabProps {
 }
 
 export const SearchTab: React.FC<SearchTabProps> = ({ navigation, route }) => {
+    const { getAllFriendsByUserId, getAllSearchUsers } = useFriend();
+
+    const [users, setUsers] = useState<any>([]);
+
     const [searchQuery, setSearchQuery] = useState('');
 
+
+    //useEffect
     useEffect(() => {
         navigation.setOptions({
             headerLeft: () => (
@@ -30,28 +38,55 @@ export const SearchTab: React.FC<SearchTabProps> = ({ navigation, route }) => {
                 borderBottomColor: 'lightgray'
             },
         });
-    }, [navigation, searchQuery]);
+    }, [navigation]);
+
+    useEffect(() => {
+        if(searchQuery.trim() != ''){
+            getSearchList(searchQuery);
+        }else{
+            getFriendsByUserId();
+        }
+    }, [searchQuery])
+    useEffect(() => {
+        getFriendsByUserId();
+    }, []);
+
+    //api functions
+    const getFriendsByUserId = async () => {
+        const userId = MmkvStorage.getString('userId');
+        if (userId) {
+            try {
+                const result = getAllFriendsByUserId ? await getAllFriendsByUserId(userId) : undefined;
+                if (await result) {
+                    // console.log(result)
+                    setUsers(result);
+                }
+            } catch (error: any) {
+                console.error("Error fetching friends by user id:", error.response);
+            }
+        }
+    }
+    const getSearchList = async (searchQuery: string) => {
+        try {
+            const result = getAllSearchUsers ? await getAllSearchUsers(searchQuery) : undefined;
+            if (await result) {
+                // console.log(result);
+                setUsers(result);
+            }
+        } catch (error: any) {
+            console.error("Error fetching search users:", error.response);
+        }
+    }
 
     return (
         <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
-            <ScrollView>
-                <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                    <View style={{ flex: 1, flexDirection: "column", marginTop: 10 }}>
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                        <IndividualSearch />
-                    </View>
-                </TouchableWithoutFeedback>
-            </ScrollView>
+            <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                <FlatList
+                    data={users}
+                    renderItem={({ item }) => <IndividualSearch key={item.id} item={item} navigation={navigation} route={route} />}
+                    keyExtractor={(item) => item.id}
+                    showsVerticalScrollIndicator={false} />
+            </TouchableWithoutFeedback>
         </SafeAreaView>
     );
 }

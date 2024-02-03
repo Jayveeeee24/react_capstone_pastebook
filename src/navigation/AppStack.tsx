@@ -14,7 +14,6 @@ import { NotificationIconWithBadge } from "../components/customComponents/Notifi
 import { Images } from "../utils/Images";
 import { NotificationScreen } from "../screens/stacks/otherScreens/NotificationScreen";
 import { FriendRequestScreen } from "../screens/stacks/otherScreens/FriendRequestScreen";
-import { Colors } from "../utils/Config";
 import { LoginScreen } from "../screens/stacks/authentication/LoginScreen";
 import { RegisterScreen } from "../screens/stacks/authentication/RegisterScreen";
 import { useAuth } from "../context/AuthContext";
@@ -26,6 +25,9 @@ import { PhotosScreen } from "../screens/stacks/otherScreens/PhotosScreen";
 import { EditEmailScreen } from "../screens/stacks/otherScreens/EditEmailScreen";
 import { EditPasswordScreen } from "../screens/stacks/otherScreens/EditPasswordScreen";
 import { CameraScreen } from "../screens/stacks/otherScreens/CameraScreen";
+import { LikesScreen } from "../screens/stacks/otherScreens/LikesScreen";
+import { OthersProfileScreen } from "../screens/stacks/otherScreens/OthersProfileScreen";
+import { Colors } from "../utils/GlobalStyles";
 
 
 
@@ -84,24 +86,6 @@ export const AppStack = () => {
         })}>
         <Stack.Screen name="Home" component={HomeTab} options={{
           title: '',
-          headerRight: () => (
-            <View style={{ flexDirection: 'row', marginRight: 10, alignItems: "center" }}>
-              <NotificationIconWithBadge
-                onPress={() => {
-                  navigation.navigate('Notifications');
-                }}
-                badgeCount={3} />
-
-              <TouchableOpacity
-                onPress={async () => {
-                  navigation.navigate('FriendRequest');
-                }}
-              >
-                <MaterialCommunityIcons name="account-plus-outline" size={30} color="black" />
-              </TouchableOpacity>
-
-            </View>
-          ),
           headerLeft: () => (
             <View style={{ flexDirection: 'row', marginLeft: 10 }}>
               <Image
@@ -126,6 +110,11 @@ export const AppStack = () => {
         <Stack.Screen name="Settings" component={SettingsScreen} options={{
           headerTitle: 'Account Settings',
         }} />
+        <Stack.Screen name="Likes" component={LikesScreen} options={{
+          headerTitle: 'Likes',
+        }} />
+        <Stack.Screen name="OthersProfile" component={OthersProfileScreen} />
+
       </Stack.Navigator>
     );
   }

@@ -4,7 +4,7 @@ import { Images } from "../utils/Images";
 export const IndividualFollower = () => {
     return (
         <TouchableOpacity>
-            <View style={{ flexDirection: "row", width: '100%', paddingVertical: 8, paddingHorizontal: 20, alignItems: "center" }}>
+            <View style={{ flexDirection: "row", width: '100%', paddingVertical: 8, paddingHorizontal: 10, alignItems: "center" }}>
                 <View style={{ flex: 0, marginEnd: 10 }}>
                     <Image source={Images.sample_avatar} resizeMode="cover" style={{ aspectRatio: 1, width: 50, height: 50, borderRadius: 25 }} />
                 </View>

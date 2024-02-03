@@ -1,6 +1,6 @@
 import axios from "axios";
 import { ReactNode, createContext, useContext } from "react";
-import { BASE_URL } from "../utils/Config";
+import { BASE_URL } from "../utils/GlobalConfig";
 import { Buffer } from "buffer";
 
 interface PhotoContextProps {
@@ -42,8 +42,6 @@ export const PhotoProvider: React.FC<PhotoProviderProps> = ({ children }) => {
                     Accept: 'image/jpeg',
                 },
             });
-
-            
             const imageData = `data:image/jpeg;base64,${Buffer.from(response.data, 'binary').toString('base64')}`;
             return imageData;
         } catch (error) {

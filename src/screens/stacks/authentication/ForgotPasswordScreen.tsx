@@ -1,12 +1,13 @@
 import { Image, Keyboard, LayoutAnimation, SafeAreaView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { Images } from "../../../utils/Images";
-import { ProgressBar, TextInput } from "react-native-paper";
+import { ActivityIndicator, ProgressBar } from "react-native-paper";
 import { useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Colors, credentialTextTheme } from "../../../utils/Config";
 import { useToast } from "react-native-toast-notifications";
+import { Colors } from "../../../utils/GlobalStyles";
+import { EmailComponent } from "../../../components/customComponents/TextInputs/EmailComponent";
+import { VerificationComponent } from "../../../components/customComponents/TextInputs/VerificationComponent";
+import { PasswordComponent } from "../../../components/customComponents/TextInputs/PasswordComponent";
 
 interface ForgotPasswordScreenProps {
     navigation: any;
@@ -14,13 +15,14 @@ interface ForgotPasswordScreenProps {
 }
 
 
-export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({navigation}) => {
+export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation }) => {
     const toast = useToast();
 
     const { verifyEmailForgot, verifyCode, changePassword } = useAuth();
 
     const [progress, setProgress] = useState(0.4);
     const [currentView, setCurrentView] = useState('EmailView');
+    const [isLoading, setIsLoading] = useState(false);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -69,49 +71,54 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({navig
 
         if (currentView === 'EmailView') {
             try {
+                setIsLoading(true);
                 const result = verifyEmailForgot ? await verifyEmailForgot(email) : undefined;
                 if (result == "Email sent successfully!") {
                     setCurrentView('VerifyCodeView');
                     setProgress(0.6);
                 } else {
-                    toast.show(result, {type: 'warning'});
+                    toast.show(result, { type: 'warning' });
                 }
             } catch (error) {
-                toast.show("An unexpected error occurred", {type: 'danger'});
+                toast.show("An unexpected error occurred", { type: 'danger' });
             }
-
+            setIsLoading(false);
         } else if (currentView === 'VerifyCodeView') {
             try {
+                setIsLoading(true);
                 const result = verifyCode ? await verifyCode(email, verificationCode) : undefined;
                 if (result === true) {
                     setCurrentView('PasswordView');
                     setProgress(0.8);
                 } else if (result.result) {
-                    toast.show(result.result, {type: 'warning'});
+                    toast.show(result.result, { type: 'warning' });
                 }
                 else {
                     setIsVerificationCodeValid(false);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                toast.show("An unexpected error occurred", {type: 'danger'});
+                toast.show("An unexpected error occurred", { type: 'danger' });
             }
+            setIsLoading(false);
         }
         else {
-            try{
+            try {
+                setIsLoading(true);
                 const result = changePassword ? await changePassword(email, password) : undefined;
 
                 if (result == "password_changed_successfully") {
-                    toast.show("Password Changed successfully", {type: 'success'});
+                    toast.show("Password Changed successfully", { type: 'success' });
                     setTimeout(() => {
                         navigation.navigate('Login');
                     }, 1000);
-                }else{
-                    toast.show(result, {type: 'warning'});
+                } else {
+                    toast.show(result, { type: 'warning' });
                 }
-            }catch (error) {
-                toast.show("An unexpected error occurred", {type: 'danger'});
+            } catch (error) {
+                toast.show("An unexpected error occurred", { type: 'danger' });
             }
+            setIsLoading(false);
         }
     };
     const getButtonText = () => {
@@ -127,67 +134,41 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({navig
         }
     };
     const renderView = () => {
-        const [showPassword, setShowPassword] = useState(false);
-        const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-
-        const togglePasswordVisibility = () => {
-            setShowPassword(!showPassword);
-        };
-        const toggleConfirmPasswordVisibility = () => {
-            setShowConfirmPassword(!showConfirmPassword);
-        };
-
         switch (currentView) {
             case 'EmailView':
                 return (
                     <>
-                        <View style={[styles.credentialContainer, { marginBottom: isValidEmail ? 10 : 0 }]}>
-                            <MaterialIcons name="alternate-email" size={20} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput
-                                placeholder="Email Address"
-                                style={[styles.text, styles.credentialText]}
-                                value={email}
-                                onChangeText={setEmail}
-                                theme={credentialTextTheme}
-                                placeholderTextColor={'#666'}
-                            />
-
-                        </View>
-                        {!isValidEmail && (
-                            <Text style={styles.textValidation}>Please enter a valid email address.</Text>
-                        )}
+                        <EmailComponent
+                            email={email}
+                            setEmail={setEmail}
+                            isEmailAvailable
+                            isValidEmail={isValidEmail} />
                     </>
                 );
             case 'VerifyCodeView':
                 return (
                     <>
-                        <View style={[styles.credentialContainer, { marginBottom: isVerificationCodeValid ? 10 : 0 }]}>
-                            <MaterialCommunityIcons name="email-check-outline" size={30} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput placeholder="Verification Code" theme={credentialTextTheme} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={verificationCode} onChangeText={setVerificationCode} />
-                        </View>
-                        {!isVerificationCodeValid && (
-                            <Text style={styles.textValidation}>Please enter the verification code sent in the email</Text>
-                        )}
+                        <VerificationComponent
+                            verificationCode={verificationCode}
+                            setVerificationCode={setVerificationCode}
+                            isVerificationCodeValid={isVerificationCodeValid} />
                     </>
                 );
             case 'PasswordView':
                 return (
                     <>
-                        <View style={[styles.credentialContainer, { marginBottom: isPasswordValid ? 10 : 0 }]}>
-                            <MaterialIcons name="lock-outline" size={20} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput placeholder="New Password" theme={credentialTextTheme} right={<TextInput.Icon icon={showPassword ? 'eye-off' : 'eye'} onPress={togglePasswordVisibility} />} secureTextEntry={!showPassword} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={password} onChangeText={setPassword} />
-                        </View>
-                        {!isPasswordValid && (
-                            <Text style={styles.textValidation}>Please enter a valid password (min 8 chars)</Text>
-                        )}
-                        <View style={[styles.credentialContainer, {}]}>
-                            <MaterialIcons name="lock-outline" size={20} color="#666" style={{ marginHorizontal: 5 }} />
-                            <TextInput placeholder="Confirm New Password" theme={credentialTextTheme} right={<TextInput.Icon icon={showConfirmPassword ? 'eye-off' : 'eye'} onPress={toggleConfirmPasswordVisibility} />} secureTextEntry={!showConfirmPassword} style={[styles.text, styles.credentialText]} placeholderTextColor={'#666'} value={confirmPassword} onChangeText={setConfirmPassword} />
-                        </View>
-                        {!isConfirmPasswordValid && (
-                            <Text style={styles.textValidation}>Passwords do not match</Text>
-                        )}
+                        <PasswordComponent
+                            password={password}
+                            setPassword={setPassword}
+                            isPasswordValid={isPasswordValid}
+                            placeholderText="Password"
+                            warningText="Please enter a valid password (min 8 chars)" />
+                        <PasswordComponent
+                            password={confirmPassword}
+                            setPassword={setConfirmPassword}
+                            isPasswordValid={isConfirmPasswordValid}
+                            placeholderText="Confirm Password"
+                            warningText="Passwords do not match" />
                     </>
                 );
             default:
@@ -239,7 +220,11 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({navig
                             }
                         }}
                         style={[styles.buttonContainer, { marginTop: 20, backgroundColor: Colors.secondaryBrand }]}>
+                        {isLoading ? (
+                            <ActivityIndicator size="small" color="white" />
+                        ) : (
                         <Text style={[styles.buttonText, styles.text]}>{getButtonText()}</Text>
+                        )}
                     </TouchableOpacity>
 
                 </View>

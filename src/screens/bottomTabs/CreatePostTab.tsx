@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Dimensions, FlatList, Image, PermissionsAndroid, Platform, SafeAreaView, ScrollView, TextInput as TextArea, Text, TouchableOpacity, View, TouchableNativeFeedback, ActivityIndicator, Animated, Pressable } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Colors, Storage, credentialTextTheme } from "../../utils/Config";
 import { CameraRoll, GetAlbumsParams } from "@react-native-camera-roll/camera-roll";
 import { Picker } from "@react-native-picker/picker";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
@@ -11,51 +10,55 @@ import { useAlbum } from "../../context/AlbumContext";
 import { usePhoto } from "../../context/PhotoContext";
 import { useToast } from "react-native-toast-notifications";
 import { usePost } from "../../context/PostContext";
-import { CommonActions } from "@react-navigation/native";
+import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import SearchBar from "react-native-dynamic-search-bar";
-import { IndividualSearch } from "../../components/IndividualSearch";
+import { IndividualUserSelect } from "../../components/IndividualUserSelect";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { useFriend } from "../../context/FriendContext";
+import { useUser } from "../../context/UserContext";
+import { MmkvStorage } from "../../utils/GlobalConfig";
+import { Colors, credentialTextTheme } from "../../utils/GlobalStyles";
 
 interface CreatePostTabProps {
     navigation: any;
     route: any;
 }
-const width = Dimensions.get('window').width;
-const height = Dimensions.get('window').height;
 export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route }) => {
+    const width = Dimensions.get('window').width;
+    const height = Dimensions.get('window').height;
     const toast = useToast();
-    const [isLoading, setIsLoading] = useState(false);
-
-    const [currentView, setCurrentView] = useState('PhotoSelectView');
-    const [images, setImages] = useState<any[]>([]);
-    const [albums, setAlbums] = useState<any[]>([]); //gallery albums
-    const [pickedImage, setPickedImage] = useState<any>({});
-    const [category, setCategory] = useState<string>('');
-
-    const [postTitle, setPostTitle] = useState('');
-    const [postBody, setPostBody] = useState('');
-    const [postedUserId, setPostedUserId] = useState('');
-
-    const [uploadsAlbumId, setUploadsAlbumId] = useState('');
 
     const { getUploadsAlbumId } = useAlbum();
-    const { addPhoto } = usePhoto();
-    const { addPost } = usePost();
+    const { addPhoto, getPhotoById } = usePhoto();
+    const { addPost, getPostById, editPost } = usePost();
+    const { getAllFriends } = useFriend();
+    const { getProfile } = useUser();
 
-    const [isBottomPostVisible, setIsBottomPostVisible] = useState(false);
-    const translateY = new Animated.Value(height - 300);
+    const [currentView, setCurrentView] = useState('PhotoSelectView');
+    const [isLoading, setIsLoading] = useState(false);
 
+    //gallery/camera roll
+    const [images, setImages] = useState<any[]>([]);
+    const [albums, setAlbums] = useState<any[]>([]); //gallery albums
+    const [uploadsAlbumId, setUploadsAlbumId] = useState('');
+    const [category, setCategory] = useState<string>('');
+    const [friends, setFriends] = useState<any>([]);
     const [searchUserQuery, setSearchUserQuery] = useState('');
 
-    //Animation Use Effect
-    useEffect(() => {
-        Animated.timing(translateY, {
-            toValue: isBottomPostVisible ? 0 : height,
-            duration: 300,
-            useNativeDriver: true,
-        }).start();
-    }, [isBottomPostVisible]);
 
-    //Main UseEffect
+    const getUserProfileExecuted = useRef(false);
+    const [currentFunction, setCurrentFunction] = useState('Add');
+    const [postId, setPostId] = useState('');
+    const [postTitle, setPostTitle] = useState('');
+    const [postBody, setPostBody] = useState('');
+    const [pickedImage, setPickedImage] = useState<any>({});
+    const [postedUserId, setPostedUserId] = useState('');
+    const [postedUserFirstName, setPostedUserFirstName] = useState('');
+    const [postedUserLastName, setPostedUserLastName] = useState('');
+
+
+    //Use Effects
+
     useEffect(() => {
         hasPermission();
 
@@ -75,7 +78,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                     else {
                         setCurrentView('PhotoSelectView');
                     }
-                    setIsBottomPostVisible(false);
+
                 }} style={{ flexDirection: "row", alignItems: "center", marginStart: 10 }}>
                     <MaterialIcons name={currentView == 'PhotoSelectView' ? 'close' : 'arrow-back'} size={32} color={'black'} />
                 </TouchableOpacity>
@@ -92,19 +95,11 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
             ),
         });
 
-
         getUploadsAlbum();
-
         loadAlbums();
+
         if (route.params?.image) {
             setPickedImage(route.params?.image);
-        }
-
-        const userId = Storage.getString('userId');
-        if (route.params?.postedUserId) {
-            setPostedUserId(route.params?.postedUserId)
-        } else {
-            setPostedUserId(userId!);
         }
 
         return () => {
@@ -113,36 +108,168 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
             });
         };
 
-
-
     }, [route.params?.image, currentView, navigation]);
+    useEffect(() => {
+        if (getUserProfileExecuted.current) {
+            getUserProfile(postedUserId);
+        } else {
+            const userId = MmkvStorage.getString('userId');
+            setPostedUserId(userId!);
+            getUserProfileExecuted.current = true;
+        }
+    }, [postedUserId]);
+    useEffect(() => {
+        if (route.params?.postId) {
+            navigation.setOptions({
+                headerTitle: 'Edit Post'
+            });
+
+            setCurrentFunction('Edit');
+
+            const getPost = async () => {
+                const result = getPostById ? await getPostById(route.params?.postId) : undefined;
+                if (result) {
+                    setPostedUserId(result.poster.id);
+                    if (!route.params?.image) {
+                        setPickedImage({
+                            node: {
+                                image: {
+                                    uri: result.photo.photoImageURL
+                                }
+                            }
+                        });
+                    }
+                    setPostId(route.params.postId);
+                    setPostTitle(result.postTitle);
+                    setPostBody(result.postBody);
+                }
+            }
+            getPost();
+        } else {
+            setCurrentFunction('Add');
+        }
+    }, []);
 
 
 
-    const getUploadsAlbum = async () => {
-        const result = getUploadsAlbumId ? await getUploadsAlbumId() : undefined;
 
-        if (result) {
-            setUploadsAlbumId(result);
+    //api functions
+    const onAddPost = async () => {
+        if (!postTitle.trim() || !postBody.trim()) {
+            toast.show('All fields are required', { type: 'danger' });
+        } else {
+            setIsLoading(true);
+            const file = pickedImage.node.image.uri;
+            const name = file.split('/').pop();
+
+            const formData = new FormData();
+            formData.append('albumId', uploadsAlbumId);
+            formData.append('file', {
+                uri: file,
+                name: name,
+                type: 'image/jpg'
+            });
+
+            try {
+                const result = addPhoto ? await addPhoto(formData) : undefined;
+                if (result) {
+                    const dateToday = new Date();
+                    const postResult = addPost ? await addPost(postTitle, postBody, dateToday, postedUserId, result) : undefined;
+
+                    if (postResult) {
+                        toast.show('Post success!', { type: 'success' });
+                        navigation.navigate('Home', { refresh: true });
+                    } else {
+                        toast.show(postResult.result, { type: 'warning' });
+                    }
+                } else {
+                    toast.show(result, { type: 'warning' });
+                }
+
+            } catch (error: any) {
+                toast.show("An unexpected error occurred", { type: 'danger' });
+                console.log(error);
+            }
+        }
+        setIsLoading(false);
+    }
+    const onEditPost = async () => {
+        if (!postTitle.trim() || !postBody.trim()) {
+            toast.show('All fields are required', { type: 'danger' });
+        } else {
+            setIsLoading(true);
+            const file = pickedImage.node.image.uri;
+            const name = file.split('/').pop();
+
+            const formData = new FormData();
+            formData.append('albumId', uploadsAlbumId);
+            formData.append('file', {
+                uri: file,
+                name: name,
+                type: 'image/jpg'
+            });
+
+            try {
+                const result = addPhoto ? await addPhoto(formData) : undefined;
+                if (result) {
+                    const postResult = editPost ? await editPost(postId, postTitle, postBody, result) : undefined;
+                    console.log(postResult);
+                    if (postResult) {
+                        toast.show('Post updated!', { type: 'success' });
+                        navigation.navigate('Home', { refresh: true });
+                    } else {
+                        toast.show(postResult.result, { type: 'warning' });
+                    }
+                } else {
+                    toast.show(result, { type: 'warning' });
+                }
+
+            } catch (error: any) {
+                toast.show("An unexpected error occurred", { type: 'danger' });
+                console.log(error);
+            }
+        }
+        setIsLoading(false);
+    }
+    const getFriends = async () => {
+        try {
+            const userId = MmkvStorage.getString('userId');
+
+            if (userId) {
+                const result = getAllFriends ? await getAllFriends(userId) : undefined;
+                if (result) {
+                    const profileResult = getProfile ? await getProfile(userId) : undefined;
+                    if (await profileResult.id) {
+                        const pictureResult = getPhotoById ? await getPhotoById(profileResult.photo.id) : undefined;
+
+                        if (pictureResult) {
+                            const newItem = {
+                                photo: {
+                                    photoImageURL: pictureResult,
+                                },
+                                firstName: profileResult.firstName,
+                                lastName: profileResult.lastName + ' (You)',
+                                id: profileResult.id,
+                            }
+                            setFriends((friends: any) => [newItem, ...result]);
+                        }
+                    }
+
+                }
+            }
+        } catch (error: any) {
+            console.error("Error fetching photos:", error.response);
+        }
+    }
+    const getUserProfile = async (userId: string) => {
+        const result = getProfile ? await getProfile(userId) : undefined;
+        if (await result.id) {
+            setPostedUserFirstName(result.firstName);
+            setPostedUserLastName(result.lastName);
         }
     }
 
-    const hasPermission = async () => {
-        const platformVersion = parseInt(String(Platform.Version), 10);
-        const permission =
-            platformVersion >= 33
-                ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
-                : PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
-
-        const hasPermission = await PermissionsAndroid.check(permission);
-        if (hasPermission) {
-            return true;
-        }
-
-        const status = await PermissionsAndroid.request(permission);
-        return status === 'granted';
-    };
-
+    //album retrieval
     const loadAlbums = async () => {
         if (Platform.OS === 'android' && !(await hasPermission())) {
             return;
@@ -157,7 +284,15 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                 console.error(err);
             });
     };
+    const getUploadsAlbum = async () => {
+        const result = getUploadsAlbumId ? await getUploadsAlbumId() : undefined;
 
+        if (result) {
+            setUploadsAlbumId(result);
+        }
+    }
+
+    //camera roll
     const pickedCategory = (itemValue: string, itemIndex: number) => {
         let params = { first: 40, groupName: albums[itemIndex].title };
 
@@ -165,13 +300,12 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
 
         CameraRoll.getPhotos(params).then((imgs) => {
             setImages(imgs.edges);
-            if (!route.params?.image) {
+            if (!route.params?.image && !route.params?.postId) {
                 setPickedImage(imgs.edges[0]);
             }
         });
 
     };
-
     const displayAssetCategories = () => {
         return albums.map((category, index) => {
             const key = `${category.title}_${index}`;
@@ -179,6 +313,17 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
         });
     };
 
+    //bottom sheet
+    const bottomSheetRef = useRef<BottomSheet>(null);
+    const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
+    const snapPoints = useMemo(() => ['50%', '90%'], []);
+    const handleSheetChanges = useCallback((index: number) => {
+        if (index === -1) {
+            setIsBottomSheetVisible(false);
+        }
+    }, []);
+
+    //others
     const renderView = () => {
         switch (currentView) {
             case 'PhotoSelectView':
@@ -231,7 +376,7 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                                 right: 0,
                                 bottom: 0, backgroundColor: Colors.primaryBrand
                             }}
-                            onPress={() => navigation.replace("Camera")}
+                            onPress={() => navigation.replace("Camera", { postId: postId })}
                         />
                     </>
                 );
@@ -265,67 +410,28 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                                     placeholderTextColor={'#666'} />
 
                                 <TouchableNativeFeedback onPress={() => {
-                                    setIsBottomPostVisible(true);
+                                    setIsBottomSheetVisible(true);
+                                    getFriends();
                                 }}>
                                     <View style={{ paddingHorizontal: 10, paddingVertical: 15, flexDirection: "row", alignItems: "center" }}>
                                         <MaterialCommunityIcons name="account-outline" size={28} color={'#37474F'} style={{ flex: 0 }} />
                                         <View style={{ marginStart: 10, alignSelf: "center", flex: 1 }}>
-                                            <Text style={{ fontSize: 18, color: '#37474F', fontFamily: 'Roboto-Medium' }}>Post in: johnbernard.tinio</Text>
+                                            <Text style={{ fontSize: 18, color: '#37474F', fontFamily: 'Roboto-Medium' }}>Post in: {`${postedUserFirstName.toLowerCase().replace(/\s/g, '')}.${postedUserLastName.toLowerCase()}`}</Text>
                                         </View>
                                         <MaterialIcons name="arrow-forward-ios" size={20} color={'#37474F'} style={{ flex: 0 }} />
                                     </View>
                                 </TouchableNativeFeedback>
 
-                                <TouchableNativeFeedback>
-                                    <View style={{ paddingHorizontal: 10, paddingVertical: 15, flexDirection: "row", alignItems: "center" }}>
-                                        <MaterialCommunityIcons name="account-outline" size={28} color={'#37474F'} style={{ flex: 0 }} />
-                                        <View style={{ marginStart: 10, alignSelf: "center", flex: 1 }}>
-                                            <Text style={{ fontSize: 18, color: '#37474F', fontFamily: 'Roboto-Medium' }}>Album: Greens</Text>
-                                        </View>
-                                        <MaterialIcons name="arrow-forward-ios" size={20} color={'#37474F'} style={{ flex: 0 }} />
-                                    </View>
-                                </TouchableNativeFeedback>
                             </View>
                         </ScrollView>
                         <TouchableOpacity
-                            onPress={async () => {
-                                if (!postTitle.trim() || !postBody.trim()) {
-                                    toast.show('All fields are required', { type: 'danger' });
+                            onPress={() => {
+                                console.log(currentFunction);
+                                if (currentFunction == 'Edit') {
+                                    onEditPost();
                                 } else {
-                                    setIsLoading(true);
-                                    const file = pickedImage.node.image.uri;
-                                    const name = file.split('/').pop();
-
-                                    const formData = new FormData();
-                                    formData.append('albumId', uploadsAlbumId);
-                                    formData.append('file', {
-                                        uri: file,
-                                        name: name,
-                                        type: 'image/jpg'
-                                    });
-
-                                    try {
-                                        const result = addPhoto ? await addPhoto(formData) : undefined;
-                                        if (result) {
-                                            const dateToday = new Date();
-                                            const postResult = addPost ? await addPost(postTitle, postBody, dateToday, postedUserId, result) : undefined;
-
-                                            if (postResult) {
-                                                toast.show('Post success!', { type: 'success' });
-                                                navigation.navigate('Home');
-                                            } else {
-                                                toast.show(postResult.result, { type: 'warning' });
-                                            }
-                                        } else {
-                                            toast.show(result, { type: 'warning' });
-                                        }
-
-                                    } catch (error: any) {
-                                        toast.show("An unexpected error occurred", { type: 'danger' });
-                                        console.log(error);
-                                    }
+                                    onAddPost();
                                 }
-                                setIsLoading(false);
                             }}
                             style={{
                                 flex: 0,
@@ -338,69 +444,64 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                             {isLoading ? (
                                 <ActivityIndicator size="small" color="white" />
                             ) : (
-                                <Text style={{ color: 'white', fontSize: 20, textAlign: 'center', fontFamily: 'Roboto-Medium' }}>Post</Text>
-
+                                <Text style={{ color: 'white', fontSize: 20, textAlign: 'center', fontFamily: 'Roboto-Medium' }}>{currentFunction == 'Edit' ? 'Update Post' : "Post"}</Text>
                             )}
                         </TouchableOpacity>
 
-                        <Animated.View
-                            style={[
-                                {
-                                    transform: [{ translateY: translateY }],
-                                    backgroundColor: 'white',
-                                    borderTopLeftRadius: 10,
-                                    borderTopRightRadius: 10,
-                                    paddingVertical: 16,
-                                    position: 'absolute',
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    borderWidth: 0.2,
-                                    maxHeight: height - 300,
-                                },
-                            ]}>
-                            <ScrollView showsVerticalScrollIndicator={false}>
-                                <View>
-                                    <TouchableOpacity onPress={() => setIsBottomPostVisible(false)} style={{ width: '100%' }} >
-                                        <View style={{ backgroundColor: 'darkgray', height: 5, width: '10%', alignSelf: "center" }}></View>
-                                        <View style={{ paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: 'lightgray', marginTop: 20 }}>
-                                            <Text style={{ fontSize: 16, color: 'black', textAlign: "center", fontWeight: '500' }}>Search user</Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                    <View>
+                        {/* bottom sheet here */}
+                        <BottomSheet
+                            ref={bottomSheetRef}
+                            index={isBottomSheetVisible ? 0 : -1}
+                            snapPoints={snapPoints}
+                            onChange={handleSheetChanges}
+                            enablePanDownToClose
+                            style={{
+                                borderTopStartRadius: 20,
+                                borderTopEndRadius: 20,
+                                shadowRadius: 20,
+                                shadowColor: 'black',
+                                elevation: 20,
+                            }}>
+                            <View style={{ borderBottomColor: 'gray', borderBottomWidth: 0.2, paddingTop: 20, paddingBottom: 10 }} >
+                                <Text style={{ textAlign: "center", fontSize: 16, color: 'black', fontWeight: '500' }}>Search user</Text>
+                            </View>
+                            <View style={{ marginVertical: 20, marginHorizontal: 20 }}>
+                                <SearchBar
+                                    placeholder="Search"
+                                    onPress={() => { setSearchUserQuery('') }}
+                                    onChangeText={setSearchUserQuery}
+                                    style={{ backgroundColor: '#ECEFF1', width: '100%', marginBottom: 10 }} />
 
-                                        <View style={{ marginHorizontal: 15, marginVertical: 15 }}>
-                                            <SearchBar
-                                                placeholder="Search"
-                                                onPress={() => { setSearchUserQuery('') }}
-                                                onChangeText={setSearchUserQuery}
-                                                style={{ backgroundColor: '#ECEFF1', width: '100%', marginBottom: 10 }} />
+                                <FlatList
+                                    data={friends}
+                                    renderItem={({ item }) => <IndividualUserSelect key={item.id} item={item} setPostedUserId={setPostedUserId} bottomSheetRef={bottomSheetRef} navigation={navigation} route={route} />}
+                                    keyExtractor={(item) => item.id}
+                                    showsVerticalScrollIndicator={false} />
 
-
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                            <IndividualSearch />
-                                        </View>
-
-                                    </View>
-                                </View>
-                            </ScrollView>
-                        </Animated.View>
+                            </View>
+                        </BottomSheet>
                     </View>
                 );
         }
     }
+    const hasPermission = async () => {
+        const platformVersion = parseInt(String(Platform.Version), 10);
+        const permission =
+            platformVersion >= 33
+                ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
+                : PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+
+        const hasPermission = await PermissionsAndroid.check(permission);
+        if (hasPermission) {
+            return true;
+        }
+
+        const status = await PermissionsAndroid.request(permission);
+        return status === 'granted';
+    };
 
     return (
-        <SafeAreaView style={{ backgroundColor: isBottomPostVisible ? '#00000060' : 'transparent', flex: 1 }}>
+        <SafeAreaView style={{ backgroundColor: 'white', flex: 1 }}>
             <TouchableOpacity activeOpacity={1} style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
                     {renderView()}

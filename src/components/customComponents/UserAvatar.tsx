@@ -2,23 +2,28 @@ import { ImageSourcePropType, StyleSheet, View } from "react-native";
 import { Card, Title } from "react-native-paper";
 import { Images } from "../../utils/Images";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { Colors } from "../../utils/Config";
+import { MmkvStorage } from "../../utils/GlobalConfig";
+import { Colors } from "../../utils/GlobalStyles";
 
 interface UserAvatarProps {
-    name: string;
-    imageUrl: ImageSourcePropType;
+    item: any;
+    navigation: any;
+    route: any;
 }
 
-export const UserAvatar: React.FC<UserAvatarProps> = ({ name, imageUrl }) => {
+
+export const UserAvatar: React.FC<UserAvatarProps> = ({ item, navigation, route }) => {
+    const userId = MmkvStorage.getString('userId');
+
     return (
-        <View>
+        <View style={{marginHorizontal: 5}} key={item}>
             <TouchableOpacity>
                 <Card style={styles.avatarContainer}>
-                    <Card.Cover resizeMode="cover" source={imageUrl} style={styles.avatarImage} />
+                    <Card.Cover resizeMode="cover" source={item.photo.photoImageURL ? { uri: item.photo.photoImageURL } : Images.sample_avatar_neutral} style={styles.avatarImage} />
                 </Card>
             </TouchableOpacity>
             <View style={styles.textContainer}>
-                <Title style={styles.text}>{name}</Title>
+                <Title style={[styles.text, {fontWeight: item.id == userId ? '900' : '300', fontFamily: 'Roboto-Medium'}]}>{item.id == userId ? 'You' : item.firstName.split(' ')[0]}</Title>
             </View>
         </View>
     );
@@ -30,7 +35,7 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderWidth: 3,
-        borderColor: Colors.secondaryBrand
+        borderColor: Colors.orange
     },
     avatarImage: {
         height: '100%',

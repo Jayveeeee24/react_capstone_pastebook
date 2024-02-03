@@ -1,6 +1,6 @@
 import axios from "axios";
 import { ReactNode, createContext, useContext } from "react";
-import { BASE_URL } from "../utils/Config";
+import { BASE_URL } from "../utils/GlobalConfig";
 import { usePhoto } from "./PhotoContext";
 
 
@@ -8,6 +8,8 @@ interface AlbumContextProps {
     getUploadsAlbumId?: () => Promise<any>;
     getAllAlbums?: () => Promise<any>;
     addAlbum?: (albumName: string) => Promise<any>;
+    editAlbum?: (albumId: string, albumName: string) => Promise<any>;
+    deleteAlbum?: (albumId: string) => Promise<any>;
 }
 
 interface AlbumProviderProps {
@@ -84,10 +86,30 @@ export const AlbumProvider: React.FC<AlbumProviderProps> = ({ children }) => {
         }
     }
 
+    const editAlbum = async (albumId: string, albumName: string) => {
+        try {
+            const response = await axios.put(`${BASE_URL}/api/album/update-album`, {id: albumId, albumName});
+            return response.data;
+        } catch (error: any) {
+            return error.response;
+        }
+    }
+
+    const deleteAlbum = async (albumId: string) => {
+        try {
+            const response = await axios.delete(`${BASE_URL}/api/album/delete-album/${albumId}`);
+            return response.data;
+        } catch (error: any) {
+            return error.response;
+        }
+    }
+
     const contextValue: AlbumContextProps = {
         getUploadsAlbumId,
         getAllAlbums,
-        addAlbum
+        addAlbum,
+        editAlbum,
+        deleteAlbum
     }
 
     return (

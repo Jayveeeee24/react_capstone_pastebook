@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useContext } from "react";
-import { BASE_URL } from "../utils/Config";
+import { BASE_URL } from "../utils/GlobalConfig";
 import axios from "axios";
 
 
@@ -9,6 +9,7 @@ interface UserContextProps {
     changePassword?: (newPassword: string) => Promise<any>;
     editProfile?: (firstName: string, lastName: string, birthdate: Date, sex: string, phoneNumber: string, aboutMe: string) => Promise<any>;
     getProfile?: (userId: string) => Promise<any>;
+    changeProfilePic?: (profileImageId: string) => Promise<any>;
 }
 
 interface UserProviderProps {
@@ -61,7 +62,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
             return result.data;
         } catch (error: any) {
-            console.log('check current password error: ' + error);
+            console.log('edit profile error: ' + error);
             return error.response.data.result;
         }
     }
@@ -71,7 +72,17 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
             const result = await axios.get(`${BASE_URL}/api/profile/get-mini-profile/${userId}`);
             return result.data;
         } catch (error: any) {
-            console.log('check current password error: ' + error);
+            console.log('get profile error: ' + error);
+            return error.response.data.result;
+        }
+    }
+
+    const changeProfilePic = async (profileImageId: string) => {
+        try {
+            const result = await axios.put(`${BASE_URL}/api/profile/edit-profile-pic/${profileImageId}`);
+            return result.data;
+        } catch (error: any) {
+            console.log('change profile pic error: ' + error);
             return error.response.data.result;
         }
     }
@@ -81,7 +92,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         checkCurrentPassword,
         changePassword,
         editProfile,
-        getProfile
+        getProfile,
+        changeProfilePic
     };
 
     return (
