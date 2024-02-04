@@ -11,7 +11,7 @@ import { ProfileTabView } from "../../tabViews/ProfileTabView";
 import { Images } from "../../../utils/Images";
 import { useFriend } from "../../../context/FriendContext";
 import axios from "axios";
-import { Colors } from "../../../utils/GlobalStyles";
+import { Colors, globalStyles } from "../../../utils/GlobalStyles";
 
 interface OthersProfileScreenProps {
     navigation: any;
@@ -23,7 +23,7 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
     const { getPhotoById } = usePhoto();
     const { getFriendExist } = useFriend();
 
-    const [dynamicTitle, setDynamicTitle] = useState("Profile Tab");
+    const [dynamicTitle, setDynamicTitle] = useState("");
 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -33,6 +33,8 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
     const [gender, setGender] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [profilePicture, setProfilePicture] = useState<any>();
+    const [friendStatus, setFriendStatus] = useState('loading');
+    const [friendId, setFriendId] = useState('');
 
     const [postCount, setPostCount] = useState(0);
     const [friendCount, setFriendCount] = useState(0);
@@ -40,57 +42,44 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
     const [userId, setUserId] = useState('');
     const [viewerId, setViewerId] = useState('');
 
-
-
-    useFocusEffect(
-        useCallback(() => {
-
-            const loadProfile = async () => {
-                const id = MmkvStorage.getString('userId');
-                if (id) {
-                    setViewerId(id);
-                }
-                if (route.params.userId) {
-
-                    setUserId(route.params.userId);
-
-                    // console.log("receiverId " + id);
-                    // console.log("senderId " + route.params.userId);
-
-                    const result = getProfile ? await getProfile(route.params.userId) : undefined;
-                    if (await result.id) {
-                        setFirstName(result.firstName);
-                        setLastName(result.lastName);
-                        setBio(result.aboutMe ? result.aboutMe : '');
-                        setPhoneNumber(result.phoneNumber);
-                        setGender(result.sex);
-                        setDateOfBirth(new Date(result.birthDate));
-                        setFriendCount(result.friendCount);
-                        setAlbumCount(result.albumCount);
-                        setPostCount(result.postCount);
-                        setDynamicTitle(`${result.firstName.toLowerCase().replace(/\s/g, '')}.${result.lastName.toLowerCase()}`);
-
-                        // console.log(result.photo)
-                        const pictureResult = getPhotoById ? await getPhotoById(result.photo.id) : undefined;
-
-                        if (pictureResult) {
-                            setProfilePicture(pictureResult);
-                        }
-
-                    }
-                }
-            }
-
-            loadProfile();
-
-        }, [getProfile, setFirstName, setLastName, setBio, setPhoneNumber, setGender, setDateOfBirth, setDynamicTitle, navigation])
-    );
-
     useEffect(() => {
+        loadProfile();
         loadIsFriend();
-    }, [])
 
+    }, [userId, viewerId, getProfile, setFirstName, setLastName, setBio, setPhoneNumber, setGender, setDateOfBirth, setDynamicTitle, navigation])
 
+    const loadProfile = async () => {
+        const id = MmkvStorage.getString('userId');
+        if (id) {
+            setViewerId(id);
+        }
+        if (route.params?.userId) {
+
+            setUserId(route.params.userId);
+
+            const result = getProfile ? await getProfile(route.params.userId) : undefined;
+            if (result.id) {
+                setFirstName(result.firstName);
+                setLastName(result.lastName);
+                setBio(result.aboutMe ? result.aboutMe : '');
+                setPhoneNumber(result.phoneNumber);
+                setGender(result.sex);
+                setDateOfBirth(new Date(result.birthDate));
+                setFriendCount(result.friendCount);
+                setAlbumCount(result.albumCount);
+                setPostCount(result.postCount);
+                setDynamicTitle(`${result.firstName.toLowerCase().replace(/\s/g, '')}.${result.lastName.toLowerCase()}`);
+
+                // console.log(result.photo)
+                const pictureResult = getPhotoById ? await getPhotoById(result.photo.id) : undefined;
+
+                if (pictureResult) {
+                    setProfilePicture(pictureResult);
+                }
+
+            }
+        }
+    }
 
     useEffect(() => {
         navigation.setOptions({
@@ -124,19 +113,27 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
 
 
     const loadIsFriend = async () => {
-        console.log("userId [" + userId + "]");
-        console.log("viewerId [" + viewerId + "]");
         try {
             const result = getFriendExist ? await getFriendExist(userId, viewerId) : undefined;
-            axios.interceptors.request.use(request => {
-              console.log('Starting Request', request);
-              return request;
-            });
-            if (result) {
-                // console.log(result);
+            // axios.interceptors.request.use(request => {
+            //     console.log('Starting Request', request);
+            //     return request;
+            // });
+            if (result.result) {
+                setFriendStatus('not_friend');
+            } else if (result.isFriend) {
+                setFriendStatus('friend');
+                setFriendId(result.id);
+            } else if (!result.isFriend) {
+                setFriendId(result.id);
+                if (result.senderId === viewerId) {
+                    setFriendStatus('i_requested');
+                } else {
+                    setFriendStatus('they_requested');
+                }
             }
         } catch (error: any) {
-            console.error("Error fetching photos:", error);
+            console.error("Error fetching friend exist:", error);
         }
     }
 
@@ -173,12 +170,15 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
                         <View>
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <MaterialCommunityIcons name="cake-variant-outline" size={16} color={'black'} />
-                                <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginStart: 5 }}>{dateOfBirth.toLocaleDateString('en-US', {
-                                    weekday: 'long',
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                })}</Text>
+                                <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginStart: 5 }}>
+                                    {
+                                        dateOfBirth.toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                        })
+                                    }
+                                </Text>
                             </View>
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <MaterialCommunityIcons name="gender-male" size={16} color={'black'} />
@@ -194,9 +194,35 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
                     </View>
 
 
-                    {/* <TouchableOpacity onPress={() => navigation.navigate('EditProfile')} style={{ borderWidth: 0.8, borderColor: 'gray', marginTop: 15, padding: 5 }}>
-                        <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', fontWeight: '700', textAlign: "center" }}>Edit Profile</Text>
-                    </TouchableOpacity> */}
+                    {
+                        // navigation.navigate('CreatePostTab', {
+                        //     screen: 'CreatePost',
+                        //     params: {
+                        //         postedId: userId,
+                        //     }
+                        // })
+                    }
+
+
+                    {friendStatus !== 'loading' && (
+                        <TouchableOpacity
+                            onPress={() => {
+                                console.log(friendId);
+                            }}
+                            style={{
+                                backgroundColor: friendStatus == "not_friend" ? Colors.success : friendStatus == "friend" ? Colors.danger : friendStatus == "i_requested" ? Colors.danger : friendStatus == "they_requested" ? Colors.success : "",
+                                borderRadius: 5,
+                                paddingHorizontal: 20,
+                                paddingVertical: 10,
+                                alignSelf: "center",
+                                marginTop: 10
+                            }}>
+                            <Text style={[{ fontFamily: 'Roboto-Medium', color: 'white', fontWeight: '500', fontSize: 16 }]}>
+                                {friendStatus == "not_friend" ? 'Add Friend' : friendStatus == "friend" ? 'Remove Friend' : friendStatus == "i_requested" ? "Remove Friend Request" : friendStatus == "they_requested" ? "Accept Friend Request" : ""}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
+
                 </View>
                 <View style={{ flex: 1 }}>
                     <ProfileTabView navigation={navigation} route={route} userId={userId} />

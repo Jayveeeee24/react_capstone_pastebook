@@ -58,7 +58,6 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
 
 
     //Use Effects
-
     useEffect(() => {
         hasPermission();
 
@@ -113,8 +112,12 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
         if (getUserProfileExecuted.current) {
             getUserProfile(postedUserId);
         } else {
-            const userId = MmkvStorage.getString('userId');
-            setPostedUserId(userId!);
+            if (route.params?.postedId) {
+                setPostedUserId(route.params.postedId);
+            }else{
+                const userId = MmkvStorage.getString('userId');
+                setPostedUserId(userId!);
+            }
             getUserProfileExecuted.current = true;
         }
     }, [postedUserId]);
@@ -147,8 +150,12 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
             getPost();
         } else {
             setCurrentFunction('Add');
+
+            navigation.setOptions({
+                headerTitle: 'New Post'
+            });
         }
-    }, []);
+    }, [route.params?.postId]);
 
 
 
@@ -220,6 +227,10 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
                     } else {
                         toast.show(postResult.result, { type: 'warning' });
                     }
+                    navigation.setParams({
+                        postId: ''
+                    });
+                    setPostId('');
                 } else {
                     toast.show(result, { type: 'warning' });
                 }
@@ -262,10 +273,17 @@ export const CreatePostTab: React.FC<CreatePostTabProps> = ({ navigation, route 
         }
     }
     const getUserProfile = async (userId: string) => {
-        const result = getProfile ? await getProfile(userId) : undefined;
-        if (await result.id) {
-            setPostedUserFirstName(result.firstName);
-            setPostedUserLastName(result.lastName);
+        try {
+            const result = getProfile ? await getProfile(userId) : undefined;
+            if (result && result.id) {
+                setPostedUserId(result.id)
+                setPostedUserFirstName(result.firstName);
+                setPostedUserLastName(result.lastName);
+            } else {
+                console.log('Error')
+            }
+        } catch (error) {
+            console.error("Error fetching user profile:", error);
         }
     }
 

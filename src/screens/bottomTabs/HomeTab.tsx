@@ -21,6 +21,8 @@ import { FriendRequestWithBadge } from "../../components/customComponents/Friend
 import { useNotification } from "../../context/NotificationContext";
 import { Item } from "react-native-paper/lib/typescript/components/Drawer/Drawer";
 import { Colors } from "../../utils/GlobalStyles";
+import { CommentBottomSheet } from "../../components/customComponents/CommentBottomSheet";
+import { PostOptionsBottomSheet } from "../../components/customComponents/PostOptionsBottomSheet";
 
 interface HomeTabProps {
     navigation: any;
@@ -28,17 +30,17 @@ interface HomeTabProps {
 }
 
 export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
-    const toast = useToast();
-    const { getAllFriends, getIsPosterFriend, getFriendRequestsCount } = useFriend();
+    const { getAllFriends, getFriendExist, getFriendRequestsCount } = useFriend();
     const { getProfile } = useUser();
     const { getPhotoById } = usePhoto();
     const { getNotificationsCount } = useNotification();
-    const { getNewsfeedPosts, deletePost } = usePost();
-    const { addComment, getComments } = useComment();
+    const { getNewsfeedPosts } = usePost();
+    const { getComments } = useComment();
 
     const [isScrollLoading, setIsScrollLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isImageLoading, setIsImageLoading] = useState(true);
 
     const [firstName, setFirstName] = useState('');
     const [profilePicture, setProfilePicture] = useState<any>();
@@ -50,7 +52,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
 
     const [selectedPostId, setSelectedPostId] = useState('');
     const [selectedPoster, setSelectedPoster] = useState<any>();
-    const [commentContent, setCommentContent] = useState('');
 
     const [notificationCount, setNotificationCount] = useState(0);
     const [friendRequestCount, setFriendRequestCount] = useState(0);
@@ -58,43 +59,10 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     //Bottom sheets
     const commentBottomSheetRef = useRef<BottomSheet>(null);
     const [isCommentBottomSheetVisible, setIsCommentBottomSheetVisible] = useState(false);
-    const snapPoints = useMemo(() => ['45%', '95%'], []);
-    const handleCommentSheetChanges = useCallback((index: number) => {
-        if (index === -1) {
-            setIsCommentBottomSheetVisible(false);
-        }
-    }, []);
 
     const optionsRef = useRef<BottomSheet>(null);
     const [isOptionsVisible, setIsOptionsVisible] = useState(false);
-    const snapPointsOptions = useMemo(() => ['30%', '35%'], []);
-    const handleOptionsSheetChanges = useCallback((index: number) => {
-        if (index === -1) {
-            setIsOptionsVisible(false);
-        }
-    }, []);
 
-
-    //useEffects
-    // useFocusEffect(
-    //     useCallback(() => {
-    //         const loadInitial = async () => {
-    //             getFriends();
-    //             loadProfile();
-    //             getNotificationCount();
-    //             getFriendRequestCount();
-    //         }
-    //         loadInitial();
-
-    //     }, [navigation, friendRequestCount, notificationCount])
-    // );
-    // useFocusEffect(() => {
-    //     getFriends();
-    //     loadProfile();
-    //     getNotificationCount();
-    //     getFriendRequestCount();
-    // })
-    const [isImageLoading, setIsImageLoading] = useState(true);
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -104,13 +72,13 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                 try {
                     const result = getProfile ? await getProfile(userId) : undefined;
 
-                    if (await result.id) {
+                    if (result && result.id) {
                         setFirstName(result.firstName);
                         const pictureResult = getPhotoById ? await getPhotoById(result.photo.id) : undefined;
 
                         if (pictureResult) {
                             setProfilePicture(pictureResult);
-                            setIsImageLoading(false);  // Set loading to false when image is loaded
+                            setIsImageLoading(false);
                         }
                     }
                 } catch (error) {
@@ -120,11 +88,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
         };
 
         loadProfile();
-        
-        getFriends();
-        getNotificationCount();
-        getFriendRequestCount();
-    }, [getProfile, getPhotoById, userId]);
+    }, [getProfile, userId]);
 
     useEffect(() => {
         setIsLoading(true);
@@ -188,7 +152,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
             }
         }
     };
-
     const getFriends = async () => {
         try {
             const userId = MmkvStorage.getString('userId');
@@ -200,37 +163,19 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                 }
             }
         } catch (error: any) {
-            console.error("Error fetching photos:", error.response);
+            console.error("Error fetching friends:", error.response);
         }
     }
     const getPosts = async () => {
         try {
             const result = getNewsfeedPosts ? await getNewsfeedPosts() : undefined;
-            if (await result) {
+            if (result) {
                 setPosts(result);
+                // console.log(result[0].friend);
                 setIsLoading(false);
             }
         } catch (error: any) {
-            console.error("Error fetching photos:", error.response);
-        }
-    }
-    const onDeletePost = async () => {
-        try {
-            const result = deletePost ? await deletePost(selectedPostId) : undefined;
-            if (result) {
-                toast.show('Post Deleted!', {
-                    type: "success",
-                });
-                hideModal();
-                getPosts();
-            } else {
-                toast.show(result, {
-                    type: "warning",
-                });
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            toast.show("An unexpected error occurred", { type: 'danger' });
+            console.error("Error fetching posts:", error.response);
         }
     }
     const onGetComments = async (postId: string) => {
@@ -245,55 +190,27 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
             console.error("Error fetching photos:", error.response);
         }
     }
-    const onAddComment = async () => {
-        if (!commentContent.trim()) {
-            toast.show('All fields are required', { type: 'danger' });
-        } else {
-            try {
-                const result = addComment ? await addComment(commentContent, selectedPostId) : undefined;
-                if (result) {
-                    onGetComments(selectedPostId);
-                    getPosts();
-                }
-                setCommentContent('');
-            } catch (error: any) {
-                toast.show("An unexpected error occurred", { type: 'danger' });
-                console.log(error);
-            }
-        }
-    }
     const getNotificationCount = async () => {
         try {
             const result = getNotificationsCount ? await getNotificationsCount() : undefined;
             if (result) {
-                // return result;
                 setNotificationCount(result);
             }
         } catch (error: any) {
             console.error("Error fetching notifs count:", error.response);
-            // return 0;
         }
     }
     const getFriendRequestCount = async () => {
         try {
             const result = getFriendRequestsCount ? await getFriendRequestsCount() : undefined;
-            // console.log(result);
             if (result) {
                 setFriendRequestCount(result);
-                // return result;
             }
         } catch (error: any) {
             console.error("Error fetching friend request count:", error.response);
             // return 0;
         }
     }
-
-
-    //modal
-    const [visible, setVisible] = useState(false);
-    const showModal = () => setVisible(true);
-    const hideModal = () => setVisible(false);
-
 
 
     //scroll refresh
@@ -326,7 +243,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                     <ActivityIndicator size="large" color={Colors.primaryBrand} />
                 </View>
-            ) : posts.length > 0 ? (
+            ) : posts && posts.length > 0 ? (
                 <FlatList
                     data={posts}
                     onScroll={handleScroll}
@@ -376,163 +293,36 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                 </TouchableWithoutFeedback>
             )}
 
-            {/* Comment Bottom Sheet */}
-            <BottomSheet
-                ref={commentBottomSheetRef}
-                index={isCommentBottomSheetVisible ? 0 : -1}
-                snapPoints={snapPoints}
-                onChange={handleCommentSheetChanges}
-                enablePanDownToClose
-                style={{
-                    borderTopStartRadius: 20,
-                    borderTopEndRadius: 20,
-                    shadowRadius: 20,
-                    shadowColor: 'black',
-                    elevation: 20,
-                    zIndex: 1,
-                }}>
-                <View style={{ flex: 1 }}>
-                    <View style={{ flex: 0, borderBottomColor: 'gray', borderBottomWidth: 0.2, paddingTop: 20, paddingBottom: 10 }}>
-                        <Text style={{ textAlign: 'center', fontSize: 16, color: 'black', fontWeight: '500' }}>Comments</Text>
-                    </View>
+            <CommentBottomSheet
+                comments={comments}
+                commentBottomSheetRef={commentBottomSheetRef}
+                profilePicture={profilePicture}
+                selectedPoster={selectedPoster}
+                getPosts={getPosts}
+                onGetComments={onGetComments}
+                selectedPostId={selectedPostId}
+                isCommentBottomSheetVisible={isCommentBottomSheetVisible}
+                setIsCommentBottomSheetVisible={setIsCommentBottomSheetVisible}
+                navigation={navigation}
+                route={route} />
 
-                    <View style={{ flex: 0, borderBottomColor: 'gray', borderBottomWidth: 0.2 }}>
-                        <View style={[{ flexDirection: 'row', borderBottomColor: '#ccc', marginHorizontal: 10, marginVertical: 5, gap: 10, alignItems: "center", }]}>
-                            <Image source={profilePicture ? { uri: profilePicture } : Images.sample_avatar_neutral} resizeMode="cover" style={{ aspectRatio: 1, width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: Colors.orange }} />
+            <PostOptionsBottomSheet
+                selectedPostId={selectedPostId}
+                getPosts={getPosts}
+                isOptionsVisible={isOptionsVisible}
+                optionsRef={optionsRef}
+                setIsOptionsVisible={setIsOptionsVisible}
+                navigation={navigation}
+                route={route} />
 
-                            <TextInput
-                                placeholder={selectedPoster ? `Add a comment for ${selectedPoster.firstName.toLowerCase().replace(/\s/g, '')}.${selectedPoster.lastName.toLowerCase()} ...` : ``}
-                                style={{ fontFamily: 'Roboto-Medium', color: 'black', fontSize: 15, flex: 1, backgroundColor: 'transparent' }}
-                                value={commentContent}
-                                onChangeText={setCommentContent}
-                                placeholderTextColor={'#666'} />
-
-                            <TouchableOpacity onPress={onAddComment}>
-                                <MaterialCommunityIcons name="send" size={26} color={Colors.primaryBrand} />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-
-                    <View style={{ flex: 1, marginVertical: 20 }}>
-                        {comments.length > 0 ? (
-                            <FlatList
-                                data={comments}
-                                renderItem={({ item }) => <IndividualComment comment={item} navigation={navigation} route={route} />}
-                                keyExtractor={(item) => item.id}
-                                showsVerticalScrollIndicator={false} />
-                        ) : (
-                            <View style={{ flex: 1, alignItems: "center", marginTop: 50 }}>
-                                <Text style={{ color: 'black', fontWeight: '700', fontSize: 22 }}>No comments yet</Text>
-                                <Text style={{ color: '#263238', fontWeight: '500', fontSize: 15 }}>Start the conversation.</Text>
-                            </View>
-                        )}
-                    </View>
-                </View>
-            </BottomSheet>
-
-            {/* Post Individual Bottom Sheet */}
-            <BottomSheet
-                ref={optionsRef}
-                index={isOptionsVisible ? 0 : -1}
-                snapPoints={snapPointsOptions}
-                onChange={handleOptionsSheetChanges}
-                enablePanDownToClose
-                style={{
-                    borderTopStartRadius: 20,
-                    borderTopEndRadius: 20,
-                    shadowRadius: 20,
-                    shadowColor: 'black',
-                    elevation: 20,
-                    zIndex: 1,
-                }}>
-                <View style={{ flex: 1 }}>
-                    <View style={{ flex: 0, borderBottomColor: 'gray', borderBottomWidth: 0.2, paddingTop: 20, paddingBottom: 10 }}>
-                        <Text style={{ textAlign: 'center', fontSize: 16, color: 'black', fontWeight: '500' }}>Post Options</Text>
-                    </View>
-
-                    <TouchableOpacity onPress={() => {
-                        optionsRef && optionsRef.current?.close();
-
-                        navigation.navigate('CreatePostTab', {
-                            screen: 'CreatePost',
-                            params: {
-                                postId: selectedPostId,
-                            }
-                        })
-                    }}>
-                        <View style={{ paddingHorizontal: 15, paddingVertical: 10, flexDirection: "row", alignItems: "center" }}>
-                            <MaterialCommunityIcons name="comment-edit-outline" size={36} color={'black'} style={{ flex: 0 }} />
-                            <View style={{ marginStart: 15, alignSelf: "center", flex: 1 }}>
-                                <Text style={{ fontSize: 20, color: 'black', fontFamily: 'Roboto-Medium' }}>Edit Post</Text>
-                            </View>
-                            <MaterialIcons name="arrow-forward-ios" size={24} color={'black'} style={{ flex: 0 }} />
-                        </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => {
-                        optionsRef && optionsRef.current?.close();
-                        showModal()
-                    }}>
-                        <View style={{ paddingHorizontal: 15, paddingVertical: 10, flexDirection: "row", alignItems: "center" }}>
-                            <MaterialCommunityIcons name="delete-outline" size={36} color={Colors.danger} style={{ flex: 0 }} />
-                            <View style={{ marginStart: 15, alignSelf: "center", flex: 1 }}>
-                                <Text style={{ fontSize: 20, color: Colors.danger, fontFamily: 'Roboto-Medium' }}>Delete Post</Text>
-                            </View>
-                            <MaterialIcons name="arrow-forward-ios" size={24} color={Colors.danger} style={{ flex: 0 }} />
-                        </View>
-                    </TouchableOpacity>
-
-
-                </View>
-            </BottomSheet>
-
-            <Modal
-                visible={visible}
-                onDismiss={hideModal}
-                contentContainerStyle={{
-                    flexDirection: "column",
-                    backgroundColor: 'white',
-                    borderRadius: 15,
-                    height: 300,
-                    width: 250,
-                    alignSelf: "center",
-                    alignItems: "flex-start",
-                }}>
-                <View style={{ marginBottom: 10, padding: 20 }}>
-                    <Text style={{ alignSelf: "center", fontSize: 18, textAlign: "center", fontWeight: '700', color: 'black', fontFamily: 'Roboto-Medium' }}>
-                        Are you sure you want to delete this post?
-                    </Text>
-                    <Text style={{ marginTop: 10, alignSelf: "center", textAlign: "center" }}>
-                        You're requesting to delete this post. You cannot revert this back, Confirm?
-                    </Text>
-                </View>
-                <View style={{ height: 1, backgroundColor: 'darkgray', width: '100%' }} />
-                <TouchableOpacity onPress={onDeletePost} style={{ width: '100%', alignSelf: "center", paddingVertical: 15 }}>
-                    <Text style={{ color: Colors.danger, fontWeight: '700', fontFamily: 'Roboto-Medium', fontSize: 16, alignSelf: "center" }}>Continue delete post</Text>
-                </TouchableOpacity>
-                <View style={{ height: 1, backgroundColor: 'darkgray', width: '100%', marginBottom: 10 }} />
-                <TouchableOpacity onPress={hideModal} style={{ width: '100%', alignSelf: "center", marginTop: 5, flex: 0 }}>
-                    <Text style={{ color: 'black', fontWeight: '700', fontFamily: 'Roboto-Medium', fontSize: 16, alignSelf: "center" }}>Cancel</Text>
-                </TouchableOpacity>
-            </Modal>
         </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    text: {
-        fontFamily: 'Roboto-Medium'
-    },
-
     friendsView: {
         gap: 15,
         height: 85,
         marginBottom: 10,
     },
-    postsContainer: {
-        flex: 1,
-        backgroundColor: 'white',
-        flexDirection: "column",
-        alignItems: 'center'
-    }
 })

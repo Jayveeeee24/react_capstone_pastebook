@@ -6,11 +6,11 @@ import { usePhoto } from "./PhotoContext";
 
 interface FriendContextProps {
     getAllFriends?: (userId: string) => Promise<any>;
-    getIsPosterFriend?: (posterId: string, userId: string) => Promise<any>;
+    getIsPosterFriend?: (posterId: string) => Promise<any>;
     getAllFriendsByUserId?: (userId: string) => Promise<any>;
     getAllSearchUsers?: (name: string) => Promise<any>;
     getAllFriendRequest?: () => Promise<any>;
-    acceptFriendRequest?: (requestId: string) => Promise<any>; 
+    acceptFriendRequest?: (requestId: string) => Promise<any>;
     rejectFriendRequest?: (requestId: string) => Promise<any>;
     getFriendRequestsCount?: () => Promise<any>;
     getFriendExist?: (receiverId: string, senderId: string) => Promise<any>;
@@ -70,13 +70,13 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
         }
     };
 
-    const getIsPosterFriend = async (posterId: string, userId: string) => {
+    const getIsPosterFriend = async (posterId: string) => {
         try {
-            const result = await axios.post(`${BASE_URL}/api/friend/get-friend-exist`, { receiverId: posterId, senderId: userId });
-            return result.data;
+            const result = await axios.get(`${BASE_URL}/api/friend/is-poster-friend/${posterId}`);
+            return result;
         } catch (error: any) {
             console.log('get poster friend error: ' + error);
-            return error.response;
+            return Promise.reject(error);
         }
     }
 
@@ -225,18 +225,21 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
     }
 
     const getFriendExist = async (receiverId: string, senderId: string) => {
-        console.log("receiverId " + receiverId);
-        console.log("senderId " + senderId);
-        // console.log(axios.defaults.headers.common["Authorization"]);
+        // console.log("receiverId " + receiverId);
+        //     // console.log("senderId " + senderId);
+        //     // console.log(axios.defaults.headers.common["Authorization"]);
+        //     // axios.interceptors.request.use(request => {
+        //     //   console.log('Starting Request', request);
+        //     //   return request;
+        //     // });
         try {
             const result = await axios.post(`${BASE_URL}/api/friend/get-friend-exist`, { receiverId, senderId });
             return result.data;
         } catch (error: any) {
-            console.log('get friend exist error: ' + error);
-            return error.response;
+            // console.log('get friend exist error: ' + error);
+            return error.response.data;
         }
     }
-
 
     const contextValue: FriendContextProps = {
         getAllFriends,

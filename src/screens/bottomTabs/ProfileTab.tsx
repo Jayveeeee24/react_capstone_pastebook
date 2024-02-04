@@ -41,7 +41,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
         useCallback(() => {
             const loadProfile = async () => {
                 const userId = MmkvStorage.getString('userId');
-                if(userId){
+                if (userId) {
                     setUserId(userId);
                 }
 
@@ -130,12 +130,13 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
                         <View>
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <MaterialCommunityIcons name="cake-variant-outline" size={16} color={'black'} />
-                                <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginStart: 5 }}>{dateOfBirth.toLocaleDateString('en-US', {
-                                    weekday: 'long',
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                })}</Text>
+                                <Text style={{ color: 'black', fontFamily: 'Roboto-Medium', marginStart: 5 }}>
+                                    {dateOfBirth.toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                    })}
+                                </Text>
                             </View>
                             <View style={{ flexDirection: "row", alignItems: "center" }}>
                                 <MaterialCommunityIcons name="gender-male" size={16} color={'black'} />

@@ -17,7 +17,7 @@ export const IndividualSearch: React.FC<IndividualSearchProps> = ({ item, naviga
     return (
         <View>
             <TouchableOpacity onPress={async () => {
-                
+                navigation.navigate('OthersProfile', { userId: item.id })
             }}>
                 <View style={{ flexDirection: 'row', width: '100%', paddingVertical: 8, paddingHorizontal: 12, alignItems: "center" }}>
                     <Image source={item.photo.photoImageURL ? { uri: item.photo.photoImageURL } : Images.sample_avatar_neutral} resizeMode="cover" style={{ aspectRatio: 1, width: 60, height: 60, borderRadius: 30 }} />

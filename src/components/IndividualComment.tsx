@@ -11,7 +11,7 @@ interface IndividualCommentProps {
 
 export const IndividualComment: React.FC<IndividualCommentProps> = ({comment, navigation, route}) => {
     return (
-        <View style={{ marginHorizontal: 10, flexDirection: "row", width: '100%', marginVertical: 8 }}>
+        <View key={comment.id} style={{ marginHorizontal: 10, flexDirection: "row", width: '100%', marginVertical: 8 }}>
             <Image source={comment.commenter.photo.photoImageURL ? {uri : comment.commenter.photo.photoImageURL} : Images.sample_avatar_neutral} resizeMode="cover" style={{ aspectRatio: 1, width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: Colors.orange }} />
             <View style={{ flexDirection: "column", marginStart: 15 }}>
                 <View style={{flexDirection: "row"}}>
