@@ -30,7 +30,7 @@ export const usePost = () => {
 
 export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
     const { getPhotoById } = usePhoto();
-    const { getIsPosterFriend, getFriendExist } = useFriend();
+    const { getFriendExist } = useFriend();
 
     const addPost = async (postTitle: string, postBody: string, datePosted: Date, userId: string, photoId: string) => {
         try {
@@ -94,12 +94,11 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
     const getNewsfeedPosts = async () => {
         try {
             const result = await axios.get(`${BASE_URL}/api/timeline/get-newsfeed-posts`);
-            const userId = MmkvStorage.getString('userId');
 
             if (result && Array.isArray(result.data) && result.data.length > 0) {
                 const updatedPosts = await Promise.all(
                     result.data.map(async (post) => {
-                        const updatedPost = { ...post, commentsCount: 0, likesCount: 0, friend: { status: '' } };
+                        const updatedPost = { ...post, commentsCount: 0, likesCount: 0, friend: {}, isLiked: false };
 
                         if (updatedPost.photo && updatedPost.photoId) {
                             updatedPost.photo.photoImageURL = getPhotoById ? await getPhotoById(post.photoId) : undefined;
@@ -119,24 +118,14 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
                         const likesCount = getPostLikesCount ? await getPostLikesCount(post.id) : 0;
                         updatedPost.likesCount = likesCount;
 
-                        if (userId) {
-                            try {
-                                // console.log("userId [" + updatedPost.poster.id + "]");
-                                // console.log("viewerId [" + userId + "]");
-                                const friendResult = getFriendExist ? await getFriendExist(updatedPost.poster.id, userId) : undefined;
-                                // console.log(friendResult);
-                                updatedPost.friend = friendResult;
+                        if (updatedPost.poster.id) {
+                            const friendResult = getIsPosterFriend ? await getIsPosterFriend(updatedPost.poster.id) : undefined;
+                            updatedPost.friend = friendResult;
+                        }
 
-                                // if (friendResult) {
-                                //     console.log(friendResult);
-                                //     // Now you can further process the array of posts
-                                // } else {
-                                //     console.error("Error fetching friend exist: Invalid or undefined result");
-                                // }
-
-                            } catch (error) {
-                                console.error("Error fetching friend exist:", error);
-                            }
+                        if (updatedPost.id) {
+                            const result = getIsPostLiked ? await getIsPostLiked(updatedPost.id) : undefined;
+                            updatedPost.isLiked = result;
                         }
 
 
@@ -173,6 +162,15 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
             return error.response;
         }
     }
+    const getIsPosterFriend = async (posterId: string) => {
+        try {
+            const result = await axios.get(`${BASE_URL}/api/friend/is-poster-friend/${posterId}`);
+            return result.data;
+        } catch (error: any) {
+            console.log('get poster friend error: ' + error);
+            return error.response;
+        }
+    }
 
     const getIsPostLiked = async (postId: string) => {
         try {
@@ -201,7 +199,7 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
             if (result && Array.isArray(result.data)) {
                 const updatedPosts = await Promise.all(
                     result.data.map(async (post) => {
-                        const updatedPost = { ...post, commentsCount: 0, likesCount: 0, friend: {} };
+                        const updatedPost = { ...post, commentsCount: 0, likesCount: 0, friend: {}, isLiked: false };
 
                         if (updatedPost.photo && updatedPost.photoId) {
                             updatedPost.photo.photoImageURL = getPhotoById ? await getPhotoById(post.photoId) : undefined;
@@ -223,9 +221,14 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
 
                         // console.log(post.poster.id);
                         // console.log(userId);
-                        if (userId) {
-                            const friend = getIsPosterFriend ? await getIsPosterFriend(post.poster.id) : {};
-                            updatedPost.friend = await friend;
+                        if (updatedPost.poster.id) {
+                            const friendResult = getIsPosterFriend ? await getIsPosterFriend(updatedPost.poster.id) : undefined;
+                            updatedPost.friend = friendResult;
+                        }
+
+                        if (updatedPost.id) {
+                            const result = getIsPostLiked ? await getIsPostLiked(updatedPost.id) : undefined;
+                            updatedPost.isLiked = result;
                         }
 
                         return updatedPost;
@@ -249,7 +252,7 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
             if (result && Array.isArray(result.data)) {
                 const updatedPosts = await Promise.all(
                     result.data.map(async (post) => {
-                        const updatedPost = { ...post, commentsCount: 0, likesCount: 0, friend: {} };
+                        const updatedPost = { ...post, commentsCount: 0, likesCount: 0, friend: {}, isLiked: false };
 
                         if (updatedPost.photo && updatedPost.photoId) {
                             updatedPost.photo.photoImageURL = getPhotoById ? await getPhotoById(post.photoId) : undefined;
@@ -269,11 +272,14 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
                         const likesCount = getPostLikesCount ? await getPostLikesCount(post.id) : 0;
                         updatedPost.likesCount = likesCount;
 
-                        // console.log(post.poster.id);
-                        // console.log(userId);
-                        if (userId) {
-                            const friend = getIsPosterFriend ? await getIsPosterFriend(post.poster.id) : {};
-                            updatedPost.friend = await friend;
+                        if (updatedPost.poster.id) {
+                            const friendResult = getIsPosterFriend ? await getIsPosterFriend(updatedPost.poster.id) : undefined;
+                            updatedPost.friend = friendResult;
+                        }
+
+                        if (updatedPost.id) {
+                            const result = getIsPostLiked ? await getIsPostLiked(updatedPost.id) : undefined;
+                            updatedPost.isLiked = result;
                         }
 
                         return updatedPost;
@@ -291,10 +297,6 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
             return error.response?.data?.result || "An unexpected error occurred";
         }
     }
-
-
-
-
 
     const contextValue: PostContextProps = {
         addPost,

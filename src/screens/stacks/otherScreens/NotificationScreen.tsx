@@ -31,11 +31,8 @@ export const NotificationScreen: React.FC<NotificationScreenProps> = ({ navigati
         try {
             const result = getAllNotifications ? await getAllNotifications() : undefined;
 
+            // console.log(result);
             if (result && Array.isArray(result)) {
-                // for (let i = 0; i < result.length; i++) {
-                //     console.log(result[i].notifier);
-                // }
-                // console.log(result[0].notifiedDate);
                 setNotifications(result);
             }
         } catch (error) {
@@ -84,7 +81,6 @@ export const NotificationScreen: React.FC<NotificationScreenProps> = ({ navigati
                         <IndividualNotification key={item.id} notification={item} getNotifications={getNotifications} navigation={navigation} route={route} />
                     )}
                     keyExtractor={(item) => item.id}
-                    // numColumns={3}
                     onScroll={handleScroll}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
                     showsVerticalScrollIndicator={false}

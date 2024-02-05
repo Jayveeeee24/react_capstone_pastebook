@@ -171,7 +171,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
             const result = getNewsfeedPosts ? await getNewsfeedPosts() : undefined;
             if (result) {
                 setPosts(result);
-                // console.log(result[0].friend);
+                // console.log(result[0].friend.result);
                 setIsLoading(false);
             }
         } catch (error: any) {

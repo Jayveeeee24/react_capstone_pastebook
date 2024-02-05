@@ -8,6 +8,7 @@ import { usePost } from "../context/PostContext";
 import { MmkvStorage } from "../utils/GlobalConfig";
 import { Colors, globalStyles } from "../utils/GlobalStyles";
 import { convertToRelativeTime } from "../utils/HelperFunctions";
+import { useFriend } from "../context/FriendContext";
 
 interface IndividualPostProps {
     post: any;
@@ -22,10 +23,10 @@ interface IndividualPostProps {
 }
 
 export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, onGetComments, setSelectedPostId, setSelectedPoster, setIsBottomSheetVisible, setIsOptionsVisible, navigation, route }) => {
-    const { getIsPostLiked, likePost } = usePost();
+    const { likePost } = usePost();
+    const { addFriend } = useFriend();
 
     const width = Dimensions.get('window').width;
-    const [isLiked, setIsLiked] = useState(false);
     const [userId, setUserId] = useState('');
 
     useEffect(() => {
@@ -34,16 +35,13 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
             setUserId(id);
         }
 
-        isPostLiked(post.id);
-    }, [post, isLiked]);
+    }, [post]);
 
     const onLikePost = async () => {
-        const userId = MmkvStorage.getString('userId');
         if (userId) {
             try {
                 const result = likePost ? await likePost(post.id, userId) : undefined;
                 if (result) {
-                    isPostLiked(post.id);
                     getPosts();
                 }
             } catch (error: any) {
@@ -52,12 +50,16 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
         }
     }
 
-    const isPostLiked = async (postId: string) => {
-        try {
-            const result = getIsPostLiked ? await getIsPostLiked(postId) : undefined;
-            setIsLiked(result);
-        } catch (error: any) {
-            console.error("Error fetching like:", error.response);
+    const onFollow = async () => {
+        if (userId) {
+            try {
+                const result = addFriend ? await addFriend(post.poster.id) : undefined;
+                if (result) {
+                    getPosts();
+                }
+            } catch (error: any) {
+                console.error("Error fetching add friend:", error.response);
+            }
         }
     }
 
@@ -92,10 +94,13 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
                         </View>
                     </TouchableOpacity>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-                        {/*  display: post.friend.isFriend ? 'none' : 'flex', */}
-                        {/* <TouchableOpacity style={{ backgroundColor: 'lightgray', borderRadius: 5, paddingHorizontal: 14, paddingVertical: 5 }}>
+
+                        <TouchableOpacity onPress={() => {
+                            onFollow();
+                        }} style={{ display: post.friend.result == "friend_not_found" ? "flex" : "none", backgroundColor: 'lightgray', borderRadius: 5, paddingHorizontal: 14, paddingVertical: 5 }}>
                             <Text style={[styles.text, { fontWeight: '500' }]}>Follow</Text>
-                        </TouchableOpacity> */}
+                        </TouchableOpacity>
+
                         <TouchableOpacity style={{ display: post.poster?.id == userId ? 'flex' : 'none' }} onPress={() => {
                             setSelectedPoster(post.poster);
                             setSelectedPostId(post.id);
@@ -118,7 +123,7 @@ export const IndividualPost: React.FC<IndividualPostProps> = ({ post, getPosts, 
                     <View style={styles.footerButtonContainer}>
                         <View style={{ flexDirection: "row", gap: 16, alignItems: "center" }}>
                             <TouchableOpacity onPress={onLikePost}>
-                                <MaterialCommunityIcons name={isLiked ? "cards-heart" : "cards-heart-outline"} size={30} color={isLiked ? Colors.danger : "black"} />
+                                <MaterialCommunityIcons name={post.isLiked ? "cards-heart" : "cards-heart-outline"} size={30} color={post.isLiked ? Colors.danger : "black"} />
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => {

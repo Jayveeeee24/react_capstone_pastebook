@@ -21,7 +21,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ navigation, route }) => 
     const { getProfile } = useUser();
     const { getPhotoById } = usePhoto();
 
-    const [dynamicTitle, setDynamicTitle] = useState("Profile Tab");
+    const [dynamicTitle, setDynamicTitle] = useState("");
 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');

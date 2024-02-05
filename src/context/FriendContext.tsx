@@ -6,7 +6,6 @@ import { usePhoto } from "./PhotoContext";
 
 interface FriendContextProps {
     getAllFriends?: (userId: string) => Promise<any>;
-    getIsPosterFriend?: (posterId: string) => Promise<any>;
     getAllFriendsByUserId?: (userId: string) => Promise<any>;
     getAllSearchUsers?: (name: string) => Promise<any>;
     getAllFriendRequest?: () => Promise<any>;
@@ -14,6 +13,7 @@ interface FriendContextProps {
     rejectFriendRequest?: (requestId: string) => Promise<any>;
     getFriendRequestsCount?: () => Promise<any>;
     getFriendExist?: (receiverId: string, senderId: string) => Promise<any>;
+    addFriend?: (receiverId: string) => Promise<any>;
 }
 
 interface FriendProviderProps {
@@ -69,16 +69,6 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
             return [];
         }
     };
-
-    const getIsPosterFriend = async (posterId: string) => {
-        try {
-            const result = await axios.get(`${BASE_URL}/api/friend/is-poster-friend/${posterId}`);
-            return result;
-        } catch (error: any) {
-            console.log('get poster friend error: ' + error);
-            return Promise.reject(error);
-        }
-    }
 
     const getAllFriendsByUserId = async (userId: string) => {
         try {
@@ -241,16 +231,25 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
         }
     }
 
+    const addFriend = async (receiverId: string) => {
+        try {
+            const response = await axios.post(`${BASE_URL}/api/friend/add-friend`, { receiverId });
+            return response.data;
+        } catch (error: any) {
+            return error.response;
+        }
+    }
+
     const contextValue: FriendContextProps = {
         getAllFriends,
-        getIsPosterFriend,
         getAllFriendsByUserId,
         getAllSearchUsers,
         getAllFriendRequest,
         acceptFriendRequest,
         rejectFriendRequest,
         getFriendRequestsCount,
-        getFriendExist
+        getFriendExist,
+        addFriend
     }
 
     return (
