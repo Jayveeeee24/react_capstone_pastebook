@@ -10,8 +10,6 @@ import { useUser } from "../../context/UserContext";
 import { usePhoto } from "../../context/PhotoContext";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { usePost } from "../../context/PostContext";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { IndividualComment } from "../../components/IndividualComment";
 import { useComment } from "../../context/CommentContext";
 import { useToast } from "react-native-toast-notifications";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -169,14 +167,14 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
     const getPosts = async () => {
         try {
             const result = getNewsfeedPosts ? await getNewsfeedPosts() : undefined;
-            if (result) {
+            if (result != undefined) {
                 setPosts(result);
                 // console.log(result[0].friend.result);
-                setIsLoading(false);
             }
         } catch (error: any) {
-            console.error("Error fetching posts:", error.response);
+            console.log("Error fetching posts:", error.response);
         }
+        setIsLoading(false);
     }
     const onGetComments = async (postId: string) => {
         try {
@@ -245,7 +243,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ navigation, route }) => {
                 </View>
             ) : posts && posts.length > 0 ? (
                 <FlatList
-                    data={posts}
+                    data={posts || []}
                     onScroll={handleScroll}
                     renderItem={({ item }) => <IndividualPost post={item} getPosts={getPosts} setSelectedPostId={setSelectedPostId} setSelectedPoster={setSelectedPoster} onGetComments={onGetComments} setIsOptionsVisible={setIsOptionsVisible} setIsBottomSheetVisible={setIsCommentBottomSheetVisible} navigation={navigation} route={route} />}
                     keyExtractor={(item) => item.id}

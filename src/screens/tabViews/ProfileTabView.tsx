@@ -15,6 +15,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Modal } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import { Colors } from '../../utils/GlobalStyles';
+import { CommentBottomSheet } from '../../components/customComponents/CommentBottomSheet';
 
 
 interface ProfileTabViewProps {
@@ -252,7 +253,7 @@ export const ProfileTabView: React.FC<ProfileTabViewProps> = ({ navigation, rout
 
 
             {/* Comment Bottom Sheet */}
-            <BottomSheet
+            {/* <BottomSheet
                 ref={commentBottomSheetRef}
                 index={isCommentBottomSheetVisible ? 0 : -1}
                 snapPoints={snapPoints}
@@ -303,7 +304,20 @@ export const ProfileTabView: React.FC<ProfileTabViewProps> = ({ navigation, rout
                         )}
                     </View>
                 </View>
-            </BottomSheet>
+            </BottomSheet> */}
+            
+            <CommentBottomSheet
+                commentBottomSheetRef={commentBottomSheetRef}
+                comments={comments}
+                getPosts={index == 0 ? getOwnPost : getOthersPost}
+                isCommentBottomSheetVisible={isCommentBottomSheetVisible}
+                navigation={navigation}
+                onGetComments={onGetComments}
+                profilePicture={profilePicture}
+                route={route}
+                selectedPostId={selectedPostId}
+                selectedPoster={selectedPoster}
+                setIsCommentBottomSheetVisible={setIsCommentBottomSheetVisible} />
 
             {/* Post Individual Bottom Sheet */}
             <BottomSheet

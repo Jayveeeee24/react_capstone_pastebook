@@ -96,11 +96,11 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                                         }
                                     } catch (error: any) {
                                         toast.show("An unexpected error occurred", { type: 'danger' });
-                                    } finally {
-                                        setIsLoading(false);
                                     }
                                 }
                             }
+                            setIsLoading(false);
+
                         }}
                         style={[styles.buttonContainer, { marginTop: 35, backgroundColor: Colors.primaryBrand }]}>
                         {isLoading ? (

@@ -21,7 +21,7 @@ interface OthersProfileScreenProps {
 export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ navigation, route }) => {
     const { getProfile } = useUser();
     const { getPhotoById } = usePhoto();
-    const { getFriendExist } = useFriend();
+    const { getFriendExist, addFriend, removeFriend, rejectFriendRequest, acceptFriendRequest } = useFriend();
 
     const [dynamicTitle, setDynamicTitle] = useState("");
 
@@ -39,48 +39,15 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
     const [postCount, setPostCount] = useState(0);
     const [friendCount, setFriendCount] = useState(0);
     const [albumCount, setAlbumCount] = useState(0);
-    const [userId, setUserId] = useState('');
-    const [viewerId, setViewerId] = useState('');
+    const [receiverId, setReceiverId] = useState('');
+    const [senderId, setSenderId] = useState('');
 
+    //useEffects
     useEffect(() => {
         loadProfile();
         loadIsFriend();
 
-    }, [userId, viewerId, getProfile, setFirstName, setLastName, setBio, setPhoneNumber, setGender, setDateOfBirth, setDynamicTitle, navigation])
-
-    const loadProfile = async () => {
-        const id = MmkvStorage.getString('userId');
-        if (id) {
-            setViewerId(id);
-        }
-        if (route.params?.userId) {
-
-            setUserId(route.params.userId);
-
-            const result = getProfile ? await getProfile(route.params.userId) : undefined;
-            if (result.id) {
-                setFirstName(result.firstName);
-                setLastName(result.lastName);
-                setBio(result.aboutMe ? result.aboutMe : '');
-                setPhoneNumber(result.phoneNumber);
-                setGender(result.sex);
-                setDateOfBirth(new Date(result.birthDate));
-                setFriendCount(result.friendCount);
-                setAlbumCount(result.albumCount);
-                setPostCount(result.postCount);
-                setDynamicTitle(`${result.firstName.toLowerCase().replace(/\s/g, '')}.${result.lastName.toLowerCase()}`);
-
-                // console.log(result.photo)
-                const pictureResult = getPhotoById ? await getPhotoById(result.photo.id) : undefined;
-
-                if (pictureResult) {
-                    setProfilePicture(pictureResult);
-                }
-
-            }
-        }
-    }
-
+    }, [friendStatus, receiverId, senderId, getProfile, setFirstName, setLastName, setBio, setPhoneNumber, setGender, setDateOfBirth, setDynamicTitle, navigation])
     useEffect(() => {
         navigation.setOptions({
             headerLeft: () => (
@@ -112,9 +79,79 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
     }, [dynamicTitle, navigation]);
 
 
+    //api functions
+    const loadProfile = async () => {
+        const id = MmkvStorage.getString('userId');
+        if (id) {
+            setSenderId(id);
+        }
+        if (route.params?.userId) {
+
+            setReceiverId(route.params.userId);
+
+            const result = getProfile ? await getProfile(route.params.userId) : undefined;
+            if (result.id) {
+                setFirstName(result.firstName);
+                setLastName(result.lastName);
+                setBio(result.aboutMe ? result.aboutMe : '');
+                setPhoneNumber(result.phoneNumber);
+                setGender(result.sex);
+                setDateOfBirth(new Date(result.birthDate));
+                setFriendCount(result.friendCount);
+                setAlbumCount(result.albumCount);
+                setPostCount(result.postCount);
+                setDynamicTitle(`${result.firstName.toLowerCase().replace(/\s/g, '')}.${result.lastName.toLowerCase()}`);
+
+                // console.log(result.photo)
+                const pictureResult = getPhotoById ? await getPhotoById(result.photo.id) : undefined;
+
+                if (pictureResult) {
+                    setProfilePicture(pictureResult);
+                }
+
+            }
+        }
+    }
+    const handleFriend = async () => {
+        if (friendStatus == "not_friend") {
+            const result = addFriend ? await addFriend(receiverId) : undefined;
+
+            if (result.result == "friend_request_successfully") {
+                console.log(result);
+                setFriendStatus("friend");
+            }
+        } else if (friendStatus == "friend") {
+            const result = removeFriend ? await removeFriend(receiverId) : undefined;
+
+            if (result.result == "friend_removed") {
+                console.log(result);
+                setFriendStatus("friend");
+            }
+        } else if (friendStatus == "i_requested") {
+            // console.log(friendId)
+            const result = rejectFriendRequest ? await rejectFriendRequest(friendId) : undefined;
+
+            if (result.result == "friend_request_rejected") {
+                console.log(result);
+                setFriendStatus("not_friend");
+            }
+        } else if (friendStatus == "they_requested") {
+            const result = acceptFriendRequest ? await acceptFriendRequest(friendId) : undefined;
+
+            if (result.result == "friend_request_accepted") {
+                console.log(result);
+                setFriendStatus("friend");
+            }
+        }
+
+
+    }
+
+
+
     const loadIsFriend = async () => {
         try {
-            const result = getFriendExist ? await getFriendExist(userId, viewerId) : undefined;
+            const result = getFriendExist ? await getFriendExist(receiverId, senderId) : undefined;
             // axios.interceptors.request.use(request => {
             //     console.log('Starting Request', request);
             //     return request;
@@ -126,7 +163,7 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
                 setFriendId(result.id);
             } else if (!result.isFriend) {
                 setFriendId(result.id);
-                if (result.senderId === viewerId) {
+                if (result.senderId === senderId) {
                     setFriendStatus('i_requested');
                 } else {
                     setFriendStatus('they_requested');
@@ -207,7 +244,7 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
                     {friendStatus !== 'loading' && (
                         <TouchableOpacity
                             onPress={() => {
-                                console.log(friendId);
+                                handleFriend();
                             }}
                             style={{
                                 backgroundColor: friendStatus == "not_friend" ? Colors.success : friendStatus == "friend" ? Colors.danger : friendStatus == "i_requested" ? Colors.danger : friendStatus == "they_requested" ? Colors.success : "",
@@ -225,7 +262,7 @@ export const OthersProfileScreen: React.FC<OthersProfileScreenProps> = ({ naviga
 
                 </View>
                 <View style={{ flex: 1 }}>
-                    <ProfileTabView navigation={navigation} route={route} userId={userId} />
+                    <ProfileTabView navigation={navigation} route={route} userId={receiverId} />
                 </View>
             </View>
         </SafeAreaView>

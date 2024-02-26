@@ -93,11 +93,7 @@ export const NotificationScreen: React.FC<NotificationScreenProps> = ({ navigati
                                 <MaterialCommunityIcons name="notification-clear-all" size={25} color={'black'} />
                                 <Text style={{ color: 'black', marginStart: 5 }}>Clear all</Text>
                             </TouchableOpacity>
-                            {/* <Text style={{ marginHorizontal: 10, marginVertical: 13, fontSize: 18, color: 'black', fontFamily: 'Roboto-Medium' }}>Yesterday</Text>
-                    <IndividualNotification />
-                    <Text style={{ marginHorizontal: 10, marginVertical: 13, fontSize: 18, color: 'black', fontFamily: 'Roboto-Medium' }}>Last 7 days</Text>
-                    <IndividualNotification />
-                    */}
+                            
                         </View>
                     )}
                 />

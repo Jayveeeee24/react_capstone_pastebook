@@ -14,6 +14,7 @@ interface FriendContextProps {
     getFriendRequestsCount?: () => Promise<any>;
     getFriendExist?: (receiverId: string, senderId: string) => Promise<any>;
     addFriend?: (receiverId: string) => Promise<any>;
+    removeFriend?: (removeFriendId: string) => Promise<any>;
 }
 
 interface FriendProviderProps {
@@ -239,6 +240,14 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
             return error.response;
         }
     }
+    const removeFriend = async (removeFriendId: string) => {
+        try {
+            const response = await axios.delete(`${BASE_URL}/api/friend/remove-friend/${removeFriendId}`);
+            return response.data;
+        } catch (error: any) {
+            return error.response;
+        }
+    }
 
     const contextValue: FriendContextProps = {
         getAllFriends,
@@ -249,7 +258,8 @@ export const FriendProvider: React.FC<FriendProviderProps> = ({ children }) => {
         rejectFriendRequest,
         getFriendRequestsCount,
         getFriendExist,
-        addFriend
+        addFriend,
+        removeFriend
     }
 
     return (

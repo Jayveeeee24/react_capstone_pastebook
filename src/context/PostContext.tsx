@@ -30,7 +30,6 @@ export const usePost = () => {
 
 export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
     const { getPhotoById } = usePhoto();
-    const { getFriendExist } = useFriend();
 
     const addPost = async (postTitle: string, postBody: string, datePosted: Date, userId: string, photoId: string) => {
         try {
@@ -222,13 +221,11 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
                         // console.log(post.poster.id);
                         // console.log(userId);
                         if (updatedPost.poster.id) {
-                            const friendResult = getIsPosterFriend ? await getIsPosterFriend(updatedPost.poster.id) : undefined;
-                            updatedPost.friend = friendResult;
+                            updatedPost.friend = getIsPosterFriend ? await getIsPosterFriend(updatedPost.poster.id) : undefined;
                         }
 
                         if (updatedPost.id) {
-                            const result = getIsPostLiked ? await getIsPostLiked(updatedPost.id) : undefined;
-                            updatedPost.isLiked = result;
+                            updatedPost.isLiked = getIsPostLiked ? await getIsPostLiked(updatedPost.id) : undefined;;
                         }
 
                         return updatedPost;
@@ -291,8 +288,6 @@ export const PostProvider: React.FC<PostProviderProps> = ({ children }) => {
                 console.error("Invalid data format received from the server");
                 return result.data;
             }
-
-            return result.data;
         } catch (error: any) {
             return error.response?.data?.result || "An unexpected error occurred";
         }
